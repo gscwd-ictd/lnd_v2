@@ -11,6 +11,8 @@ import { SendTrainingNoticeModal } from "../training-notice-modal/send/SendTrain
 import { ViewNomineeStatusModal } from "../training-notice-modal/nominee-status/ViewNomineeStatusModal";
 import { ConfirmCompleteTrainingModal } from "../training-notice-modal/send/ConfirmCompleteTrainingModal";
 import { SendConfirmationTrainingModal } from "../training-notice-modal/send/SendConfirmationTrainingModal";
+import { SubmitToPdcSecModal } from "../training-notice-modal/submit-to-pdc-sec/SubmitToPdcSecModal";
+import { ViewTrainingNoticeModal } from "../training-notice-modal/view/ViewTrainingNoticeModal";
 
 type TrainingNoticeState = {
   id: string;
@@ -26,6 +28,10 @@ type TrainingNoticeState = {
   setConfirmCompleteModalIsOpen: Dispatch<SetStateAction<boolean>>;
   sendConfirmationModalIsOpen: boolean;
   setSendConfirmationModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  submitToPdcSecModalIsOpen: boolean;
+  setSubmitToPdcSecModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  viewTrainingNoticeModalIsOpen: boolean;
+  setViewTrainingNoticeModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -40,6 +46,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     nomineeStatusIsOpen,
     confirmCompleteModalIsOpen,
     sendConfirmationModalIsOpen,
+    submitToPdcSecModalIsOpen,
+    viewTrainingNoticeModalIsOpen,
+    setViewTrainingNoticeModalIsOpen,
+    setSubmitToPdcSecModalIsOpen,
     setSendConfirmationModalIsOpen,
     setConfirmCompleteModalIsOpen,
     setEditModalIsOpen,
@@ -67,6 +77,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           removeModalIsOpen,
           sendConfirmationModalIsOpen,
           sendModalIsOpen,
+          submitToPdcSecModalIsOpen,
+          viewTrainingNoticeModalIsOpen,
+          setViewTrainingNoticeModalIsOpen,
+          setSubmitToPdcSecModalIsOpen,
           setConfirmCompleteModalIsOpen,
           setEditModalIsOpen,
           setNomineeStatusIsOpen,
@@ -81,6 +95,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <ViewNomineeStatusModal />
         <ConfirmCompleteTrainingModal />
         <SendConfirmationTrainingModal />
+        <SubmitToPdcSecModal />
+        <ViewTrainingNoticeModal />
       </TrainingNoticeContext.Provider>
     </>
   );

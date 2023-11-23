@@ -152,21 +152,6 @@ export const TrainingRecommendations = () => {
                         // max={numberOfParticipants}
                         value={Number(data.numberOfSlots) ?? 0}
                         className="w-20 border-gray-300 rounded focus:border-indigo-400"
-                        // onChange={(e) => {
-                        //   const newRecommendation = [...recommendation];
-                        //   const newTrainingDistribution = [...trainingDistribution];
-
-                        //   newRecommendation[index].numberOfSlots = Number(e.target.value);
-
-                        //   newTrainingDistribution.push({
-                        //     employeeId: newRecommendation[index].supervisor.supervisorId,
-                        //     numberOfSlots: newRecommendation[index].numberOfSlots,
-                        //   });
-
-                        //   setTrainingDistribution(newRecommendation);
-
-                        //   setRecommendation(newRecommendation);
-                        // }}
                       />
                     </div>
                   </div>

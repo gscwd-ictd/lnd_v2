@@ -21,15 +21,21 @@ export const AddRecommendations: FunctionComponent = () => {
   const setSlotDistribution = useTrainingNoticeStore((state) => state.setSlotDistribution);
   // const tag = useTrainingNoticeStore((state) => state.tag);
   const selectedTags = useTrainingNoticeStore((state) => state.selectedTags);
-  const setTrainingDistribution = useTrainingNoticeStore((state) => state.setTrainingDistribution);
-  const trainingDistribution = useTrainingNoticeStore((state) => state.trainingDistribution);
   const action = useTrainingNoticeModalStore((state) => state.action);
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
 
   useEffect(() => {
     if (!hasFetchedRecommendations && !isEmpty(selectedTags)) {
+      const selectedTagIds = selectedTags.map((tag) => {
+        return tag.id;
+      });
+
       const getRecommendedEmployees = async () => {
-        const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
+        // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
+        const result = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+
+        console.log(result);
+
         result.data.map((slot: Recommendation) => {
           slot.numberOfSlots = 0;
           return slot;

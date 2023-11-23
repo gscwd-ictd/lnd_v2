@@ -3,7 +3,7 @@
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { FunctionComponent, useContext, useEffect } from "react";
-import { SendTrainingNoticeSummary } from "./SendTrainingNoticeSummary";
+import { SendTrainingNoticeSummary } from "../send/SendTrainingNoticeSummary";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
@@ -13,7 +13,7 @@ import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingT
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
-export const SendTrainingNoticeModal: FunctionComponent = () => {
+export const ViewTrainingNoticeModal: FunctionComponent = () => {
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -47,13 +47,12 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
   const location = useTrainingNoticeStore((state) => state.location);
   const bucketFiles = useTrainingNoticeStore((state) => state.bucketFiles);
-  const { id, sendModalIsOpen, setSendModalIsOpen, setConfirmCompleteModalIsOpen, confirmCompleteModalIsOpen } =
-    useContext(TrainingNoticeContext);
+  const { id, viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
     queryKey: ["training-details-sending", trainingNoticeId],
-    enabled: !!trainingNoticeId && sendModalIsOpen !== false,
+    enabled: !!trainingNoticeId && viewTrainingNoticeModalIsOpen !== false,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -114,7 +113,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
     if (isEmpty(trainingNoticeId) && !isEmpty(id)) {
       setTrainingNoticeId(id);
     }
-  }, [id, trainingNoticeId, sendModalIsOpen]);
+  }, [id, trainingNoticeId, viewTrainingNoticeModalIsOpen]);
 
   useEffect(() => {
     if (selectedTrainingSource.name === "Internal") {
@@ -166,8 +165,8 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
   return (
     <>
       <Modal
-        isOpen={sendModalIsOpen}
-        setIsOpen={setSendModalIsOpen}
+        isOpen={viewTrainingNoticeModalIsOpen}
+        setIsOpen={setViewTrainingNoticeModalIsOpen}
         size="3md"
         animate={false}
         isStatic
@@ -201,20 +200,12 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
                   size="small"
                   variant="white"
                   onClick={() => {
-                    setSendModalIsOpen(false);
+                    setViewTrainingNoticeModalIsOpen(false);
                     setSelectedTrainingType(undefined);
                     reset();
                   }}
                 >
                   Close
-                </Button>
-                <Button
-                  size="small"
-                  type="button"
-                  disabled={!isComplete}
-                  onClick={() => setConfirmCompleteModalIsOpen(true)}
-                >
-                  Confirm & Send
                 </Button>
               </div>
             </div>

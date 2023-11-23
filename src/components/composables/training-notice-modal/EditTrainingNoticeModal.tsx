@@ -159,7 +159,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         location,
         slotDistribution: slotDistribution.map((slot) => {
           slot.employees.map((employee) => {
-            return { employeeId: employee.employeeId };
+            return { id: employee.id };
           });
           return slot;
         }),
@@ -216,7 +216,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         location,
         slotDistribution: slotDistribution.map((slot) => {
           slot.employees.map((employee) => {
-            return { employeeId: employee.employeeId };
+            return { id: employee.id };
           });
           return slot;
         }),
@@ -247,10 +247,14 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           console.log(data);
           setCourseContent(data.courseContent);
           setTrainingRequirements(data.trainingRequirements);
-          if (data.trainingSource === "Internal") {
-            setSelectedTrainingSource({ name: "Internal" });
+          if (data.source.name === "Internal") {
+            setSelectedTrainingSource({ id: data.source.id, name: "Internal" });
             //setSelectedTrainingSource(data.trainingSource); //TODO Uncomment this and remove line 262 code
-            setSelectedTrainingDesign({ courseTitle: data.courseTitle, id: data.trainingDesign });
+            setSelectedTrainingDesign({
+              courseTitle: data.trainingDesign.courseTitle,
+              id: data.trainingDesign.id,
+            });
+
             setSlotDistribution(data.slotDistribution);
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
@@ -264,7 +268,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
             setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
-
+            // setCourseTitle(data.)
             setInitialTrainingDocuments([
               { document: "Pre-test", isSelected: false },
               { document: "Course Materials", isSelected: false },
@@ -277,8 +281,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
 
           // EXTERNAL
           else if (data.trainingSource === "External") {
-            setSelectedTrainingSource({ name: "External" });
-            //setSelectedTrainingSource(data.trainingSource); //TODO Uncomment this and remove line 289 code
+            setSelectedTrainingSource({ id: data.source.id, name: "External" });
             assignBucketFile(data.bucketFiles);
             setDeadlineForSubmission(data.deadlineForSubmission);
             setInvitationUrl!(data.invitationUrl);

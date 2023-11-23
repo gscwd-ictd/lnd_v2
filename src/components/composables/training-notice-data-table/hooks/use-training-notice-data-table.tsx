@@ -23,6 +23,8 @@ export const useTrainingNoticeDataTable = () => {
   const [nomineeStatusIsOpen, setNomineeStatusIsOpen] = useState<boolean>(false);
   const [confirmCompleteModalIsOpen, setConfirmCompleteModalIsOpen] = useState<boolean>(false);
   const [sendConfirmationModalIsOpen, setSendConfirmationModalIsOpen] = useState<boolean>(false);
+  const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
+  const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
   const setId = useTrainingNoticeStore((state) => state.setId);
@@ -144,6 +146,24 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
+              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ||
+              props.row.original.preparationStatus !== TrainingPreparationStatus.PENDING ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    setViewTrainingNoticeModalIsOpen(true);
+                    setTrainingNoticeId(props.row.original.id);
+                    e.stopPropagation();
+                  }}
+                >
+                  View
+                </button>
+              ) : null}
+
               {props.row.original.preparationStatus === TrainingPreparationStatus.PENDING ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -156,7 +176,11 @@ export const useTrainingNoticeDataTable = () => {
                   Send to Managers
                 </button>
               ) : null}
-              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ? (
+              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                   onClick={(e) => {
@@ -169,12 +193,14 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
-              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ? (
+              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                   onClick={(e) => {
                     // set modal to true
                     e.stopPropagation();
+                    setSubmitToPdcSecModalIsOpen(true);
                   }}
                 >
                   Submit to PDC Secretariat
@@ -230,6 +256,10 @@ export const useTrainingNoticeDataTable = () => {
     nomineeStatusIsOpen,
     confirmCompleteModalIsOpen,
     sendConfirmationModalIsOpen,
+    submitToPdcSecModalIsOpen,
+    viewTrainingNoticeModalIsOpen,
+    setViewTrainingNoticeModalIsOpen,
+    setSubmitToPdcSecModalIsOpen,
     setConfirmCompleteModalIsOpen,
     setSendConfirmationModalIsOpen,
     setIsComplete,

@@ -30,11 +30,6 @@ export type NomineeQualification = {
   tag: string;
 };
 
-export type TrainingDistribution = {
-  employeeId: string;
-  numberOfSlots: number;
-};
-
 export type TrainingTypesStore = {
   trainingTypes: SelectList[];
   selectedTrainingType: TrainingTypes | undefined;
@@ -199,8 +194,6 @@ export type TrainingNoticeStore = {
   setInvitationUrl: (invitationUrl: string) => void;
   numberOfParticipants: number;
   setNumberOfParticipants: (numberOfParticipants: number) => void;
-  trainingDistribution: TrainingDistribution[];
-  setTrainingDistribution: (recommendations: Recommendation[]) => void;
   recommendations: Recommendation[];
   setRecommendations: (recommendations: Recommendation[]) => void;
   slotDistribution: Recommendation[];
@@ -335,14 +328,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     setInvitationUrl: (invitationUrl) => set({ invitationUrl }),
     numberOfParticipants: 0,
     setNumberOfParticipants: (numberOfParticipants) => set({ numberOfParticipants }),
-    trainingDistribution: [],
-    setTrainingDistribution: (recommendations) => {
-      const trainingDistribution = recommendations.map((reco) => {
-        return { employeeId: reco.supervisor.supervisorId, numberOfSlots: reco.numberOfSlots };
-      });
 
-      set({ trainingDistribution });
-    },
     recommendations: [],
     setRecommendations: (recommendations) => set({ recommendations }),
 
@@ -381,7 +367,6 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         deadlineForSubmission: "",
         invitationUrl: "",
         numberOfParticipants: 0,
-        trainingDistribution: [],
         recommendations: [],
         slotDistribution: [],
         trainingDocuments: [],
