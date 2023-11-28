@@ -1,7 +1,6 @@
 import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import {
-  InitialTrainingDocuments,
-  TrainingDocument,
+  TrainingRequirement,
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
@@ -303,7 +302,7 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
         <div>
           <div className="pb-1">Training Requirements</div>
           {trainingRequirements &&
-            trainingRequirements.map((req: TrainingDocument, idx) => {
+            trainingRequirements.map((req: TrainingRequirement, idx) => {
               return (
                 <div key={idx} className="flex w-full gap-2 pl-2 gap-0s">
                   <svg

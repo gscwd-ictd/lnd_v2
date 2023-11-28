@@ -111,7 +111,6 @@ export const UploadTrainingDesign: FunctionComponent = () => {
               {bucketFiles && bucketFiles.map((file, index) => <UploadedCard key={index} file={file} />)}
             </div>
           )}
-
           <div className="flex flex-col gap-5 px-4 mt-5">
             <div className="w-full mb-2">
               <input
@@ -163,7 +162,6 @@ export const UploadTrainingDesign: FunctionComponent = () => {
               </button>
             </div>
           </div>
-
           {filesToUpload && filesToUpload.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 p-4 mx-4 mt-2 border-2 border-dashed">
               <h3 className="text-xl font-semibold text-zinc-600">No new files selected</h3>

@@ -10,7 +10,6 @@ import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/st
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
-import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
 export const ViewTrainingNoticeModal: FunctionComponent = () => {
@@ -33,20 +32,6 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
   const setSelectedTrainingDesign = useTrainingNoticeStore((state) => state.setSelectedTrainingDesign);
   const setCourseContent = useTrainingNoticeStore((state) => state.setCourseContent);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
-  const { isComplete, setIsComplete } = useTrainingNoticeDataTable();
-  const selectedTrainingSource = useTrainingNoticeStore((state) => state.selectedTrainingSource);
-  const selectedTags = useTrainingNoticeStore((state) => state.selectedTags);
-  const selectedFacilitators = useTrainingNoticeStore((state) => state.selectedFacilitators);
-  const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
-  const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
-  const numberOfHours = useTrainingNoticeStore((state) => state.numberOfHours);
-  const from = useTrainingNoticeStore((state) => state.trainingStart);
-  const to = useTrainingNoticeStore((state) => state.trainingEnd);
-  const slotDistribution = useTrainingNoticeStore((state) => state.slotDistribution);
-  const trainingRequirements = useTrainingNoticeStore((state) => state.trainingRequirements);
-  const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
-  const location = useTrainingNoticeStore((state) => state.location);
-  const bucketFiles = useTrainingNoticeStore((state) => state.bucketFiles);
   const { id, viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
@@ -69,7 +54,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
             setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
-            setSelectedTrainingType(getTrainingTypeFromString(data.trainingType));
+            setSelectedTrainingType(getTrainingTypeFromString(data.type));
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
             setSlotDistribution(data.slotDistribution);
@@ -86,7 +71,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
             setSelectedTrainingSource({ name: "External" });
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
-            setSelectedTrainingType(getTrainingTypeFromString(data.trainingType));
+            setSelectedTrainingType(getTrainingTypeFromString(data.type));
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
             setSlotDistribution(data.slotDistribution);
@@ -114,53 +99,6 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
       setTrainingNoticeId(id);
     }
   }, [id, trainingNoticeId, viewTrainingNoticeModalIsOpen]);
-
-  useEffect(() => {
-    if (selectedTrainingSource.name === "Internal") {
-      if (
-        !isEmpty(courseTitle) &&
-        !isEmpty(selectedTrainingType) &&
-        !isEmpty(selectedTags) &&
-        !isEmpty(selectedFacilitators) &&
-        numberOfParticipants > 0 &&
-        numberOfHours > 0 &&
-        !isEmpty(location) &&
-        slotDistribution.length > 0 &&
-        trainingRequirements.length > 0 &&
-        !isEmpty(from) &&
-        !isEmpty(to)
-      )
-        setIsComplete(true);
-      else setIsComplete(false);
-    } else if (selectedTrainingSource.name === "External") {
-      if (
-        !isEmpty(courseTitle) &&
-        !isEmpty(selectedTrainingType) &&
-        !isEmpty(selectedTags) &&
-        !isEmpty(selectedFacilitators) &&
-        bucketFiles.length > 0 &&
-        numberOfParticipants > 0 &&
-        numberOfHours > 0 &&
-        !isEmpty(location) &&
-        slotDistribution.length > 0 &&
-        trainingRequirements.length > 0 &&
-        !isEmpty(from) &&
-        !isEmpty(to)
-      ) {
-        setIsComplete(true);
-      } else setIsComplete(false);
-    }
-  }, [
-    bucketFiles,
-    selectedTrainingSource,
-    location,
-    selectedFacilitators,
-    numberOfParticipants,
-    numberOfHours,
-    courseTitle,
-    selectedTrainingType,
-    selectedTags,
-  ]);
 
   return (
     <>

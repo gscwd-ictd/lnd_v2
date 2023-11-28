@@ -69,12 +69,9 @@ export type RecommendedEmployee = {
   employeeId: string;
 };
 
-export type TrainingDocument = {
+export type TrainingRequirement = {
   document: string;
-};
-
-export type InitialTrainingDocuments = TrainingDocument & {
-  isSelected: boolean;
+  isSelected?: boolean;
 };
 
 // export type TrainingTag = {
@@ -82,8 +79,12 @@ export type InitialTrainingDocuments = TrainingDocument & {
 // };
 
 export type Recommendation = {
-  supervisor: { supervisorId: string; supervisorName?: string };
-  employees: { employeeId: string; employeeFullName?: string; positionTitle?: string }[];
+  supervisor: {
+    // [x: string]: string | undefined;
+    supervisorId: string;
+    name?: string;
+  };
+  employees: { employeeId: string; name?: string; positionTitle?: string }[];
   numberOfSlots: number;
 };
 
@@ -198,21 +199,23 @@ export type TrainingNoticeStore = {
   setRecommendations: (recommendations: Recommendation[]) => void;
   slotDistribution: Recommendation[];
   setSlotDistribution: (slotDistribution: Recommendation[]) => void;
-  trainingDocuments: TrainingDocument[];
-  setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => void;
+  // trainingDocuments: TrainingDocument[];
+  // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => void;
   status: string;
   setStatus: (status: string) => void;
   selectedTrainingSource: TrainingSource;
   setSelectedTrainingSource: (selectedTrainingSource: TrainingSource) => void;
-  initialTrainingDocuments: InitialTrainingDocuments[];
-  setInitialTrainingDocuments: (initialTrainingDocuments: InitialTrainingDocuments[]) => void;
+  // initialTrainingDocuments: InitialTrainingDocuments[];
+  // setInitialTrainingDocuments: (initialTrainingDocuments: InitialTrainingDocuments[]) => void;
   reset: () => void;
   hasFetchedRecommendations: boolean;
   setHasFetchedRecommendations: (hasFetchedRecommendations: boolean) => void;
   lspSource: LspSource | undefined;
   setLspSource: (lspSource: LspSource | undefined) => void;
-  trainingRequirements: [];
-  setTrainingRequirements: (trainingRequirements: []) => void;
+  trainingRequirements: TrainingRequirement[];
+  setTrainingRequirements: (trainingRequirements: TrainingRequirement[]) => void;
+  initialTrainingRequirements: TrainingRequirement[];
+  setInitialTrainingRequirements: (initialTrainingRequirements: TrainingRequirement[]) => void;
 };
 
 export const useTrainingTypesStore = create<TrainingTypesStore>((set) => ({
@@ -299,9 +302,6 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     setTrainingSource: (trainingSource) => set({ trainingSource }),
     hasFetchedRecommendations: false,
     setHasFetchedRecommendations: (hasFetchedRecommendations: boolean) => set({ hasFetchedRecommendations }),
-    initialTrainingDocuments: [],
-    setInitialTrainingDocuments: (initialTrainingDocuments: InitialTrainingDocuments[]) =>
-      set({ initialTrainingDocuments }),
     status: "",
     setStatus: (status: string) => set({ status }),
     lspDetails: "",
@@ -334,9 +334,11 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
 
     slotDistribution: [],
     setSlotDistribution: (slotDistribution: Recommendation[]) => set({ slotDistribution }),
-    trainingDocuments: [],
 
-    setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => set({ trainingDocuments }),
+    initialTrainingRequirements: [],
+    setInitialTrainingRequirements: (initialTrainingRequirements) => set({ initialTrainingRequirements }),
+
+    // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => set({ trainingDocuments }),
     reset: () =>
       set({
         hasSetTrainingRequirements: false,
@@ -350,7 +352,6 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         consumedSlots: 0,
         trainingDesign: undefined!,
         selectedTrainingDesign: undefined,
-        initialTrainingDocuments: undefined,
         selectedTrainingSource: {} as TrainingSource,
         trainingType: "",
         trainingSource: "",
@@ -369,8 +370,9 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         numberOfParticipants: 0,
         recommendations: [],
         slotDistribution: [],
-        trainingDocuments: [],
+        trainingRequirements: [],
         hasFetchedRecommendations: false,
+        initialTrainingRequirements: [],
       }),
   }))
 );

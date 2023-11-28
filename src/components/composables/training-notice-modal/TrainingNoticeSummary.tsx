@@ -1,7 +1,6 @@
 import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import {
-  InitialTrainingDocuments,
-  TrainingDocument,
+  TrainingRequirement,
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
@@ -26,7 +25,7 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
     slotDistribution,
     deadline,
     filesToUpload,
-    trainingDocuments,
+    trainingRequirements,
   } = useTrainingNoticeStore((state) => ({
     selectedTrainingDesign: state.selectedTrainingDesign,
     bucketFiles: state.bucketFiles,
@@ -42,7 +41,7 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
     location: state.location,
     slotDistribution: state.slotDistribution,
     deadline: state.deadlineForSubmission,
-    trainingDocuments: state.trainingDocuments,
+    trainingRequirements: state.trainingRequirements,
   }));
 
   return (
@@ -255,7 +254,7 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
                       />
                     </svg>
 
-                    {slot.supervisor.supervisorName}
+                    {slot.supervisor.name}
                   </div>
 
                   {slot.numberOfSlots > 0 ? (
@@ -302,8 +301,8 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
 
         <div>
           <div className="pb-1">Training Requirements</div>
-          {trainingDocuments &&
-            trainingDocuments.map((req: TrainingDocument, idx) => {
+          {trainingRequirements &&
+            trainingRequirements.map((req: TrainingRequirement, idx) => {
               return (
                 <div key={idx} className="flex w-full gap-2 pl-2 gap-0s">
                   <svg

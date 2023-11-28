@@ -51,7 +51,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const page = useTrainingNoticeModalStore((state) => state.page);
   const facilitator = useTrainingNoticeStore((state) => state.facilitator);
-  const trainingDesign = useTrainingNoticeStore((state) => state.trainingDesign);
+  const selectedTrainingDesign = useTrainingNoticeStore((state) => state.selectedTrainingDesign);
   const training = useTrainingNoticeStore();
   const modalIsOpen = useTrainingNoticeModalStore((state) => state.modalIsOpen);
   const setModalIsOpen = useTrainingNoticeModalStore((state) => state.setModalIsOpen);
@@ -70,7 +70,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const resetModal = useTrainingNoticeModalStore((state) => state.resetModal);
   const setTrainingSource = useTrainingNoticeStore((state) => state.setTrainingSource);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
-  const setInitialTrainingDocuments = useTrainingNoticeStore((state) => state.setInitialTrainingDocuments);
+  const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
   const setLspSource = useLspSourceStore((state) => state.setLspSource);
   const setSelectedFacilitator = useTrainingNoticeStore((state) => state.setSelectedFacilitator);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
@@ -104,7 +104,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         courseContent,
         numberOfParticipants,
         slotDistribution,
-        trainingDocuments,
+        trainingRequirements,
       } = training;
 
       let tempIds: Array<string> = [];
@@ -118,39 +118,26 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       );
       setBucketStrings(tempIds);
 
-      console.log({
-        trainingSource,
-        trainingType: selectedTrainingType,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        // trainingDesign: trainingDesign?.id,
-        courseTitle,
-        location,
-        slotDistribution,
-        trainingStart: new Date(training.trainingStart).toISOString(),
-        trainingEnd: new Date(training.trainingEnd).toISOString(),
-        numberOfHours,
-        courseContent,
-        deadlineForSubmission: new Date(training.trainingStart).toISOString(),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
-        }),
-        bucketFiles: tempIds,
-        trainingRequirements: trainingDocuments,
-      });
-
       const response = await axios.post(`${url}/training-details/external`, {
-        trainingSource,
-        trainingType: selectedTrainingType,
+        source: { id: selectedTrainingSource.id },
+        type: selectedTrainingType,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id };
         }),
         // trainingDesign: trainingDesign?.id,
         courseTitle,
         location,
-        slotDistribution,
+        slotDistribution: slotDistribution.map((slot) => {
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
+          });
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
+        }),
         trainingStart: new Date(training.trainingStart).toISOString(),
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
@@ -158,10 +145,10 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         deadlineForSubmission: new Date(training.trainingStart).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
         bucketFiles: tempIds,
-        trainingRequirements: trainingDocuments,
+        trainingRequirements,
       });
 
       return response.data;
@@ -184,57 +171,45 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
     onError: (error) => setToastOptions("danger", "Error", `There is a problem with the request: ${error}`),
     mutationFn: async () => {
       const {
-        trainingSource,
+        selectedTrainingSource,
         location,
         numberOfHours,
         courseContent,
         numberOfParticipants,
         slotDistribution,
-        trainingDocuments,
+        trainingRequirements,
       } = training;
 
-      console.log({
-        trainingSource,
-        trainingDesign: trainingDesign?.id,
-        trainingType: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
-        }),
-        location,
-        slotDistribution,
-        trainingStart: new Date(training.trainingStart).toISOString(),
-        trainingEnd: new Date(training.trainingEnd).toISOString(),
-        numberOfHours,
-        deadlineForSubmission: new Date(training.trainingStart).toISOString(),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
-        }),
-
-        trainingRequirements: trainingDocuments,
-      });
-
       const response = await axios.post(`${url}/training-details/internal`, {
-        trainingSource,
-        trainingDesign: trainingDesign?.id,
-        trainingType: selectedTrainingType,
+        source: { id: selectedTrainingSource.id },
+        trainingDesign: { id: selectedTrainingDesign.id },
+        type: selectedTrainingType,
         courseContent,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
         }),
         location,
-        slotDistribution,
+        slotDistribution: slotDistribution.map((slot) => {
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
+          });
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
+        }),
         trainingStart: new Date(training.trainingStart).toISOString(),
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
         // deadlineForSubmission: new Date(training.trainingStart).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
 
-        trainingRequirements: trainingDocuments,
+        trainingRequirements,
       });
 
       return response.data;
@@ -381,7 +356,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
                             onClick={() => {
                               setTrainingSource(trainingSource.id!);
                               setSelectedTrainingSource(trainingSource);
-                              setInitialTrainingDocuments([
+                              setInitialTrainingRequirements([
                                 { document: "Pre-test", isSelected: false },
                                 { document: "Course Materials", isSelected: false },
                                 { document: "Post Training Report", isSelected: false },

@@ -25,6 +25,7 @@ export const useTrainingNoticeDataTable = () => {
   const [sendConfirmationModalIsOpen, setSendConfirmationModalIsOpen] = useState<boolean>(false);
   const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
+  const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
   const setId = useTrainingNoticeStore((state) => state.setId);
@@ -32,7 +33,7 @@ export const useTrainingNoticeDataTable = () => {
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setLspSource = useLspSourceStore((state) => state.setLspSource);
   const setHasFetchedRecommendations = useTrainingNoticeStore((state) => state.setHasFetchedRecommendations);
-  const setInitialTrainingDocuments = useTrainingNoticeStore((state) => state.setInitialTrainingDocuments);
+  const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
 
   const columns = [
     helper.accessor("courseTitle", {
@@ -105,7 +106,7 @@ export const useTrainingNoticeDataTable = () => {
 
     helper.accessor("preparationStatus", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => GetTrainingStatus(info.getValue()),
     }),
 
     helper.accessor("id", {
@@ -132,7 +133,7 @@ export const useTrainingNoticeDataTable = () => {
                     if (props.row.original.source === "External") {
                       setLspSource(LspSource.EXTERNAL);
                     }
-                    setInitialTrainingDocuments([
+                    setInitialTrainingRequirements([
                       { document: "Pre-test", isSelected: false },
                       { document: "Course Materials", isSelected: false },
                       { document: "Post Training Report", isSelected: false },
@@ -207,6 +208,31 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
+              {/* {props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL && (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    // set modal to true
+                    e.stopPropagation();
+                    setViewDocumentsModalIsOpen(true);
+                  }}
+                >
+                  View Documents
+                </button>
+              )} */}
+
+              <button
+                className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                onClick={(e) => {
+                  // set modal to true
+                  e.stopPropagation();
+                  setTrainingNoticeId(props.row.original.id);
+                  setViewDocumentsModalIsOpen(true);
+                }}
+              >
+                Batching & Documents
+              </button>
+
               {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
                 <Tooltip content="Generate document" withArrow>
                   <button
@@ -258,6 +284,8 @@ export const useTrainingNoticeDataTable = () => {
     sendConfirmationModalIsOpen,
     submitToPdcSecModalIsOpen,
     viewTrainingNoticeModalIsOpen,
+    viewDocumentsModalIsOpen,
+    setViewDocumentsModalIsOpen,
     setViewTrainingNoticeModalIsOpen,
     setSubmitToPdcSecModalIsOpen,
     setConfirmCompleteModalIsOpen,
@@ -269,4 +297,43 @@ export const useTrainingNoticeDataTable = () => {
     setEditModalIsOpen,
     setNomineeStatusIsOpen,
   };
+};
+
+export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
+  if (status === TrainingPreparationStatus.PENDING)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
+        Pending
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.ON_GOING_NOMINATION)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem]  border font-semibold rounded text-red-700 bg-red-100 border-red-200">
+        Ongoing Nomination
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.NOMINATION_DONE)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-orange-700 bg-orange-300 border-orange-200">
+        Nomination Done
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.PDC_APPROVAL)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-blue-700 bg-blue-300 border-blue-200">
+        PDC Approval
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.GM_APPROVAL)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-gray-700 bg-gray-300 border-gray-200">
+        PDC Approval
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.DONE)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-green-700 bg-green-300 border-green-200">
+        Done
+      </div>
+    );
 };

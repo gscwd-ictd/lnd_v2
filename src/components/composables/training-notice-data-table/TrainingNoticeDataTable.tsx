@@ -13,6 +13,7 @@ import { ConfirmCompleteTrainingModal } from "../training-notice-modal/send/Conf
 import { SendConfirmationTrainingModal } from "../training-notice-modal/send/SendConfirmationTrainingModal";
 import { SubmitToPdcSecModal } from "../training-notice-modal/submit-to-pdc-sec/SubmitToPdcSecModal";
 import { ViewTrainingNoticeModal } from "../training-notice-modal/view/ViewTrainingNoticeModal";
+import { BatchModal } from "../training-notice-modal/batch/BatchModal";
 
 type TrainingNoticeState = {
   id: string;
@@ -32,6 +33,8 @@ type TrainingNoticeState = {
   setSubmitToPdcSecModalIsOpen: Dispatch<SetStateAction<boolean>>;
   viewTrainingNoticeModalIsOpen: boolean;
   setViewTrainingNoticeModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  viewDocumentsModalIsOpen: boolean;
+  setViewDocumentsModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -48,6 +51,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     sendConfirmationModalIsOpen,
     submitToPdcSecModalIsOpen,
     viewTrainingNoticeModalIsOpen,
+    viewDocumentsModalIsOpen,
+    setViewDocumentsModalIsOpen,
     setViewTrainingNoticeModalIsOpen,
     setSubmitToPdcSecModalIsOpen,
     setSendConfirmationModalIsOpen,
@@ -79,6 +84,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           sendModalIsOpen,
           submitToPdcSecModalIsOpen,
           viewTrainingNoticeModalIsOpen,
+          viewDocumentsModalIsOpen,
+          setViewDocumentsModalIsOpen,
           setViewTrainingNoticeModalIsOpen,
           setSubmitToPdcSecModalIsOpen,
           setConfirmCompleteModalIsOpen,
@@ -97,6 +104,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <SendConfirmationTrainingModal />
         <SubmitToPdcSecModal />
         <ViewTrainingNoticeModal />
+        <BatchModal />
       </TrainingNoticeContext.Provider>
     </>
   );

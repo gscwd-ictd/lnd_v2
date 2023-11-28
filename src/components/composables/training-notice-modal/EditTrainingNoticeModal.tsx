@@ -52,7 +52,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     bucketFiles,
     filesToUpload,
     selectedTags,
-    initialTrainingDocuments,
+    initialTrainingRequirements,
     trainingRequirements,
     setBucketFiles,
     reset,
@@ -69,7 +69,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setDeadlineForSubmission,
     setSelectedTrainingDesign,
     setSelectedTrainingSource,
-    setInitialTrainingDocuments,
+    setInitialTrainingRequirements,
     setSelectedFacilitators,
     setSlotDistribution,
     setSelectedTags,
@@ -138,41 +138,45 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     onError: (error) => setToastOptions("danger", "Error", `There is a problem with the request: ${error}`),
     mutationFn: async () => {
       const {
-        trainingSource,
         location,
         numberOfHours,
         courseContent,
         numberOfParticipants,
         slotDistribution,
-        trainingDocuments,
-        trainingDesign,
+        trainingRequirements,
+        selectedTrainingDesign,
       } = training;
 
       const response = await axios.put(`${url}/training-details/internal`, {
-        trainingSource,
-        trainingDesign: trainingDesign?.id,
-        trainingType: selectedTrainingType,
+        id: trainingNoticeId,
+        source: { id: selectedTrainingSource.id },
+        trainingDesign: { id: selectedTrainingDesign.id },
+        type: selectedTrainingType,
         courseContent,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
         }),
         location,
         slotDistribution: slotDistribution.map((slot) => {
-          slot.employees.map((employee) => {
-            return { id: employee.id };
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
           });
-          return slot;
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
         }),
         trainingStart: new Date(training.trainingStart).toISOString(),
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
-        deadlineForSubmission: new Date(training.deadlineForSubmission).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
 
-        trainingRequirements: trainingDocuments,
+        trainingRequirements,
       });
 
       return response.data;
@@ -194,42 +198,80 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     onError: (error) => setToastOptions("danger", "Error", `There is a problem with the request: ${error}`),
     mutationFn: async () => {
       const {
-        trainingSource,
         location,
         numberOfHours,
         courseContent,
         numberOfParticipants,
         slotDistribution,
-        trainingDocuments,
-        trainingDesign,
+        trainingRequirements,
+        initialTrainingRequirements,
       } = training;
 
+      console.log(
+        {
+          id: trainingNoticeId,
+          source: { id: selectedTrainingSource.id },
+          courseTitle,
+          type: selectedTrainingType,
+          courseContent,
+          trainingLspDetails: selectedFacilitators.map((faci) => {
+            return { id: faci.id };
+          }),
+          location,
+          slotDistribution: slotDistribution.map((slot) => {
+            const employees = slot.employees.map((emp) => {
+              return { employeeId: emp.employeeId };
+            });
+
+            return {
+              supervisor: { supervisorId: slot.supervisor.supervisorId },
+              numberOfSlots: slot.numberOfSlots,
+              employees,
+            };
+          }),
+          trainingStart: new Date(training.trainingStart).toISOString(),
+          trainingEnd: new Date(training.trainingEnd).toISOString(),
+          numberOfHours,
+          numberOfParticipants,
+          trainingTags: selectedTags.map((tag) => {
+            return { id: tag.id };
+          }),
+
+          trainingRequirements,
+        },
+        "HELLOASKDJASKLD"
+      );
+
       const response = await axios.put(`${url}/training-details/external`, {
-        id,
-        trainingSource,
+        id: trainingNoticeId,
+        source: { id: selectedTrainingSource.id },
         courseTitle,
-        trainingType: selectedTrainingType,
+        type: selectedTrainingType,
         courseContent,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id };
         }),
         location,
         slotDistribution: slotDistribution.map((slot) => {
-          slot.employees.map((employee) => {
-            return { id: employee.id };
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
           });
-          return slot;
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
         }),
         trainingStart: new Date(training.trainingStart).toISOString(),
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
-        deadlineForSubmission: new Date(training.trainingStart).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
 
-        trainingRequirements: trainingDocuments,
+        trainingRequirements,
       });
 
       return response.data;
@@ -269,7 +311,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
             // setCourseTitle(data.)
-            setInitialTrainingDocuments([
+            setInitialTrainingRequirements([
               { document: "Pre-test", isSelected: false },
               { document: "Course Materials", isSelected: false },
               { document: "Post Training Report", isSelected: false },
@@ -280,7 +322,8 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           }
 
           // EXTERNAL
-          else if (data.trainingSource === "External") {
+          else if (data.source.name === "External") {
+            console.log("EXTERNAL NI");
             setSelectedTrainingSource({ id: data.source.id, name: "External" });
             assignBucketFile(data.bucketFiles);
             setDeadlineForSubmission(data.deadlineForSubmission);
@@ -298,7 +341,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
 
-            setInitialTrainingDocuments([
+            setInitialTrainingRequirements([
               { document: "Pre-test", isSelected: false },
               { document: "Course Materials", isSelected: false },
               { document: "Post Training Report", isSelected: false },

@@ -87,7 +87,7 @@ export const AddRecommendations: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full px-4 py-2">
                       <div className="text-start">
-                        <span className="text-lg font-semibold text-gray-700">{data.supervisor.supervisorName}</span>
+                        <span className="text-lg font-semibold text-gray-700">{data.supervisor.name}</span>
                         <p className="text-sm text-gray-500">
                           {data.employees.length > 1 ? (
                             <span className="text-gray-500">{data.employees.length} recommended participants</span>
@@ -118,7 +118,7 @@ export const AddRecommendations: FunctionComponent = () => {
                     <ul>
                       {data.employees.map((emp, index) => (
                         <div key={index}>
-                          <li className="text-sm text-gray-700">{emp.employeeFullName}</li>
+                          <li className="text-sm text-gray-700">{emp.name}</li>
                         </div>
                       ))}
                     </ul>
