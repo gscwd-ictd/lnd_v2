@@ -133,23 +133,6 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
                 </div>
               );
             })}
-
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="px-3 py-2 text-white bg-indigo-700 rounded"
-              onClick={() => console.log(initialTrainingRequirements)}
-            >
-              LOG INITIAL
-            </button>
-            <button
-              type="button"
-              className="px-3 py-2 text-white bg-indigo-700 rounded"
-              onClick={() => console.log(trainingRequirements)}
-            >
-              LOG TR
-            </button>
-          </div>
         </div>
       </form>
     </>

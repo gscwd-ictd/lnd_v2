@@ -72,8 +72,8 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
               fill="currentColor"
             />
           </svg>
-          {filesToUpload.length}{" "}
-          {filesToUpload.length > 1
+          {filesToUpload.length + bucketFiles.length}{" "}
+          {filesToUpload.length + bucketFiles.length > 1
             ? "attached training design files"
             : filesToUpload.length === 1
             ? "attached training design file"
