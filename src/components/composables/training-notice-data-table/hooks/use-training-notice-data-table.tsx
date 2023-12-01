@@ -3,6 +3,7 @@ import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { LspSource, useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
 import {
+  Batch,
   useTrainingNoticeModalStore,
   useTrainingNoticeStore,
   useTrainingTypesStore,
@@ -26,6 +27,9 @@ export const useTrainingNoticeDataTable = () => {
   const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
+  const [selectedBatch, setSelectedBatch] = useState<Batch>({ employees: [], number: 1 });
+  const [selectedBatchModalIsOpen, setSelectedBatchModalIsOpen] = useState<boolean>(false);
+  const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [] }]);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
   const setId = useTrainingNoticeStore((state) => state.setId);
@@ -194,20 +198,6 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
-              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
-                <button
-                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                  onClick={(e) => {
-                    // set modal to true
-                    e.stopPropagation();
-                    setSubmitToPdcSecModalIsOpen(true);
-                  }}
-                >
-                  Submit to PDC Secretariat
-                </button>
-              ) : null}
-
               {/* {props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL && (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -254,6 +244,20 @@ export const useTrainingNoticeDataTable = () => {
                 </Tooltip>
               ) : null}
 
+              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    // set modal to true
+                    e.stopPropagation();
+                    setSubmitToPdcSecModalIsOpen(true);
+                  }}
+                >
+                  Submit to PDC Secretariat
+                </button>
+              ) : null}
+
               <button
                 className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                 onClick={(e) => {
@@ -285,6 +289,12 @@ export const useTrainingNoticeDataTable = () => {
     submitToPdcSecModalIsOpen,
     viewTrainingNoticeModalIsOpen,
     viewDocumentsModalIsOpen,
+    batches,
+    selectedBatch,
+    selectedBatchModalIsOpen,
+    setSelectedBatchModalIsOpen,
+    setSelectedBatch,
+    setBatches,
     setViewDocumentsModalIsOpen,
     setViewTrainingNoticeModalIsOpen,
     setSubmitToPdcSecModalIsOpen,

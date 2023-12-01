@@ -14,6 +14,8 @@ import { SendConfirmationTrainingModal } from "../training-notice-modal/send/Sen
 import { SubmitToPdcSecModal } from "../training-notice-modal/submit-to-pdc-sec/SubmitToPdcSecModal";
 import { ViewTrainingNoticeModal } from "../training-notice-modal/view/ViewTrainingNoticeModal";
 import { BatchModal } from "../training-notice-modal/batch/BatchModal";
+import { Batch } from "@lms/utilities/stores/training-notice-store";
+import { AddParticipants } from "../training-notice-modal/batch/AddParticipants";
 
 type TrainingNoticeState = {
   id: string;
@@ -35,6 +37,12 @@ type TrainingNoticeState = {
   setViewTrainingNoticeModalIsOpen: Dispatch<SetStateAction<boolean>>;
   viewDocumentsModalIsOpen: boolean;
   setViewDocumentsModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  batches: Batch[];
+  setBatches: Dispatch<SetStateAction<Batch[]>>;
+  selectedBatch: Batch;
+  setSelectedBatch: Dispatch<SetStateAction<Batch>>;
+  selectedBatchModalIsOpen: boolean;
+  setSelectedBatchModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -52,6 +60,12 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     submitToPdcSecModalIsOpen,
     viewTrainingNoticeModalIsOpen,
     viewDocumentsModalIsOpen,
+    batches,
+    selectedBatch,
+    selectedBatchModalIsOpen,
+    setSelectedBatchModalIsOpen,
+    setSelectedBatch,
+    setBatches,
     setViewDocumentsModalIsOpen,
     setViewTrainingNoticeModalIsOpen,
     setSubmitToPdcSecModalIsOpen,
@@ -85,6 +99,12 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           submitToPdcSecModalIsOpen,
           viewTrainingNoticeModalIsOpen,
           viewDocumentsModalIsOpen,
+          batches,
+          selectedBatch,
+          selectedBatchModalIsOpen,
+          setSelectedBatchModalIsOpen,
+          setSelectedBatch,
+          setBatches,
           setViewDocumentsModalIsOpen,
           setViewTrainingNoticeModalIsOpen,
           setSubmitToPdcSecModalIsOpen,
@@ -105,6 +125,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <SubmitToPdcSecModal />
         <ViewTrainingNoticeModal />
         <BatchModal />
+        <AddParticipants />
       </TrainingNoticeContext.Provider>
     </>
   );

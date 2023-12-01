@@ -3,34 +3,63 @@ import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/vi
 import { Recommendation, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
-import { EmployeeWithStatus, TrainingNomineeStatus } from "@lms/utilities/types/training";
+import { EmployeeWithStatus, EmployeeWithSupervisor, TrainingNomineeStatus } from "@lms/utilities/types/training";
 
-type SupervisorWithEmployeeStatus = Pick<Recommendation, "supervisor"> & { employees: Array<EmployeeWithStatus> };
-
-const supervisorWithEmployees: SupervisorWithEmployeeStatus[] = [
+//todo REMOVE
+const employeesWithSupervisor: EmployeeWithSupervisor[] = [
   {
-    supervisor: { supervisorId: "123", supervisorName: "Michael Gabales" },
-    employees: [
-      { employeeId: "001", employeeFullName: "Richard Vincent Narvaez", status: TrainingNomineeStatus.PENDING },
-      { employeeId: "002", employeeFullName: "Hafez Benanben Saiyou", status: TrainingNomineeStatus.PENDING },
-    ],
+    employeeId: "001",
+    name: "Richard Vincent Narvaez",
+    status: TrainingNomineeStatus.PENDING,
+    supervisor: { supervisorId: "123", name: "Michael Gabales" },
   },
   {
-    supervisor: { supervisorId: "234", supervisorName: "Ferdinand Ferrer" },
-    employees: [
-      { employeeId: "003", employeeFullName: "Jan Freigseg Lared", status: TrainingNomineeStatus.DECLINED },
-      { employeeId: "004", employeeFullName: "Xavier Dale Dabuco", status: TrainingNomineeStatus.PENDING },
-      { employeeId: "005", employeeFullName: "Paul Ryner Uchiha", status: TrainingNomineeStatus.ACCEPTED },
-    ],
+    employeeId: "002",
+    name: "Hafez Benanben Saiyou",
+    status: TrainingNomineeStatus.PENDING,
+    supervisor: { supervisorId: "123", name: "Michael Gabales" },
   },
   {
-    supervisor: { supervisorId: "345", supervisorName: "Anjo Turija" },
-    employees: [
-      { employeeId: "006", employeeFullName: "Joel Amoguis", status: TrainingNomineeStatus.DECLINED },
-      { employeeId: "007", employeeFullName: "Mark Leandre Gamutin", status: TrainingNomineeStatus.ACCEPTED },
-      { employeeId: "008", employeeFullName: "Ralph Mari Dayot", status: TrainingNomineeStatus.ACCEPTED },
-      { employeeId: "009", employeeFullName: "Louise Mae Soledad", status: TrainingNomineeStatus.PENDING },
-    ],
+    employeeId: "003",
+    name: "Jan Freigseg Lared",
+    status: TrainingNomineeStatus.DECLINED,
+    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+  },
+  {
+    employeeId: "004",
+    name: "Xavier Dale Dabuco",
+    status: TrainingNomineeStatus.PENDING,
+    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+  },
+  {
+    employeeId: "005",
+    name: "Paul Ryner Uchiha",
+    status: TrainingNomineeStatus.ACCEPTED,
+    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+  },
+  {
+    employeeId: "006",
+    name: "Joel Amoguis",
+    status: TrainingNomineeStatus.DECLINED,
+    supervisor: { supervisorId: "345", name: "Anjo Turija" },
+  },
+  {
+    employeeId: "007",
+    name: "Mark Leandre Gamutin",
+    status: TrainingNomineeStatus.ACCEPTED,
+    supervisor: { supervisorId: "345", name: "Anjo Turija" },
+  },
+  {
+    employeeId: "008",
+    name: "Ralph Mari Dayot",
+    status: TrainingNomineeStatus.ACCEPTED,
+    supervisor: { supervisorId: "345", name: "Anjo Turija" },
+  },
+  {
+    employeeId: "009",
+    name: "Louise Mae Soledad",
+    status: TrainingNomineeStatus.PENDING,
+    supervisor: { supervisorId: "345", name: "Anjo Turija" },
   },
 ];
 
@@ -44,13 +73,13 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
   const [countIsDone, setCountIsDone] = useState<boolean>(false);
 
   useEffect(() => {
-    if (supervisorWithEmployees.length > 0 && countIsDone === false) {
+    if (employeesWithSupervisor.length > 0 && countIsDone === false) {
       let tempCountEmployees = 0;
       let newAcceptedEmployees = [...acceptedEmployees];
       let newDeclinedEmployees = [...declinedEmployees];
       let newNominatedEmployees = [...nominatedEmployees];
-      supervisorWithEmployees.map((supervisor) => {
-        return supervisor.employees.map((employee) => {
+      employeesWithSupervisor
+        .map((employee) => {
           tempCountEmployees += 1;
           if (employee.status === TrainingNomineeStatus.ACCEPTED) {
             newAcceptedEmployees.push(employee);
@@ -61,15 +90,17 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
           }
 
           return employee;
-        });
-      });
+        })
+        .sort((a, b) =>
+          a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
+        );
       setAcceptedEmployees(newAcceptedEmployees);
       setDeclinedEmployees(newDeclinedEmployees);
       setNominatedEmployees(newNominatedEmployees);
       setCountEmployees(tempCountEmployees);
       setCountIsDone(true);
     }
-  }, [supervisorWithEmployees, countIsDone]);
+  }, [employeesWithSupervisor, countIsDone]);
 
   return (
     <>
@@ -150,16 +181,14 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {supervisorWithEmployees.map((supervisor) => {
-                      return supervisor.employees.map((employee) => {
-                        return (
-                          <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
-                            <td className="p-2 text-sm font-light border ">{employee.employeeFullName}</td>
-                            <td className="p-2 text-sm font-light border ">{supervisor.supervisor.supervisorName}</td>
-                            <td className="p-2 text-sm font-light border ">{BadgePill(employee.status)}</td>
-                          </tr>
-                        );
-                      });
+                    {employeesWithSupervisor.map((employee) => {
+                      return (
+                        <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
+                          <td className="p-2 text-sm font-light border ">{employee.name}</td>
+                          <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
+                          <td className="p-2 text-sm font-light border ">{BadgePill(employee.status)}</td>
+                        </tr>
+                      );
                     })}
                   </tbody>
                 </table>

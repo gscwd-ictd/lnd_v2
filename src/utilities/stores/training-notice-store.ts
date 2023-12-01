@@ -74,18 +74,24 @@ export type TrainingRequirement = {
   isSelected?: boolean;
 };
 
-// export type TrainingTag = {
-//   tag: string;
-// };
-
 export type Recommendation = {
   supervisor: {
-    // [x: string]: string | undefined;
     supervisorId: string;
     name?: string;
   };
   employees: { employeeId: string; name?: string; positionTitle?: string }[];
   numberOfSlots: number;
+};
+
+export type Batch = {
+  number: number;
+  date?: string;
+  employees: Array<{
+    employeeId: string;
+    employeeFullName: string;
+    supervisor: { supervisorId: string; name: string };
+    distributionId: string;
+  }>;
 };
 
 export type TrainingNoticeModalStore = {

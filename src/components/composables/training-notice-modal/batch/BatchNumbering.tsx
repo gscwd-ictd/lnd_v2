@@ -1,60 +1,62 @@
 import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
-import { FunctionComponent, useState } from "react";
-
-type Batch = {
-  number: number;
-  employees: { employeeId: string; employeeFullName: string }[];
-};
+import { FunctionComponent, useContext } from "react";
+import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
 export const BatchNumbering: FunctionComponent = () => {
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
-  const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [] }]);
+  const { batches, setBatches, setSelectedBatch, setSelectedBatchModalIsOpen } = useContext(TrainingNoticeContext);
+
   return (
     <>
-      <div className="flex justify-between px-5">
-        <div className="text-gray-700">Maximum number of participants: {numberOfParticipants}</div>
-        <div className="flex items-center px-5">
-          <span className="text-3xl text-indigo-600">
-            {batches.length} {batches.length > 1 ? "batches" : "batch"}
-          </span>
+      <div className="flex px-5">
+        <div>
+          <span className="text-lg font-medium text-gray-700">Total participants</span>
+        </div>
+        <div className="flex items-center justify-between w-full px-5">
           <div className="flex flex-col">
-            <button
-              onClick={() =>
-                setBatches([...batches, { number: batches[batches.length - 1].number + 1, employees: [] }])
-              }
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M17.6569 16.2427L19.0711 14.8285L12.0001 7.75739L4.92896 14.8285L6.34317 16.2427L12.0001 10.5858L17.6569 16.2427Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() => {
-                if (batches.length > 1) {
-                  const updatedBatches = [...batches];
-                  updatedBatches.splice(updatedBatches.length - 1, 1);
-                  setBatches(updatedBatches);
+            <span className="text-3xl text-indigo-600">{numberOfParticipants}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-3xl text-indigo-600">
+              {batches.length} {batches.length > 1 ? "batches" : "batch"}
+            </span>
+            <div className="flex flex-col gap-1">
+              <button
+                className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-black"
+                onClick={() =>
+                  setBatches([...batches, { number: batches[batches.length - 1].number + 1, employees: [] }])
                 }
-              }}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M6.34317 7.75732L4.92896 9.17154L12 16.2426L19.0711 9.17157L17.6569 7.75735L12 13.4142L6.34317 7.75732Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M17.6569 16.2427L19.0711 14.8285L12.0001 7.75739L4.92896 14.8285L6.34317 16.2427L12.0001 10.5858L17.6569 16.2427Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <button
+                className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-black"
+                onClick={() => {
+                  if (batches.length > 1) {
+                    const updatedBatches = [...batches];
+                    updatedBatches.splice(updatedBatches.length - 1, 1);
+                    setBatches(updatedBatches);
+                  }
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M6.34317 7.75732L4.92896 9.17154L12 16.2426L19.0711 9.17157L17.6569 7.75735L12 13.4142L6.34317 7.75732Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <select name="" id=""></select>
-      </div>
-
-      <div className="grid grid-flow-row-dense grid-cols-2 gap-2">
+      <div className="grid grid-flow-row-dense grid-cols-2 gap-2 pt-5">
         {batches.map((batch, idx) => {
           return (
             <div
@@ -82,6 +84,8 @@ export const BatchNumbering: FunctionComponent = () => {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      setSelectedBatch({ employees: batch.employees, number: idx + 1, date: batch.date! });
+                      setSelectedBatchModalIsOpen(true);
                     }}
                   >
                     <div className="flex items-center gap-2">
@@ -96,9 +100,6 @@ export const BatchNumbering: FunctionComponent = () => {
                       <span>Add</span>
                     </div>
                   </button>
-                </div>
-                <div>
-                  <table></table>
                 </div>
               </div>
             </div>

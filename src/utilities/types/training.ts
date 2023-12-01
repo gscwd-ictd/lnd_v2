@@ -1,3 +1,5 @@
+import { Recommendation } from "../stores/training-notice-store";
+
 export type TrainingSource = {
   createdAt: Date;
   updatedAt: Date;
@@ -33,9 +35,11 @@ export enum TrainingNomineeStatus {
 
 export type EmployeeWithStatus = {
   employeeId: string;
-  employeeFullName: string;
+  name: string;
   status: TrainingNomineeStatus;
 };
+
+export type EmployeeWithSupervisor = EmployeeWithStatus & Pick<Recommendation, "supervisor">;
 
 export type TrainingNotice = {
   createdAt: Date;

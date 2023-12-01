@@ -14,11 +14,10 @@ import { BatchNumbering } from "./BatchNumbering";
 export const BatchModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const reset = useTrainingNoticeStore((state) => state.reset);
-  const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
-  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen } = useContext(TrainingNoticeContext);
+  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen, setBatches } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
@@ -55,7 +54,7 @@ export const BatchModal: FunctionComponent = () => {
       <Modal
         isOpen={viewDocumentsModalIsOpen}
         setIsOpen={setViewDocumentsModalIsOpen}
-        size="lg"
+        size="3md"
         animate={false}
         isStatic
         onClose={() => {
@@ -90,6 +89,7 @@ export const BatchModal: FunctionComponent = () => {
                     setViewDocumentsModalIsOpen(false);
                     setSelectedTrainingType(undefined);
                     reset();
+                    setBatches([{ number: 1, employees: [] }]);
                   }}
                 >
                   Close
