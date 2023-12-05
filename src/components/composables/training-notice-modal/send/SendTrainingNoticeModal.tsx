@@ -70,7 +70,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
             setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
-            setSelectedTrainingType(getTrainingTypeFromString(data.trainingType));
+            setSelectedTrainingType(getTrainingTypeFromString(data.type));
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
             setSlotDistribution(data.slotDistribution);
@@ -87,7 +87,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
             setSelectedTrainingSource({ name: "External" });
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
-            setSelectedTrainingType(getTrainingTypeFromString(data.trainingType));
+            setSelectedTrainingType(getTrainingTypeFromString(data.type));
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
             setSlotDistribution(data.slotDistribution);

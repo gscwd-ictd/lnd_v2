@@ -77,7 +77,7 @@ export type TrainingRequirement = {
 export type Recommendation = {
   supervisor: {
     supervisorId: string;
-    name?: string;
+    name: string;
   };
   employees: { employeeId: string; name?: string; positionTitle?: string }[];
   numberOfSlots: number;
@@ -85,12 +85,13 @@ export type Recommendation = {
 
 export type Batch = {
   number: number;
-  date?: string;
+  date: { from: string | undefined; to?: string | undefined };
+  isOneDayTraining?: boolean;
   employees: Array<{
     employeeId: string;
-    employeeFullName: string;
+    name: string;
     supervisor: { supervisorId: string; name: string };
-    distributionId: string;
+    distributionId?: string;
   }>;
 };
 

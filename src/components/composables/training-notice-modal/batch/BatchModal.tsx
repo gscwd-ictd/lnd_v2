@@ -10,14 +10,19 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { BatchNumbering } from "./BatchNumbering";
+import dayjs from "dayjs";
 
 export const BatchModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const reset = useTrainingNoticeStore((state) => state.reset);
+  const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
+
+  const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
+  const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
-  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen, setBatches } = useContext(TrainingNoticeContext);
+  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
@@ -33,6 +38,9 @@ export const BatchModal: FunctionComponent = () => {
         if (!isEmpty(data)) {
           console.log(data);
           setNumberOfParticipants(data.numberOfParticipants);
+          setCourseTitle(data.courseTitle);
+          setTrainingStart(data.trainingStart);
+          setTrainingEnd(data.trainingEnd);
         }
 
         return data;
@@ -67,12 +75,11 @@ export const BatchModal: FunctionComponent = () => {
             <header className="pl-2">
               {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
               <div className="flex items-start gap-2">
-                <h3 className="text-lg font-semibold text-gray-600">Training Notice Recommendations</h3>
+                <h3 className="text-lg font-semibold text-gray-600">Training Notice</h3>
               </div>
-              <p className="text-sm text-gray-400">Details are as follows</p>
+              <p className="text-sm text-gray-400">Batch details</p>
             </header>
           </ModalContent.Title>
-
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               <BatchNumbering />
@@ -82,18 +89,21 @@ export const BatchModal: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
-                <Button
+                {/* <Button
                   size="small"
                   variant="white"
                   onClick={() => {
                     setViewDocumentsModalIsOpen(false);
                     setSelectedTrainingType(undefined);
                     reset();
-                    setBatches([{ number: 1, employees: [] }]);
+                    setBatches([{ number: 1, employees: [], date: { from: "", to: undefined } }]);
                   }}
                 >
                   Close
-                </Button>
+                </Button> */}
+                {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
+                  LOG
+                </button> */}
               </div>
             </div>
           </ModalContent.Footer>

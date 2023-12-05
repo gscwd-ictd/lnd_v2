@@ -36,10 +36,11 @@ export enum TrainingNomineeStatus {
 export type EmployeeWithStatus = {
   employeeId: string;
   name: string;
-  status: TrainingNomineeStatus;
+  status?: TrainingNomineeStatus;
 };
 
-export type EmployeeWithSupervisor = EmployeeWithStatus & Pick<Recommendation, "supervisor">;
+export type EmployeeWithSupervisor = EmployeeWithStatus &
+  Pick<Recommendation, "supervisor"> & { isOneDayTraining?: boolean };
 
 export type TrainingNotice = {
   createdAt: Date;

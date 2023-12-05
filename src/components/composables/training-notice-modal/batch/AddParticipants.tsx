@@ -8,6 +8,8 @@ import { EmployeeWithSupervisor, TrainingNomineeStatus } from "@lms/utilities/ty
 import { Combobox } from "@headlessui/react";
 import React from "react";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
+import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
+import { isEmpty } from "lodash";
 
 const employeesWithSupervisor: EmployeeWithSupervisor[] = [
   {
@@ -68,11 +70,28 @@ const employeesWithSupervisor: EmployeeWithSupervisor[] = [
 
 export const AddParticipants: FunctionComponent = () => {
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
-  const [employees, setEmployees] = useState<EmployeeWithSupervisor[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<EmployeeWithSupervisor[]>([]);
+  // const [employees, setEmployees] = useState<EmployeeWithSupervisor[]>([]);
   const [searchEmployee, setSearchEmployee] = useState<string>("");
-  const { id, selectedBatch, setSelectedBatch, selectedBatchModalIsOpen, setSelectedBatchModalIsOpen } =
-    useContext(TrainingNoticeContext);
+  const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
+
+  // const []
+  const {
+    id,
+    selectedBatch,
+    setSelectedBatch,
+    selectedBatchModalIsOpen,
+    employeePool,
+    setEmployeePool,
+    setSelectedBatchModalIsOpen,
+    batches,
+    setBatches,
+  } = useContext(TrainingNoticeContext);
+
+  // filtered facilitators
+  const filteredEmployees =
+    searchEmployee === ""
+      ? employeePool
+      : employeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
 
   // per training notice query
   //   useQuery({
@@ -99,14 +118,15 @@ export const AddParticipants: FunctionComponent = () => {
 
   useEffect(() => {
     //todo Replace with get route
-    setEmployees(
-      employeesWithSupervisor
-        .sort((a, b) => (a.name > b.name ? 1 : -1))
-        .sort((a, b) =>
-          a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
-        )
-    );
-    setFilteredEmployees(
+    // setEmployees(
+    //   employeesWithSupervisor
+    //     .sort((a, b) => (a.name > b.name ? 1 : -1))
+    //     .sort((a, b) =>
+    //       a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
+    //     )
+    // );
+
+    setEmployeePool(
       employeesWithSupervisor
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .sort((a, b) =>
@@ -114,6 +134,27 @@ export const AddParticipants: FunctionComponent = () => {
         )
     );
   }, []);
+
+  useEffect(() => {
+    if (selectedBatch.isOneDayTraining === true) {
+      setSelectedBatch({
+        ...selectedBatch,
+        date: { ...selectedBatch.date, to: selectedBatch.date?.from },
+      });
+    } else if (selectedBatch.isOneDayTraining === false) {
+      setSelectedBatch({ ...selectedBatch, date: { ...selectedBatch.date, to: "" } });
+    }
+  }, [selectedBatch.isOneDayTraining]);
+
+  useEffect(() => {
+    if (selectedBatchModalIsOpen === true) {
+      console.log("NAG LOAD DIRI HA", initialLoadedEmp);
+      if (batches.find((batch) => batch.number === selectedBatch.number)!.employees.length > 0) {
+        setSelectedEmployees(batches.find((batch) => batch.number === selectedBatch.number)!.employees);
+      }
+      setInitialLoadedEmp(true);
+    }
+  }, [selectedBatchModalIsOpen]);
 
   return (
     <>
@@ -125,7 +166,9 @@ export const AddParticipants: FunctionComponent = () => {
         isStatic
         onClose={() => {
           setSelectedBatchModalIsOpen(false);
-          setSelectedBatch({ employees: [], number: 1, date: "" });
+          setSelectedBatch({ employees: [], number: 1, date: { from: "", to: "" } });
+          setSelectedEmployees([]);
+          setInitialLoadedEmp(false);
         }}
       >
         <ModalContent>
@@ -134,21 +177,59 @@ export const AddParticipants: FunctionComponent = () => {
               {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.number}</h3>
-                <div>
-                  <input
-                    className="text-sm border rounded border-zinc-300"
-                    type="date"
-                    onChange={(e) =>
-                      setSelectedBatch({
-                        employees: selectedBatch.employees,
-                        number: selectedBatch.number,
-                        date: e.target.value,
-                      })
-                    }
-                  />
-                </div>
               </div>
             </header>
+            <div className="flex items-center justify-between w-full gap-2 text-xs">
+              <input
+                className="w-full text-sm border rounded border-zinc-300"
+                type="date"
+                value={selectedBatch.date?.from}
+                onChange={(e) =>
+                  setSelectedBatch({
+                    employees: selectedBatch.employees,
+                    number: selectedBatch.number,
+                    isOneDayTraining: selectedBatch.isOneDayTraining,
+                    date: {
+                      from: e.target.value,
+                      to:
+                        selectedBatch.isOneDayTraining === true
+                          ? e.target.value
+                          : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.date?.to)
+                          ? selectedBatch.date.to
+                          : "",
+                    },
+                  })
+                }
+              />
+              <input
+                className="w-full text-sm border rounded border-zinc-300"
+                type="date"
+                disabled={selectedBatch.isOneDayTraining}
+                value={selectedBatch.date?.to!}
+                onChange={(e) =>
+                  setSelectedBatch({
+                    employees: selectedBatch.employees,
+                    number: selectedBatch.number,
+                    isOneDayTraining: selectedBatch.isOneDayTraining,
+                    date: {
+                      ...selectedBatch.date,
+                      to: selectedBatch.isOneDayTraining ? selectedBatch.date.from : e.target.value,
+                    },
+                  })
+                }
+              />
+              <div className="flex items-center w-full gap-2">
+                <Checkbox
+                  id={`checkbox-same-day-training`}
+                  label="Same day training?"
+                  // disabled={isEmpty(selectedBatch.date?.from)}
+                  checked={selectedBatch.isOneDayTraining}
+                  onChange={() => {
+                    setSelectedBatch({ ...selectedBatch, isOneDayTraining: !selectedBatch.isOneDayTraining });
+                  }}
+                />
+              </div>
+            </div>
           </ModalContent.Title>
 
           <ModalContent.Body>
@@ -166,13 +247,14 @@ export const AddParticipants: FunctionComponent = () => {
                   <Combobox
                     value={selectedEmployees}
                     multiple
+                    nullable={true}
                     onChange={(value) => {
-                      const newValues = employees.filter((x) => !value.includes(x));
+                      const newValues = employeePool.filter((x) => !value.includes(x));
                       //   setSelectedEmployees(newValues);
-
+                      // setSearchEmployee("");
                       setSelectedEmployees(value);
-                      setEmployees(newValues);
-                      setFilteredEmployees(newValues);
+                      setEmployeePool(newValues);
+                      // setFilteredEmployees(newValues);
                       //   if (value[0].type === "organization" && value.length === 1) {
                       //     setSelectedFacilitators(value);
                       //     setFacilitators(newValues);
@@ -189,8 +271,9 @@ export const AddParticipants: FunctionComponent = () => {
                       as={React.Fragment}
                     >
                       <Input
-                        id="search-emp"
+                        id="search-participant"
                         autoComplete="off"
+                        onBlur={() => setSearchEmployee("")}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
@@ -205,7 +288,7 @@ export const AddParticipants: FunctionComponent = () => {
                       />
                     </Combobox.Input>
 
-                    <Combobox.Options className="absolute max-h-52 z-[80] overflow-y-auto bg-white w-full border rounded-md shadow-lg shadow-gray-100">
+                    <Combobox.Options className="absolute max-h-52 z-[80] overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
                       {filteredEmployees?.length === 0 ? (
                         <div className="flex items-center justify-center py-10">No results found</div>
                       ) : (
@@ -258,15 +341,15 @@ export const AddParticipants: FunctionComponent = () => {
                             <td className="p-2 text-sm font-light border ">
                               <div className="text-center">
                                 <button
-                                  className="text-white bg-red-500 border rounded hover:text-black hover:bg-red-200"
+                                  className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
                                   type="button"
                                   onClick={() => {
                                     const newSelectedEmployees = [...selectedEmployees];
                                     newSelectedEmployees.splice(idx, 1);
                                     setSelectedEmployees(newSelectedEmployees);
-                                    const newEmployees = [...employees];
+                                    const newEmployees = [...employeePool];
                                     newEmployees.push(employee);
-                                    setEmployees(
+                                    setEmployeePool(
                                       newEmployees
                                         .sort((a, b) => (a.name > b.name ? 1 : -1))
                                         .sort((a, b) =>
@@ -277,17 +360,17 @@ export const AddParticipants: FunctionComponent = () => {
                                             : -1
                                         )
                                     );
-                                    setFilteredEmployees(
-                                      newEmployees
-                                        .sort((a, b) => (a.name > b.name ? 1 : -1))
-                                        .sort((a, b) =>
-                                          a.supervisor.name! > b.supervisor.name!
-                                            ? 1
-                                            : a.supervisor.name! === b.supervisor.name
-                                            ? 0
-                                            : -1
-                                        )
-                                    );
+                                    // setFilteredEmployees(
+                                    //   newEmployees
+                                    //     .sort((a, b) => (a.name > b.name ? 1 : -1))
+                                    //     .sort((a, b) =>
+                                    //       a.supervisor.name! > b.supervisor.name!
+                                    //         ? 1
+                                    //         : a.supervisor.name! === b.supervisor.name
+                                    //         ? 0
+                                    //         : -1
+                                    //     )
+                                    // );
                                   }}
                                 >
                                   <svg
@@ -320,14 +403,35 @@ export const AddParticipants: FunctionComponent = () => {
               <div className="flex items-center justify-end w-full gap-2">
                 <Button
                   size="small"
+                  onClick={() => {
+                    // assign the object to the specific array (selected batch number)
+
+                    Object.assign(batches.find((batch) => batch.number === selectedBatch.number)!, {
+                      date: { from: selectedBatch.date.from, to: selectedBatch.date.to },
+                      number: selectedBatch.number,
+                      employees: selectedEmployees,
+                      isOneDayTraining: selectedBatch.isOneDayTraining,
+                    });
+
+                    setSelectedBatchModalIsOpen(false);
+                    setInitialLoadedEmp(false);
+                    setSelectedEmployees([]);
+                    setSelectedBatch({ employees: [], number: 1, date: { to: undefined, from: "" } });
+                  }}
+                >
+                  Apply
+                </Button>
+
+                {/* <Button
+                  size="small"
                   variant="white"
                   onClick={() => {
                     setSelectedBatchModalIsOpen(false);
-                    setSelectedBatch({ employees: [], number: 1, date: "" });
+                    setSelectedBatch({ employees: [], number: 1, date: { to: undefined, from: "" } });
                   }}
                 >
                   Close
-                </Button>
+                </Button> */}
               </div>
             </div>
           </ModalContent.Footer>

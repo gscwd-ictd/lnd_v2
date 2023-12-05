@@ -8,7 +8,7 @@ import {
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
-import { TrainingNotice, TrainingPreparationStatus } from "@lms/utilities/types/training";
+import { EmployeeWithSupervisor, TrainingNotice, TrainingPreparationStatus } from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -27,9 +27,10 @@ export const useTrainingNoticeDataTable = () => {
   const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
-  const [selectedBatch, setSelectedBatch] = useState<Batch>({ employees: [], number: 1 });
+  const [selectedBatch, setSelectedBatch] = useState<Batch>({ employees: [], number: 1, date: { from: "", to: "" } });
   const [selectedBatchModalIsOpen, setSelectedBatchModalIsOpen] = useState<boolean>(false);
-  const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [] }]);
+  const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [], date: { from: "", to: "" } }]);
+  const [employeePool, setEmployeePool] = useState<EmployeeWithSupervisor[]>([]);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
   const setId = useTrainingNoticeStore((state) => state.setId);
@@ -292,6 +293,8 @@ export const useTrainingNoticeDataTable = () => {
     batches,
     selectedBatch,
     selectedBatchModalIsOpen,
+    employeePool,
+    setEmployeePool,
     setSelectedBatchModalIsOpen,
     setSelectedBatch,
     setBatches,
