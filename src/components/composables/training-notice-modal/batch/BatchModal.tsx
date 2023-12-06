@@ -22,7 +22,8 @@ export const BatchModal: FunctionComponent = () => {
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
-  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen } = useContext(TrainingNoticeContext);
+  const { id, viewDocumentsModalIsOpen, batches, employeePool, setViewDocumentsModalIsOpen } =
+    useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
@@ -102,7 +103,14 @@ export const BatchModal: FunctionComponent = () => {
                   Close
                 </Button> */}
                 {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
-                  LOG
+                  Batches
+                </button>
+
+                <button
+                  className="px-3 py-2 text-white bg-indigo-500 rounded "
+                  onClick={() => console.log(employeePool)}
+                >
+                  Pool
                 </button> */}
               </div>
             </div>

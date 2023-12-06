@@ -8,7 +8,8 @@ export const BatchNumbering: FunctionComponent = () => {
   const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
   const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
-  const { batches, setBatches, setSelectedBatch, setSelectedBatchModalIsOpen } = useContext(TrainingNoticeContext);
+  const { batches, setBatches, setSelectedBatch, setSelectedBatchModalIsOpen, employeePool, setEmployeePool } =
+    useContext(TrainingNoticeContext);
 
   return (
     <>
@@ -26,19 +27,24 @@ export const BatchNumbering: FunctionComponent = () => {
           )}
         </div>
       </div>
-      <div className="flex px-5">
-        <div>
-          <span className="font-medium text-gray-700 text-md">Total participants</span>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-medium text-gray-700">Max participants</div>
+          <div className="text-3xl text-indigo-600">{numberOfParticipants}</div>
         </div>
-        <div className="flex items-center justify-between w-full px-5">
-          <div className="flex flex-col">
-            <span className="text-3xl text-indigo-600">{numberOfParticipants}</span>
-          </div>
+
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-medium text-gray-700">Available</div>
+          <div className="text-3xl text-indigo-600">{employeePool.length}</div>
+        </div>
+
+        <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="text-3xl text-indigo-600">
               {batches.length} {batches.length > 1 ? "batches" : "batch"}
             </span>
             <div className="flex flex-col gap-1">
+              {/* Arrow up */}
               <button
                 className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-700"
                 onClick={() =>
@@ -59,11 +65,35 @@ export const BatchNumbering: FunctionComponent = () => {
                   />
                 </svg>
               </button>
+
+              {/* Arrow down */}
               <button
                 className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-700"
                 onClick={() => {
                   if (batches.length > 1) {
                     const updatedBatches = [...batches];
+
+                    {
+                      /* this logic is for adding back the pool if the batch-for-removal has employees */
+                    }
+                    if (updatedBatches[updatedBatches.length - 1].employees.length > 0) {
+                      const currentEmployeePool = [...employeePool];
+                      currentEmployeePool.push(...updatedBatches[updatedBatches.length - 1].employees);
+                      currentEmployeePool
+                        .sort((a, b) => (a.name > b.name ? 1 : -1))
+                        .sort((a, b) =>
+                          a.supervisor.name! > b.supervisor.name!
+                            ? 1
+                            : a.supervisor.name! === b.supervisor.name
+                            ? 0
+                            : -1
+                        );
+
+                      setEmployeePool(currentEmployeePool);
+                    }
+
+                    // setEmployeePool([...employeePool, updatedBatches[updatedBatches.length - 1].employees]);
+
                     updatedBatches.splice(updatedBatches.length - 1, 1);
                     setBatches(updatedBatches);
                   }

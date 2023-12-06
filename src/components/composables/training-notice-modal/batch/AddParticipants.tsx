@@ -250,20 +250,9 @@ export const AddParticipants: FunctionComponent = () => {
                     nullable={true}
                     onChange={(value) => {
                       const newValues = employeePool.filter((x) => !value.includes(x));
-                      //   setSelectedEmployees(newValues);
-                      // setSearchEmployee("");
-                      setSelectedEmployees(value);
+
+                      setSelectedEmployees(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
                       setEmployeePool(newValues);
-                      // setFilteredEmployees(newValues);
-                      //   if (value[0].type === "organization" && value.length === 1) {
-                      //     setSelectedFacilitators(value);
-                      //     setFacilitators(newValues);
-                      //   } else if (value[0].type === "organization" && value.length > 1) {
-                      //     setError("facilitators", { message: "Only 1 facilitator for organization is allowed" });
-                      //   } else if (value[0].type === "individual") {
-                      //     setSelectedFacilitators(value);
-                      //     setFacilitators(newValues);
-                      //   }
                     }}
                   >
                     <Combobox.Input

@@ -221,7 +221,7 @@ export const useTrainingNoticeDataTable = () => {
                   setViewDocumentsModalIsOpen(true);
                 }}
               >
-                Batching & Documents
+                Batching
               </button>
 
               {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
