@@ -10,8 +10,10 @@ import React from "react";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { isEmpty } from "lodash";
+import dayjs from "dayjs";
+import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 
-const employeesWithSupervisor: EmployeeWithSupervisor[] = [
+export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
   {
     employeeId: "001",
     name: "Richard Vincent Narvaez",
@@ -70,21 +72,21 @@ const employeesWithSupervisor: EmployeeWithSupervisor[] = [
 
 export const AddParticipants: FunctionComponent = () => {
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
-  // const [employees, setEmployees] = useState<EmployeeWithSupervisor[]>([]);
   const [searchEmployee, setSearchEmployee] = useState<string>("");
   const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
+  const { totalSelectedEmployees, setTotalSelectedEmployees } = useContext(TrainingNoticeContext);
+  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
+  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
 
   // const []
   const {
-    id,
     selectedBatch,
-    setSelectedBatch,
     selectedBatchModalIsOpen,
     employeePool,
     setEmployeePool,
+    setSelectedBatch,
     setSelectedBatchModalIsOpen,
     batches,
-    setBatches,
   } = useContext(TrainingNoticeContext);
 
   // filtered facilitators
@@ -93,39 +95,7 @@ export const AddParticipants: FunctionComponent = () => {
       ? employeePool
       : employeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
 
-  // per training notice query
-  //   useQuery({
-  //     queryKey: ["training-details-sending", trainingNoticeId],
-  //     enabled: !!trainingNoticeId && selectedBatchModalIsOpen !== false,
-  //     staleTime: 2,
-  //     refetchOnReconnect: false,
-  //     refetchOnMount: false,
-  //     refetchOnWindowFocus: false,
-  //     queryFn: async () => {
-  //       try {
-  //         const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
-  //         if (!isEmpty(data)) {
-  //           console.log(data);
-  //           setNumberOfParticipants(data.numberOfParticipants);
-  //         }
-
-  //         return data;
-  //       } catch (error) {
-  //         return error;
-  //       }
-  //     },
-  //   });
-
   useEffect(() => {
-    //todo Replace with get route
-    // setEmployees(
-    //   employeesWithSupervisor
-    //     .sort((a, b) => (a.name > b.name ? 1 : -1))
-    //     .sort((a, b) =>
-    //       a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
-    //     )
-    // );
-
     setEmployeePool(
       employeesWithSupervisor
         .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -148,7 +118,6 @@ export const AddParticipants: FunctionComponent = () => {
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true) {
-      console.log("NAG LOAD DIRI HA", initialLoadedEmp);
       if (batches.find((batch) => batch.number === selectedBatch.number)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.number === selectedBatch.number)!.employees);
       }
@@ -175,8 +144,19 @@ export const AddParticipants: FunctionComponent = () => {
           <ModalContent.Title>
             <header className="pl-2">
               {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-5">
                 <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.number}</h3>
+              </div>
+              <div className="flex text-sm ">
+                <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
+                <span>
+                  &nbsp;
+                  {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
+                  &nbsp;
+                </span>
+                {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
+                  <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
+                )}
               </div>
             </header>
             <div className="flex items-center justify-between w-full gap-2 text-xs">
@@ -255,10 +235,7 @@ export const AddParticipants: FunctionComponent = () => {
                       setEmployeePool(newValues);
                     }}
                   >
-                    <Combobox.Input
-                      // displayValue={(fac: Array<Facilitator>) => fac.map((fac) => fac.name).join(", ")}
-                      as={React.Fragment}
-                    >
+                    <Combobox.Input as={React.Fragment}>
                       <Input
                         id="search-participant"
                         autoComplete="off"
@@ -270,8 +247,6 @@ export const AddParticipants: FunctionComponent = () => {
                         }}
                         onChange={(e) => setSearchEmployee(e.target.value)}
                         size="small"
-                        // color={!isEmpty(errors.facilitators) ? "error" : "primary"}
-                        // helperText={errors.facilitators ? errors?.facilitators?.message : undefined}
                         placeholder="Search for participant"
                         className="placeholder:text-xs"
                       />
@@ -312,7 +287,7 @@ export const AddParticipants: FunctionComponent = () => {
 
                 <div className="relative overflow-x-auto rounded-lg shadow-md">
                   <table className="w-full text-left ">
-                    <thead className="text-white bg-indigo-600 rounded-t">
+                    <thead className="text-white bg-indigo-700 rounded-t">
                       <tr>
                         <th className="p-2 font-medium text-center border">#</th>
                         <th className="p-2 font-medium border">Participant Name</th>
@@ -349,17 +324,6 @@ export const AddParticipants: FunctionComponent = () => {
                                             : -1
                                         )
                                     );
-                                    // setFilteredEmployees(
-                                    //   newEmployees
-                                    //     .sort((a, b) => (a.name > b.name ? 1 : -1))
-                                    //     .sort((a, b) =>
-                                    //       a.supervisor.name! > b.supervisor.name!
-                                    //         ? 1
-                                    //         : a.supervisor.name! === b.supervisor.name
-                                    //         ? 0
-                                    //         : -1
-                                    //     )
-                                    // );
                                   }}
                                 >
                                   <svg
@@ -394,7 +358,6 @@ export const AddParticipants: FunctionComponent = () => {
                   size="small"
                   onClick={() => {
                     // assign the object to the specific array (selected batch number)
-
                     Object.assign(batches.find((batch) => batch.number === selectedBatch.number)!, {
                       date: { from: selectedBatch.date.from, to: selectedBatch.date.to },
                       number: selectedBatch.number,
@@ -402,6 +365,25 @@ export const AddParticipants: FunctionComponent = () => {
                       isOneDayTraining: selectedBatch.isOneDayTraining,
                     });
 
+                    const currentUpdatedEmployees = batches.find(
+                      (batch) => batch.number === selectedBatch.number
+                    )?.employees;
+
+                    const tempBatches = [...batches];
+
+                    let selectedEmployeesPool: EmployeeWithSupervisor[] = [];
+
+                    tempBatches.map((batch) => {
+                      if (batch.number !== selectedBatch.number && batch.employees) {
+                        selectedEmployeesPool.push(...batch.employees);
+                      }
+                    });
+
+                    const joinedEmployees = currentUpdatedEmployees?.concat(selectedEmployeesPool);
+
+                    setTotalSelectedEmployees(joinedEmployees!.sort((a, b) => (a.name > b.name ? 1 : -1)));
+
+                    // this logic here should not only be adding but comparing the current selected employees
                     setSelectedBatchModalIsOpen(false);
                     setInitialLoadedEmp(false);
                     setSelectedEmployees([]);
@@ -410,17 +392,6 @@ export const AddParticipants: FunctionComponent = () => {
                 >
                   Apply
                 </Button>
-
-                {/* <Button
-                  size="small"
-                  variant="white"
-                  onClick={() => {
-                    setSelectedBatchModalIsOpen(false);
-                    setSelectedBatch({ employees: [], number: 1, date: { to: undefined, from: "" } });
-                  }}
-                >
-                  Close
-                </Button> */}
               </div>
             </div>
           </ModalContent.Footer>

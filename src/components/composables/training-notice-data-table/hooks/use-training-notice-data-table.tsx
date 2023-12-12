@@ -31,6 +31,8 @@ export const useTrainingNoticeDataTable = () => {
   const [selectedBatchModalIsOpen, setSelectedBatchModalIsOpen] = useState<boolean>(false);
   const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [], date: { from: "", to: "" } }]);
   const [employeePool, setEmployeePool] = useState<EmployeeWithSupervisor[]>([]);
+  const [totalSelectedEmployees, setTotalSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
+  const [employeesWithStatus, setEmployeesWithStatus] = useState<EmployeeWithSupervisor[]>([]);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setAction = useTrainingNoticeModalStore((state) => state.setAction);
   const setId = useTrainingNoticeStore((state) => state.setId);
@@ -294,6 +296,10 @@ export const useTrainingNoticeDataTable = () => {
     selectedBatch,
     selectedBatchModalIsOpen,
     employeePool,
+    totalSelectedEmployees,
+    employeesWithStatus,
+    setEmployeesWithStatus,
+    setTotalSelectedEmployees,
     setEmployeePool,
     setSelectedBatchModalIsOpen,
     setSelectedBatch,

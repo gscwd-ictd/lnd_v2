@@ -45,6 +45,10 @@ type TrainingNoticeState = {
   setSelectedBatchModalIsOpen: Dispatch<SetStateAction<boolean>>;
   employeePool: EmployeeWithSupervisor[];
   setEmployeePool: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
+  totalSelectedEmployees: EmployeeWithSupervisor[];
+  setTotalSelectedEmployees: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
+  employeesWithStatus: EmployeeWithSupervisor[];
+  setEmployeesWithStatus: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -66,6 +70,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     selectedBatch,
     selectedBatchModalIsOpen,
     employeePool,
+    totalSelectedEmployees,
+    employeesWithStatus,
+    setEmployeesWithStatus,
+    setTotalSelectedEmployees,
     setEmployeePool,
     setSelectedBatchModalIsOpen,
     setSelectedBatch,
@@ -107,6 +115,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           selectedBatch,
           selectedBatchModalIsOpen,
           employeePool,
+          totalSelectedEmployees,
+          employeesWithStatus,
+          setEmployeesWithStatus,
+          setTotalSelectedEmployees,
           setEmployeePool,
           setSelectedBatchModalIsOpen,
           setSelectedBatch,

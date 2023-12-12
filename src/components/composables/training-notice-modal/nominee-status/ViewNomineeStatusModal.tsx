@@ -4,64 +4,68 @@ import { Recommendation, useTrainingNoticeStore } from "@lms/utilities/stores/tr
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { EmployeeWithStatus, EmployeeWithSupervisor, TrainingNomineeStatus } from "@lms/utilities/types/training";
+import { useQuery } from "@tanstack/react-query";
+import { isEmpty } from "lodash";
+import axios from "axios";
+import { url } from "@lms/utilities/url/api-url";
 
 //todo REMOVE
-const employeesWithSupervisor: EmployeeWithSupervisor[] = [
-  {
-    employeeId: "001",
-    name: "Richard Vincent Narvaez",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "123", name: "Michael Gabales" },
-  },
-  {
-    employeeId: "002",
-    name: "Hafez Benanben Saiyou",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "123", name: "Michael Gabales" },
-  },
-  {
-    employeeId: "003",
-    name: "Jan Freigseg Lared",
-    status: TrainingNomineeStatus.DECLINED,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "004",
-    name: "Xavier Dale Dabuco",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "005",
-    name: "Paul Ryner Uchiha",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "006",
-    name: "Joel Amoguis",
-    status: TrainingNomineeStatus.DECLINED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "007",
-    name: "Mark Leandre Gamutin",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "008",
-    name: "Ralph Mari Dayot",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "009",
-    name: "Louise Mae Soledad",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-];
+// const employeesWithSupervisor: EmployeeWithSupervisor[] = [
+//   {
+//     employeeId: "001",
+//     name: "Richard Vincent Narvaez",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
+//   },
+//   {
+//     employeeId: "002",
+//     name: "Hafez Benanben Saiyou",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
+//   },
+//   {
+//     employeeId: "003",
+//     name: "Jan Freigseg Lared",
+//     status: TrainingNomineeStatus.DECLINED,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "004",
+//     name: "Xavier Dale Dabuco",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "005",
+//     name: "Paul Ryner Uchiha",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "006",
+//     name: "Joel Amoguis",
+//     status: TrainingNomineeStatus.DECLINED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "007",
+//     name: "Mark Leandre Gamutin",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "008",
+//     name: "Ralph Mari Dayot",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "009",
+//     name: "Louise Mae Soledad",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+// ];
 
 export const ViewNomineeStatusModal: FunctionComponent = () => {
   const setTrainingId = useTrainingNoticeStore((state) => state.setId);
@@ -69,16 +73,41 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
   const [acceptedEmployees, setAcceptedEmployees] = useState<EmployeeWithStatus[]>([]);
   const [nominatedEmployees, setNominatedEmployees] = useState<EmployeeWithStatus[]>([]);
   const [declinedEmployees, setDeclinedEmployees] = useState<EmployeeWithStatus[]>([]);
-  const { nomineeStatusIsOpen, setNomineeStatusIsOpen } = useContext(TrainingNoticeContext);
+  const { id, nomineeStatusIsOpen, setNomineeStatusIsOpen, employeesWithStatus, setEmployeesWithStatus } =
+    useContext(TrainingNoticeContext);
   const [countIsDone, setCountIsDone] = useState<boolean>(false);
+  const trainingId = useTrainingNoticeStore((state) => state.id);
+
+  // per training notice query
+  useQuery({
+    queryKey: ["training-nominees", trainingId],
+    enabled: !!trainingId && nomineeStatusIsOpen !== false,
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      try {
+        const { data } = (await axios.get(`${url}/training-nominees/${id}`)) as any;
+        if (!isEmpty(data)) {
+          console.log(data);
+          setEmployeesWithStatus(data);
+        }
+
+        return data;
+      } catch (error) {
+        return error;
+      }
+    },
+  });
 
   useEffect(() => {
-    if (employeesWithSupervisor.length > 0 && countIsDone === false) {
+    if (employeesWithStatus.length > 0 && countIsDone === false) {
       let tempCountEmployees = 0;
       let newAcceptedEmployees = [...acceptedEmployees];
       let newDeclinedEmployees = [...declinedEmployees];
       let newNominatedEmployees = [...nominatedEmployees];
-      employeesWithSupervisor
+      employeesWithStatus
         .map((employee) => {
           tempCountEmployees += 1;
           if (employee.status === TrainingNomineeStatus.ACCEPTED) {
@@ -94,13 +123,21 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
         .sort((a, b) =>
           a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
         );
+
       setAcceptedEmployees(newAcceptedEmployees);
       setDeclinedEmployees(newDeclinedEmployees);
       setNominatedEmployees(newNominatedEmployees);
       setCountEmployees(tempCountEmployees);
       setCountIsDone(true);
     }
-  }, [employeesWithSupervisor, countIsDone]);
+  }, [employeesWithStatus, countIsDone]);
+
+  // set the training notice id only on one instance upon opening the modal
+  useEffect(() => {
+    if (isEmpty(trainingId) && !isEmpty(id)) {
+      setTrainingId(id);
+    }
+  }, [id, trainingId]);
 
   return (
     <>
@@ -112,6 +149,12 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
         isStatic
         onClose={() => {
           setTrainingId(null);
+          setEmployeesWithStatus([]);
+          setCountIsDone(false);
+          setNomineeStatusIsOpen(false);
+          setAcceptedEmployees([]);
+          setDeclinedEmployees([]);
+          setNominatedEmployees([]);
         }}
       >
         <ModalContent>
@@ -178,15 +221,17 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                       <th className="p-2 font-medium border">Employee Name</th>
                       <th className="p-2 font-medium border">Supervisor</th>
                       <th className="p-2 font-medium text-center border">Status</th>
+                      <th className="p-2 font-medium text-center border">Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {employeesWithSupervisor.map((employee) => {
+                    {employeesWithStatus.map((employee) => {
                       return (
                         <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
                           <td className="p-2 text-sm font-light border ">{employee.name}</td>
                           <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
-                          <td className="p-2 text-sm font-light border ">{BadgePill(employee.status)}</td>
+                          <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
+                          <td className="p-2 text-sm font-light text-center border">{employee.remarks ?? "-"}</td>
                         </tr>
                       );
                     })}
@@ -205,6 +250,11 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                   onClick={() => {
                     setNomineeStatusIsOpen(false);
                     setTrainingId(null);
+                    setEmployeesWithStatus([]);
+                    setCountIsDone(false);
+                    setAcceptedEmployees([]);
+                    setDeclinedEmployees([]);
+                    setNominatedEmployees([]);
                   }}
                 >
                   Close

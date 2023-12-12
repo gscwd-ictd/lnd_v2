@@ -37,6 +37,7 @@ export type EmployeeWithStatus = {
   employeeId: string;
   name: string;
   status?: TrainingNomineeStatus;
+  remarks?: string | null;
 };
 
 export type EmployeeWithSupervisor = EmployeeWithStatus &

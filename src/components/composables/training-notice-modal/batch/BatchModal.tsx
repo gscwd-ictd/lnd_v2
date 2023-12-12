@@ -10,7 +10,7 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { BatchNumbering } from "./BatchNumbering";
-import dayjs from "dayjs";
+import { employeesWithSupervisor } from "./AddParticipants";
 
 export const BatchModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
@@ -18,16 +18,23 @@ export const BatchModal: FunctionComponent = () => {
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
-
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
-  const { id, viewDocumentsModalIsOpen, batches, employeePool, setViewDocumentsModalIsOpen } =
-    useContext(TrainingNoticeContext);
+  const {
+    id,
+    viewDocumentsModalIsOpen,
+    employeePool,
+    batches,
+    setBatches,
+    setEmployeePool,
+    setTotalSelectedEmployees,
+    setViewDocumentsModalIsOpen,
+  } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
-    queryKey: ["training-details-sending", trainingNoticeId],
+    queryKey: ["training-details-nominees", trainingNoticeId],
     enabled: !!trainingNoticeId && viewDocumentsModalIsOpen !== false,
     staleTime: 2,
     refetchOnReconnect: false,
@@ -68,6 +75,9 @@ export const BatchModal: FunctionComponent = () => {
         isStatic
         onClose={() => {
           setSelectedTrainingType(undefined);
+          setTotalSelectedEmployees([]);
+          setBatches([{ date: { from: "", to: "" }, employees: [], number: 1 }]); // initialize
+          setEmployeePool(employeesWithSupervisor); //TODO Replace this with the route from sir henry
           reset();
         }}
       >
@@ -90,18 +100,6 @@ export const BatchModal: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
-                {/* <Button
-                  size="small"
-                  variant="white"
-                  onClick={() => {
-                    setViewDocumentsModalIsOpen(false);
-                    setSelectedTrainingType(undefined);
-                    reset();
-                    setBatches([{ number: 1, employees: [], date: { from: "", to: undefined } }]);
-                  }}
-                >
-                  Close
-                </Button> */}
                 {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
                   Batches
                 </button>
@@ -111,6 +109,13 @@ export const BatchModal: FunctionComponent = () => {
                   onClick={() => console.log(employeePool)}
                 >
                   Pool
+                </button>
+
+                <button
+                  className="px-3 py-2 text-white bg-indigo-500 rounded "
+                  onClick={() => console.log(totalSelectedEmployees)}
+                >
+                  Selected
                 </button> */}
               </div>
             </div>
