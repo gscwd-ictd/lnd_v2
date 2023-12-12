@@ -71,14 +71,6 @@ export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
 ];
 
 export const AddParticipants: FunctionComponent = () => {
-  const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
-  const [searchEmployee, setSearchEmployee] = useState<string>("");
-  const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
-  const { totalSelectedEmployees, setTotalSelectedEmployees } = useContext(TrainingNoticeContext);
-  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
-  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
-
-  // const []
   const {
     selectedBatch,
     selectedBatchModalIsOpen,
@@ -89,11 +81,19 @@ export const AddParticipants: FunctionComponent = () => {
     batches,
   } = useContext(TrainingNoticeContext);
 
+  const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
+  const [searchEmployee, setSearchEmployee] = useState<string>("");
+  const [tempEmployeePool, setTempEmployeePool] = useState<EmployeeWithSupervisor[]>(employeePool);
+  const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
+  const { totalSelectedEmployees, setTotalSelectedEmployees } = useContext(TrainingNoticeContext);
+  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
+  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
+
   // filtered facilitators
   const filteredEmployees =
     searchEmployee === ""
-      ? employeePool
-      : employeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
+      ? tempEmployeePool
+      : tempEmployeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
 
   useEffect(() => {
     setEmployeePool(
@@ -118,6 +118,7 @@ export const AddParticipants: FunctionComponent = () => {
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true) {
+      setTempEmployeePool(employeePool);
       if (batches.find((batch) => batch.number === selectedBatch.number)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.number === selectedBatch.number)!.employees);
       }
@@ -229,10 +230,11 @@ export const AddParticipants: FunctionComponent = () => {
                     multiple
                     nullable={true}
                     onChange={(value) => {
-                      const newValues = employeePool.filter((x) => !value.includes(x));
+                      const newValues = tempEmployeePool.filter((x) => !value.includes(x));
 
                       setSelectedEmployees(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
-                      setEmployeePool(newValues);
+                      // setEmployeePool(newValues);
+                      setTempEmployeePool(newValues);
                     }}
                   >
                     <Combobox.Input as={React.Fragment}>
@@ -311,9 +313,9 @@ export const AddParticipants: FunctionComponent = () => {
                                     const newSelectedEmployees = [...selectedEmployees];
                                     newSelectedEmployees.splice(idx, 1);
                                     setSelectedEmployees(newSelectedEmployees);
-                                    const newEmployees = [...employeePool];
+                                    const newEmployees = [...tempEmployeePool];
                                     newEmployees.push(employee);
-                                    setEmployeePool(
+                                    setTempEmployeePool(
                                       newEmployees
                                         .sort((a, b) => (a.name > b.name ? 1 : -1))
                                         .sort((a, b) =>
@@ -387,6 +389,7 @@ export const AddParticipants: FunctionComponent = () => {
                     setSelectedBatchModalIsOpen(false);
                     setInitialLoadedEmp(false);
                     setSelectedEmployees([]);
+                    setEmployeePool(tempEmployeePool);
                     setSelectedBatch({ employees: [], number: 1, date: { to: undefined, from: "" } });
                   }}
                 >

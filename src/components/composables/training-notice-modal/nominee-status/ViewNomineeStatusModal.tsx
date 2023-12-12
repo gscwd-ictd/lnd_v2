@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
+import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
 
 //todo REMOVE
 // const employeesWithSupervisor: EmployeeWithSupervisor[] = [
@@ -231,7 +232,15 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                           <td className="p-2 text-sm font-light border ">{employee.name}</td>
                           <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
                           <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
-                          <td className="p-2 text-sm font-light text-center border">{employee.remarks ?? "-"}</td>
+                          <td className="p-2 text-sm font-light text-center border hover:cursor-help ">
+                            {employee.remarks ? (
+                              <Tooltip content={employee.remarks} withArrow>
+                                <div className="text-left truncate">{employee.remarks}</div>
+                              </Tooltip>
+                            ) : (
+                              <span className="text-center">-</span>
+                            )}
+                          </td>
                         </tr>
                       );
                     })}
