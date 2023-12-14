@@ -84,11 +84,12 @@ export type Recommendation = {
 };
 
 export type Batch = {
-  number: number;
-  date: { from: string | undefined; to?: string | undefined };
+  batchNumber: number;
+  trainingDate: { from: string | undefined; to?: string | undefined };
   isOneDayTraining?: boolean;
   employees: Array<{
     employeeId: string;
+    nomineeId?: string;
     name: string;
     supervisor: { supervisorId: string; name: string };
     distributionId?: string;

@@ -232,10 +232,10 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                           <td className="p-2 text-sm font-light border ">{employee.name}</td>
                           <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
                           <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
-                          <td className="p-2 text-sm font-light text-center border hover:cursor-help ">
+                          <td className="p-2 text-sm font-light text-center border ">
                             {employee.remarks ? (
-                              <Tooltip content={employee.remarks} withArrow>
-                                <div className="text-left truncate">{employee.remarks}</div>
+                              <Tooltip content={employee.remarks}>
+                                <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
                               </Tooltip>
                             ) : (
                               <span className="text-center">-</span>

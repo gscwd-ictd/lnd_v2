@@ -79,9 +79,9 @@ export const BatchNumbering: FunctionComponent = () => {
                     setBatches([
                       ...batches,
                       {
-                        number: batches[batches.length - 1].number + 1,
+                        batchNumber: batches[batches.length - 1].batchNumber + 1,
                         employees: [],
-                        date: { from: "", to: undefined },
+                        trainingDate: { from: "", to: undefined },
                       },
                     ])
                   }
@@ -166,25 +166,31 @@ export const BatchNumbering: FunctionComponent = () => {
         {batches.map((batch, idx) => {
           return (
             <div
-              key={batch.number}
+              key={batch.batchNumber}
               role="button"
               className="flex items-center justify-between w-full p-4 border rounded shadow-md bg-zinc-200 "
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedBatch({ employees: batch.employees, number: idx + 1, date: batch.date! });
+                setSelectedBatch({
+                  employees: batch.employees,
+                  batchNumber: idx + 1,
+                  trainingDate: batch.trainingDate!,
+                });
                 setSelectedBatchModalIsOpen(true);
               }}
             >
               <div className="flex flex-col w-full text-indigo-800">
-                <div className="text-2xl font-medium">Batch {batch.number}</div>
-                {batch.date.from && (
+                <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
+                {batch.trainingDate?.from && (
                   <div className="flex text-gray-600 text-md">
-                    <div>{batch.date.from ? ` ${dayjs(batch.date.from).format("MMMM DD, YYYY")} ` : null} </div>
                     <div>
-                      {batch.date.to && batch.date.from === batch.date.to
+                      {batch.trainingDate?.from ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY")} ` : null}{" "}
+                    </div>
+                    <div>
+                      {batch.trainingDate.to && batch.trainingDate.from === batch.trainingDate.to
                         ? null
-                        : batch.date.to && batch.date.to !== batch.date.from
-                        ? `- ${dayjs(batch.date.to).format("MMMM DD, YYYY")}`
+                        : batch.trainingDate.to && batch.trainingDate.to !== batch.trainingDate.from
+                        ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY")}`
                         : null}
                     </div>
                   </div>

@@ -12,6 +12,9 @@ import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { isEmpty } from "lodash";
 import dayjs from "dayjs";
 import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
   {
@@ -81,6 +84,22 @@ export const AddParticipants: FunctionComponent = () => {
     batches,
   } = useContext(TrainingNoticeContext);
 
+  const schema = yup.object({
+    trainingStart: yup.string().required(),
+    trainingEnd: yup.string().required(),
+
+    employees: yup
+      .array()
+      .of(
+        yup.object({
+          nomineeId: yup.string().notRequired(),
+          employeeId: yup.string().required(),
+          name: yup.string().required(),
+        })
+      )
+      .required(),
+  });
+
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
   const [searchEmployee, setSearchEmployee] = useState<string>("");
   const [tempEmployeePool, setTempEmployeePool] = useState<EmployeeWithSupervisor[]>(employeePool);
@@ -89,6 +108,56 @@ export const AddParticipants: FunctionComponent = () => {
   const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
   const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
 
+  const {
+    handleSubmit,
+    register,
+    clearErrors,
+    setValue,
+    setError,
+    formState: { errors },
+  } = useForm({
+    mode: "onChange",
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+    if (data.employees.length > 0) {
+      // assign the object to the specific array (selected batch number)
+      Object.assign(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!, {
+        trainingDate: { from: selectedBatch.trainingDate.from, to: selectedBatch.trainingDate.to },
+        number: selectedBatch.batchNumber,
+        employees: selectedEmployees,
+        isOneDayTraining: selectedBatch.isOneDayTraining,
+      });
+
+      const currentUpdatedEmployees = batches.find(
+        (batch) => batch.batchNumber === selectedBatch.batchNumber
+      )?.employees;
+
+      const tempBatches = [...batches];
+
+      let selectedEmployeesPool: EmployeeWithSupervisor[] = [];
+
+      tempBatches.map((batch) => {
+        if (batch.batchNumber !== selectedBatch.batchNumber && batch.employees) {
+          selectedEmployeesPool.push(...batch.employees);
+        }
+      });
+
+      const joinedEmployees = currentUpdatedEmployees?.concat(selectedEmployeesPool);
+
+      setTotalSelectedEmployees(joinedEmployees!.sort((a, b) => (a.name > b.name ? 1 : -1)));
+
+      // this logic here should not only be adding but comparing the current selected employees
+      setSelectedBatchModalIsOpen(false);
+      setInitialLoadedEmp(false);
+      setSelectedEmployees([]);
+      setEmployeePool(tempEmployeePool);
+      setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { to: undefined, from: "" } });
+    }
+  };
+
   // filtered facilitators
   const filteredEmployees =
     searchEmployee === ""
@@ -96,6 +165,10 @@ export const AddParticipants: FunctionComponent = () => {
       : tempEmployeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
 
   useEffect(() => {
+    register("employees");
+    register("trainingStart");
+    register("trainingEnd");
+
     setEmployeePool(
       employeesWithSupervisor
         .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -109,22 +182,36 @@ export const AddParticipants: FunctionComponent = () => {
     if (selectedBatch.isOneDayTraining === true) {
       setSelectedBatch({
         ...selectedBatch,
-        date: { ...selectedBatch.date, to: selectedBatch.date?.from },
+        trainingDate: { ...selectedBatch.trainingDate, to: selectedBatch.trainingDate?.from },
       });
     } else if (selectedBatch.isOneDayTraining === false) {
-      setSelectedBatch({ ...selectedBatch, date: { ...selectedBatch.date, to: "" } });
+      setSelectedBatch({ ...selectedBatch, trainingDate: { ...selectedBatch.trainingDate, to: "" } });
     }
   }, [selectedBatch.isOneDayTraining]);
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true) {
       setTempEmployeePool(employeePool);
-      if (batches.find((batch) => batch.number === selectedBatch.number)!.employees.length > 0) {
-        setSelectedEmployees(batches.find((batch) => batch.number === selectedBatch.number)!.employees);
+      if (batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees.length > 0) {
+        setSelectedEmployees(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees);
       }
       setInitialLoadedEmp(true);
     }
   }, [selectedBatchModalIsOpen]);
+
+  // everytime the value of employees change, react hook form receives the same value
+  useEffect(() => {
+    setValue(
+      "employees",
+      selectedBatch.employees.map((employee) => {
+        return { nomineeId: employee.nomineeId!, employeeId: employee.employeeId, name: employee.name };
+      })
+    );
+  }, [selectedBatch.employees]);
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   return (
     <>
@@ -136,7 +223,7 @@ export const AddParticipants: FunctionComponent = () => {
         isStatic
         onClose={() => {
           setSelectedBatchModalIsOpen(false);
-          setSelectedBatch({ employees: [], number: 1, date: { from: "", to: "" } });
+          setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { from: "", to: "" } });
           setSelectedEmployees([]);
           setInitialLoadedEmp(false);
         }}
@@ -146,7 +233,7 @@ export const AddParticipants: FunctionComponent = () => {
             <header className="pl-2">
               {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
               <div className="flex items-center gap-5">
-                <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.number}</h3>
+                <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.batchNumber}</h3>
               </div>
               <div className="flex text-sm ">
                 <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
@@ -161,44 +248,108 @@ export const AddParticipants: FunctionComponent = () => {
               </div>
             </header>
             <div className="flex items-center justify-between w-full gap-2 text-xs">
+              {/* DATE FROM */}
+              {/* <input
+                className="w-full text-sm border rounded border-zinc-300"
+                type="date"
+                {...register("trainingStart", {
+                  value: selectedBatch.trainingDate?.from,
+                  onChange: (e) => {
+                    setValue("trainingStart", e.target.value);
+                    setValue(
+                      "trainingEnd",
+                      selectedBatch.isOneDayTraining === true
+                        ? e.target.value
+                        : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
+                        ? selectedBatch.trainingDate.to
+                        : ""
+                    );
+                    setSelectedBatch({
+                      employees: selectedBatch.employees,
+                      batchNumber: selectedBatch.batchNumber,
+                      isOneDayTraining: selectedBatch.isOneDayTraining,
+                      trainingDate: {
+                        from: e.target.value,
+                        to:
+                          selectedBatch.isOneDayTraining === true
+                            ? e.target.value
+                            : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
+                            ? selectedBatch.trainingDate.to
+                            : "",
+                      },
+                    });
+                  },
+                })}
+              /> */}
               <input
                 className="w-full text-sm border rounded border-zinc-300"
                 type="date"
-                value={selectedBatch.date?.from}
-                onChange={(e) =>
+                value={selectedBatch.trainingDate?.from}
+                onChange={(e) => {
+                  setValue("trainingStart", e.target.value);
                   setSelectedBatch({
                     employees: selectedBatch.employees,
-                    number: selectedBatch.number,
+                    batchNumber: selectedBatch.batchNumber,
                     isOneDayTraining: selectedBatch.isOneDayTraining,
-                    date: {
+                    trainingDate: {
                       from: e.target.value,
                       to:
                         selectedBatch.isOneDayTraining === true
                           ? e.target.value
-                          : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.date?.to)
-                          ? selectedBatch.date.to
+                          : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
+                          ? selectedBatch.trainingDate.to
                           : "",
                     },
-                  })
-                }
+                  });
+                }}
               />
+
+              {/* DATE END */}
+              {/* <input
+                className="w-full text-sm border rounded border-zinc-300"
+                type="date"
+                disabled={selectedBatch.isOneDayTraining}
+                {...register("trainingEnd", {
+                  value: selectedBatch.trainingDate?.to!,
+                  onChange: (e) => {
+                    setValue(
+                      "trainingEnd",
+                      selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value
+                    );
+                    setSelectedBatch({
+                      employees: selectedBatch.employees,
+                      batchNumber: selectedBatch.batchNumber,
+                      isOneDayTraining: selectedBatch.isOneDayTraining,
+                      trainingDate: {
+                        ...selectedBatch.trainingDate,
+                        to: selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value,
+                      },
+                    });
+                  },
+                })}
+              /> */}
               <input
                 className="w-full text-sm border rounded border-zinc-300"
                 type="date"
                 disabled={selectedBatch.isOneDayTraining}
-                value={selectedBatch.date?.to!}
-                onChange={(e) =>
+                value={selectedBatch.trainingDate?.to!}
+                onChange={(e) => {
+                  setValue(
+                    "trainingEnd",
+                    selectedBatch.isOneDayTraining ? selectedBatch.trainingDate?.from! : e.target.value
+                  );
                   setSelectedBatch({
                     employees: selectedBatch.employees,
-                    number: selectedBatch.number,
+                    batchNumber: selectedBatch.batchNumber,
                     isOneDayTraining: selectedBatch.isOneDayTraining,
-                    date: {
-                      ...selectedBatch.date,
-                      to: selectedBatch.isOneDayTraining ? selectedBatch.date.from : e.target.value,
+                    trainingDate: {
+                      ...selectedBatch.trainingDate,
+                      to: selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value,
                     },
-                  })
-                }
+                  });
+                }}
               />
+
               <div className="flex items-center w-full gap-2">
                 <Checkbox
                   id={`checkbox-same-day-training`}
@@ -214,143 +365,150 @@ export const AddParticipants: FunctionComponent = () => {
           </ModalContent.Title>
 
           <ModalContent.Body>
-            <main className="px-2 space-y-4 min-h-[22rem] max-h-[30rem]">
-              <div className="mt-1">
-                <div className="mb-2">
-                  <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
-                    Participants
-                    {/* <span className="text-red-600 text-md">*</span> */}
-                  </label>
-                  <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
-                </div>
+            <form id="addBatchingForm" key="addBatchingForm" onSubmit={handleSubmit(onSubmit)}>
+              <main className="px-2 space-y-4 min-h-[22rem] max-h-[30rem]">
+                <div className="mt-1">
+                  <div className="mb-2">
+                    <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
+                      Participants
+                      {/* <span className="text-red-600 text-md">*</span> */}
+                    </label>
+                    <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
+                  </div>
 
-                <div className="relative">
-                  <Combobox
-                    value={selectedEmployees}
-                    multiple
-                    nullable={true}
-                    onChange={(value) => {
-                      const newValues = tempEmployeePool.filter((x) => !value.includes(x));
+                  <div className="relative">
+                    <Combobox
+                      value={selectedEmployees}
+                      multiple
+                      nullable={true}
+                      onChange={(value) => {
+                        const newValues = tempEmployeePool.filter((x) => !value.includes(x));
 
-                      setSelectedEmployees(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
-                      // setEmployeePool(newValues);
-                      setTempEmployeePool(newValues);
-                    }}
-                  >
-                    <Combobox.Input as={React.Fragment}>
-                      <Input
-                        id="search-participant"
-                        autoComplete="off"
-                        onBlur={() => setSearchEmployee("")}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                          }
-                        }}
-                        onChange={(e) => setSearchEmployee(e.target.value)}
-                        size="small"
-                        placeholder="Search for participant"
-                        className="placeholder:text-xs"
-                      />
-                    </Combobox.Input>
+                        setSelectedEmployees(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
 
-                    <Combobox.Options className="absolute max-h-52 z-[80] overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
-                      {filteredEmployees?.length === 0 ? (
-                        <div className="flex items-center justify-center py-10">No results found</div>
-                      ) : (
-                        filteredEmployees.map((employee, index) => {
+                        setValue("employees", value);
+
+                        // setEmployeePool(newValues);
+                        setTempEmployeePool(newValues);
+                      }}
+                    >
+                      <Combobox.Input as={React.Fragment}>
+                        <Input
+                          id="search-participant"
+                          autoComplete="off"
+                          onBlur={() => setSearchEmployee("")}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => setSearchEmployee(e.target.value)}
+                          size="small"
+                          placeholder="Search for participant"
+                          className="placeholder:text-xs"
+                        />
+                      </Combobox.Input>
+
+                      <Combobox.Options className="absolute max-h-52 z-[80] overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
+                        {filteredEmployees?.length === 0 ? (
+                          <div className="flex items-center justify-center py-10">No results found</div>
+                        ) : (
+                          filteredEmployees.map((employee, index) => {
+                            return (
+                              <Combobox.Option key={index} value={employee}>
+                                {({ active, selected }) => {
+                                  return (
+                                    <div
+                                      role="button"
+                                      className={`${
+                                        selected ? "bg-gray-300  text-white " : active ? "bg-gray-100" : ""
+                                      } border-b  border-b-gray-100 px-2 py-1`}
+                                    >
+                                      <h3 className={`${selected ? "text-gray-700" : "text-gray-700"} font-medium`}>
+                                        {selected ? "✓ " : null}
+                                        {employee.name}
+                                      </h3>
+                                      <p className={`${selected ? "" : "text-gray-400"} text-xs`}>
+                                        {employee.supervisor.name}
+                                      </p>
+                                    </div>
+                                  );
+                                }}
+                              </Combobox.Option>
+                            );
+                          })
+                        )}
+                      </Combobox.Options>
+                    </Combobox>
+                  </div>
+
+                  <div className="relative overflow-x-auto rounded-lg shadow-md">
+                    <table className="w-full text-left ">
+                      <thead className="text-white bg-indigo-700 rounded-t">
+                        <tr>
+                          <th className="p-2 font-medium text-center border">#</th>
+                          <th className="p-2 font-medium border">Participant Name</th>
+                          <th className="p-2 font-medium border">Supervisor</th>
+                          <th className="p-2 font-medium border"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedEmployees.map((employee, idx) => {
                           return (
-                            <Combobox.Option key={index} value={employee}>
-                              {({ active, selected }) => {
-                                return (
-                                  <div
-                                    role="button"
-                                    className={`${
-                                      selected ? "bg-gray-300  text-white " : active ? "bg-gray-100" : ""
-                                    } border-b  border-b-gray-100 px-2 py-1`}
-                                  >
-                                    <h3 className={`${selected ? "text-gray-700" : "text-gray-700"} font-medium`}>
-                                      {selected ? "✓ " : null}
-                                      {employee.name}
-                                    </h3>
-                                    <p className={`${selected ? "" : "text-gray-400"} text-xs`}>
-                                      {employee.supervisor.name}
-                                    </p>
-                                  </div>
-                                );
-                              }}
-                            </Combobox.Option>
-                          );
-                        })
-                      )}
-                    </Combobox.Options>
-                  </Combobox>
-                </div>
+                            <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
+                              <td className="p-2 text-sm font-light text-center border ">{idx + 1}</td>
+                              <td className="p-2 text-sm font-light border ">{employee.name}</td>
+                              <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
+                              <td className="p-2 text-sm font-light border ">
+                                <div className="text-center">
+                                  <button
+                                    className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
+                                    type="button"
+                                    onClick={() => {
+                                      const newSelectedEmployees = [...selectedEmployees];
+                                      newSelectedEmployees.splice(idx, 1);
+                                      setSelectedEmployees(newSelectedEmployees);
+                                      setValue("employees", newSelectedEmployees);
+                                      const newEmployees = [...tempEmployeePool];
+                                      newEmployees.push(employee);
 
-                <div className="relative overflow-x-auto rounded-lg shadow-md">
-                  <table className="w-full text-left ">
-                    <thead className="text-white bg-indigo-700 rounded-t">
-                      <tr>
-                        <th className="p-2 font-medium text-center border">#</th>
-                        <th className="p-2 font-medium border">Participant Name</th>
-                        <th className="p-2 font-medium border">Supervisor</th>
-                        <th className="p-2 font-medium border"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedEmployees.map((employee, idx) => {
-                        return (
-                          <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
-                            <td className="p-2 text-sm font-light text-center border ">{idx + 1}</td>
-                            <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                            <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
-                            <td className="p-2 text-sm font-light border ">
-                              <div className="text-center">
-                                <button
-                                  className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
-                                  type="button"
-                                  onClick={() => {
-                                    const newSelectedEmployees = [...selectedEmployees];
-                                    newSelectedEmployees.splice(idx, 1);
-                                    setSelectedEmployees(newSelectedEmployees);
-                                    const newEmployees = [...tempEmployeePool];
-                                    newEmployees.push(employee);
-                                    setTempEmployeePool(
-                                      newEmployees
-                                        .sort((a, b) => (a.name > b.name ? 1 : -1))
-                                        .sort((a, b) =>
-                                          a.supervisor.name! > b.supervisor.name!
-                                            ? 1
-                                            : a.supervisor.name! === b.supervisor.name
-                                            ? 0
-                                            : -1
-                                        )
-                                    );
-                                  }}
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
+                                      setTempEmployeePool(
+                                        newEmployees
+                                          .sort((a, b) => (a.name > b.name ? 1 : -1))
+                                          .sort((a, b) =>
+                                            a.supervisor.name! > b.supervisor.name!
+                                              ? 1
+                                              : a.supervisor.name! === b.supervisor.name
+                                              ? 0
+                                              : -1
+                                          )
+                                      );
+                                    }}
                                   >
-                                    <path
-                                      d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z"
-                                      fill="currentColor"
-                                    />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z"
+                                        fill="currentColor"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            </main>
+              </main>
+            </form>
           </ModalContent.Body>
 
           <ModalContent.Footer>
@@ -358,40 +516,9 @@ export const AddParticipants: FunctionComponent = () => {
               <div className="flex items-center justify-end w-full gap-2">
                 <Button
                   size="small"
-                  onClick={() => {
-                    // assign the object to the specific array (selected batch number)
-                    Object.assign(batches.find((batch) => batch.number === selectedBatch.number)!, {
-                      date: { from: selectedBatch.date.from, to: selectedBatch.date.to },
-                      number: selectedBatch.number,
-                      employees: selectedEmployees,
-                      isOneDayTraining: selectedBatch.isOneDayTraining,
-                    });
-
-                    const currentUpdatedEmployees = batches.find(
-                      (batch) => batch.number === selectedBatch.number
-                    )?.employees;
-
-                    const tempBatches = [...batches];
-
-                    let selectedEmployeesPool: EmployeeWithSupervisor[] = [];
-
-                    tempBatches.map((batch) => {
-                      if (batch.number !== selectedBatch.number && batch.employees) {
-                        selectedEmployeesPool.push(...batch.employees);
-                      }
-                    });
-
-                    const joinedEmployees = currentUpdatedEmployees?.concat(selectedEmployeesPool);
-
-                    setTotalSelectedEmployees(joinedEmployees!.sort((a, b) => (a.name > b.name ? 1 : -1)));
-
-                    // this logic here should not only be adding but comparing the current selected employees
-                    setSelectedBatchModalIsOpen(false);
-                    setInitialLoadedEmp(false);
-                    setSelectedEmployees([]);
-                    setEmployeePool(tempEmployeePool);
-                    setSelectedBatch({ employees: [], number: 1, date: { to: undefined, from: "" } });
-                  }}
+                  // type="button"
+                  form="addBatchingForm"
+                  type="submit"
                 >
                   Apply
                 </Button>

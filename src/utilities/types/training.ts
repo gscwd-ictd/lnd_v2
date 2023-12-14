@@ -35,6 +35,7 @@ export enum TrainingNomineeStatus {
 
 export type EmployeeWithStatus = {
   employeeId: string;
+  nomineeId?: string;
   name: string;
   status?: TrainingNomineeStatus;
   remarks?: string | null;

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { FunctionComponent, useContext, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -73,10 +72,11 @@ export const BatchModal: FunctionComponent = () => {
         size="3md"
         animate={false}
         isStatic
+        fixedHeight
         onClose={() => {
           setSelectedTrainingType(undefined);
           setTotalSelectedEmployees([]);
-          setBatches([{ date: { from: "", to: "" }, employees: [], number: 1 }]); // initialize
+          setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
           setEmployeePool(employeesWithSupervisor); //TODO Replace this with the route from sir henry
           reset();
         }}
@@ -100,7 +100,7 @@ export const BatchModal: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
-                {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
+                <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
                   Batches
                 </button>
 
@@ -110,7 +110,7 @@ export const BatchModal: FunctionComponent = () => {
                 >
                   Pool
                 </button>
-
+                {/* 
                 <button
                   className="px-3 py-2 text-white bg-indigo-500 rounded "
                   onClick={() => console.log(totalSelectedEmployees)}

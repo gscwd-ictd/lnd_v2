@@ -27,9 +27,15 @@ export const useTrainingNoticeDataTable = () => {
   const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
-  const [selectedBatch, setSelectedBatch] = useState<Batch>({ employees: [], number: 1, date: { from: "", to: "" } });
+  const [selectedBatch, setSelectedBatch] = useState<Batch>({
+    employees: [],
+    batchNumber: 1,
+    trainingDate: { from: "", to: "" },
+  });
   const [selectedBatchModalIsOpen, setSelectedBatchModalIsOpen] = useState<boolean>(false);
-  const [batches, setBatches] = useState<Batch[]>([{ number: 1, employees: [], date: { from: "", to: "" } }]);
+  const [batches, setBatches] = useState<Batch[]>([
+    { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
+  ]);
   const [employeePool, setEmployeePool] = useState<EmployeeWithSupervisor[]>([]);
   const [totalSelectedEmployees, setTotalSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
   const [employeesWithStatus, setEmployeesWithStatus] = useState<EmployeeWithSupervisor[]>([]);
