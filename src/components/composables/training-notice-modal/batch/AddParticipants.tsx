@@ -15,6 +15,9 @@ import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-st
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween);
 
 export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
   {
@@ -84,9 +87,72 @@ export const AddParticipants: FunctionComponent = () => {
     batches,
   } = useContext(TrainingNoticeContext);
 
+  const from = useTrainingNoticeStore((state) => state.trainingStart);
+  const to = useTrainingNoticeStore((state) => state.trainingEnd);
+
+  // validation schema
   const schema = yup.object({
-    trainingStart: yup.string().required(),
-    trainingEnd: yup.string().required(),
+    trainingStart: yup
+      .string()
+      .required()
+      .label("Training start")
+      .test("test-training-start", (value, validationContext) => {
+        const {
+          createError,
+          parent: { trainingEnd },
+        } = validationContext;
+
+        if (dayjs(from).isSame(dayjs(to), "day")) {
+          if (dayjs(value).isBefore(dayjs(from), "day")) {
+            return createError({
+              message: `Date shouldn't be less than the training date`,
+            });
+          } else if (dayjs(value).isAfter(dayjs(from), "day")) {
+            return createError({
+              message: `Date shouldn't be greater than the training date`,
+            });
+          } else return true;
+        } else {
+          if (!isEmpty(value) && !isEmpty(trainingEnd)) {
+            if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
+              return createError({ message: `Date shouldn't be outside the training date` });
+            } else if (dayjs(value).isAfter(dayjs(trainingEnd))) {
+              return createError({ message: `Date from shouldn't be greater than date to` });
+            } else return true;
+          } else if (!isEmpty(value) && isEmpty(trainingEnd)) {
+            if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
+              return createError({ message: `Date shouldn't be outside the training date` });
+            } else return true;
+          }
+        }
+      }),
+    trainingEnd: yup
+      .string()
+      .required()
+      .label("Training end")
+      .test("test-training-end", (value, validationContext) => {
+        const {
+          createError,
+          parent: { trainingStart },
+        } = validationContext;
+
+        if (!isEmpty(value) && !isEmpty(trainingStart)) {
+          if (dayjs(value).isBefore(dayjs(from), "day")) {
+            return createError({
+              message: `Date shouldn't be less than the training date`,
+            });
+          } else return true;
+        }
+        // another logic here
+        else if (!isEmpty(value) && isEmpty(trainingStart)) {
+          //
+          if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to))) {
+            return createError({
+              message: `Date shouldn't be outside the training date`,
+            });
+          } else return true;
+        }
+      }),
 
     employees: yup
       .array()
@@ -105,18 +171,19 @@ export const AddParticipants: FunctionComponent = () => {
   const [tempEmployeePool, setTempEmployeePool] = useState<EmployeeWithSupervisor[]>(employeePool);
   const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
   const { totalSelectedEmployees, setTotalSelectedEmployees } = useContext(TrainingNoticeContext);
-  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
-  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
 
   const {
     handleSubmit,
     register,
     clearErrors,
     setValue,
+    getValues,
     setError,
     formState: { errors },
   } = useForm({
     mode: "onChange",
+    reValidateMode: "onChange",
+
     resolver: yupResolver(schema),
   });
 
@@ -184,8 +251,12 @@ export const AddParticipants: FunctionComponent = () => {
         ...selectedBatch,
         trainingDate: { ...selectedBatch.trainingDate, to: selectedBatch.trainingDate?.from },
       });
+      setValue("trainingEnd", selectedBatch.trainingDate.from!);
     } else if (selectedBatch.isOneDayTraining === false) {
-      setSelectedBatch({ ...selectedBatch, trainingDate: { ...selectedBatch.trainingDate, to: "" } });
+      if (isEmpty(getValues("trainingEnd"))) {
+        setValue("trainingEnd", "");
+        setSelectedBatch({ ...selectedBatch, trainingDate: { ...selectedBatch.trainingDate, to: "" } });
+      }
     }
   }, [selectedBatch.isOneDayTraining]);
 
@@ -236,18 +307,18 @@ export const AddParticipants: FunctionComponent = () => {
                 <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.batchNumber}</h3>
               </div>
               <div className="flex text-sm ">
-                <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
+                <div className="text-gray-600 ">{dayjs(from).format("MMMM DD, YYYY")}</div>
                 <span>
                   &nbsp;
-                  {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
+                  {dayjs(from).format("MMMM DD, YYYY") !== dayjs(to).format("MMMM DD, YYYY") && "to"}
                   &nbsp;
                 </span>
-                {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
-                  <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
+                {dayjs(from).format("MMMM DD, YYYY") !== dayjs(to).format("MMMM DD, YYYY") && (
+                  <div className="text-gray-600 ">{dayjs(to).format("MMMM DD, YYYY")}</div>
                 )}
               </div>
             </header>
-            <div className="flex items-center justify-between w-full gap-2 text-xs">
+            <div className="flex items-start justify-between w-full gap-2 text-xs h-[4rem]">
               {/* DATE FROM */}
               {/* <input
                 className="w-full text-sm border rounded border-zinc-300"
@@ -281,28 +352,31 @@ export const AddParticipants: FunctionComponent = () => {
                   },
                 })}
               /> */}
-              <input
-                className="w-full text-sm border rounded border-zinc-300"
-                type="date"
-                value={selectedBatch.trainingDate?.from}
-                onChange={(e) => {
-                  setValue("trainingStart", e.target.value);
-                  setSelectedBatch({
-                    employees: selectedBatch.employees,
-                    batchNumber: selectedBatch.batchNumber,
-                    isOneDayTraining: selectedBatch.isOneDayTraining,
-                    trainingDate: {
-                      from: e.target.value,
-                      to:
-                        selectedBatch.isOneDayTraining === true
-                          ? e.target.value
-                          : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
-                          ? selectedBatch.trainingDate.to
-                          : "",
-                    },
-                  });
-                }}
-              />
+              <div className="flex flex-col gap-2 w-[24rem]">
+                <input
+                  className="w-full text-sm border rounded border-zinc-300"
+                  type="date"
+                  value={selectedBatch.trainingDate?.from}
+                  onChange={(e) => {
+                    setValue("trainingStart", e.target.value);
+                    setSelectedBatch({
+                      employees: selectedBatch.employees,
+                      batchNumber: selectedBatch.batchNumber,
+                      isOneDayTraining: selectedBatch.isOneDayTraining,
+                      trainingDate: {
+                        from: e.target.value,
+                        to:
+                          selectedBatch.isOneDayTraining === true
+                            ? e.target.value
+                            : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
+                            ? selectedBatch.trainingDate.to
+                            : selectedBatch.trainingDate.to,
+                      },
+                    });
+                  }}
+                />
+                <div className="text-xs text-red-700">{errors.trainingStart?.message}</div>
+              </div>
 
               {/* DATE END */}
               {/* <input
@@ -328,27 +402,31 @@ export const AddParticipants: FunctionComponent = () => {
                   },
                 })}
               /> */}
-              <input
-                className="w-full text-sm border rounded border-zinc-300"
-                type="date"
-                disabled={selectedBatch.isOneDayTraining}
-                value={selectedBatch.trainingDate?.to!}
-                onChange={(e) => {
-                  setValue(
-                    "trainingEnd",
-                    selectedBatch.isOneDayTraining ? selectedBatch.trainingDate?.from! : e.target.value
-                  );
-                  setSelectedBatch({
-                    employees: selectedBatch.employees,
-                    batchNumber: selectedBatch.batchNumber,
-                    isOneDayTraining: selectedBatch.isOneDayTraining,
-                    trainingDate: {
-                      ...selectedBatch.trainingDate,
-                      to: selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value,
-                    },
-                  });
-                }}
-              />
+
+              <div className="flex flex-col w-[24rem] gap-2">
+                <input
+                  className="w-full text-sm border rounded border-zinc-300"
+                  type="date"
+                  disabled={selectedBatch.isOneDayTraining}
+                  value={selectedBatch.trainingDate?.to!}
+                  onChange={(e) => {
+                    setValue(
+                      "trainingEnd",
+                      selectedBatch.isOneDayTraining ? selectedBatch.trainingDate?.from! : e.target.value
+                    );
+                    setSelectedBatch({
+                      employees: selectedBatch.employees,
+                      batchNumber: selectedBatch.batchNumber,
+                      isOneDayTraining: selectedBatch.isOneDayTraining,
+                      trainingDate: {
+                        ...selectedBatch.trainingDate,
+                        to: selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value,
+                      },
+                    });
+                  }}
+                />
+                <div className="text-xs text-red-700">{errors.trainingEnd?.message}</div>
+              </div>
 
               <div className="flex items-center w-full gap-2">
                 <Checkbox
@@ -514,6 +592,12 @@ export const AddParticipants: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
+                <button
+                  className="px-3 py-2 text-white bg-indigo-600"
+                  onClick={() => console.log(getValues("trainingEnd"))}
+                >
+                  Training End
+                </button>
                 <Button
                   size="small"
                   // type="button"

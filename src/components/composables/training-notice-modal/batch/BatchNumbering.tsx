@@ -44,37 +44,37 @@ export const BatchNumbering: FunctionComponent = () => {
 
         <div
           className={`flex items-center justify-center w-full gap-2 py-1 ${
-            employeePool.length === 0 ? "bg-green-600" : "bg-zinc-500"
+            employeePool.length === 0 ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
           } rounded`}
           role="button"
           onClick={() => console.log(totalSelectedEmployees)}
         >
           <div className="text-3xl text-white">{totalSelectedEmployees.length}</div>
-          <div className="text-sm font-medium text-gray-200">Selected</div>
+          <div className="text-sm font-medium text-gray-100">Selected</div>
         </div>
 
         <div
           className={`flex items-center justify-center w-full gap-2 py-1 ${
-            employeePool.length === 0 ? "bg-green-600" : "bg-zinc-500"
+            employeePool.length === 0 ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
           } rounded`}
           role="button"
           onClick={() => console.log(employeePool)}
         >
           <div className="text-3xl text-white">{employeePool.length}</div>
-          <div className="text-sm font-medium text-gray-200">Available</div>
+          <div className="text-sm font-medium text-gray-100">Available</div>
         </div>
 
-        <div className="flex items-center justify-center w-full gap-2 py-1 bg-indigo-700 rounded">
+        <div className="flex items-center justify-center w-full gap-2 py-1 border-2 border-indigo-700 rounded bg-zinc-100">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <div className="text-3xl text-white">{batches.length}</div>
-              <div className="text-sm font-medium text-gray-200"> {batches.length > 1 ? "Batches" : "Batch"}</div>
+              <div className="text-3xl text-indigo-700">{batches.length}</div>
+              <div className="text-sm font-medium text-gray-700"> {batches.length > 1 ? "Batches" : "Batch"}</div>
             </div>
             <div className="flex items-center w-full">
               <div className="flex flex-col gap-1">
                 {/* Arrow up */}
                 <button
-                  className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-800"
+                  className="text-white bg-indigo-600 rounded hover:bg-indigo-300 hover:text-zinc-800"
                   onClick={() =>
                     setBatches([
                       ...batches,
