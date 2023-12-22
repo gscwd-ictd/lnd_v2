@@ -105,11 +105,11 @@ export const AddParticipants: FunctionComponent = () => {
         if (dayjs(from).isSame(dayjs(to), "day")) {
           if (dayjs(value).isBefore(dayjs(from), "day")) {
             return createError({
-              message: `Date shouldn't be less than the training date`,
+              message: `Date shouldn't be before the training date`,
             });
           } else if (dayjs(value).isAfter(dayjs(from), "day")) {
             return createError({
-              message: `Date shouldn't be greater than the training date`,
+              message: `Date shouldn't be after the training date`,
             });
           } else return true;
         } else {
@@ -117,7 +117,7 @@ export const AddParticipants: FunctionComponent = () => {
             if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
               return createError({ message: `Date shouldn't be outside the training date` });
             } else if (dayjs(value).isAfter(dayjs(trainingEnd))) {
-              return createError({ message: `Date from shouldn't be greater than date to` });
+              return createError({ message: `Date from shouldn't be after the end of training date` });
             } else return true;
           } else if (!isEmpty(value) && isEmpty(trainingEnd)) {
             if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
@@ -136,21 +136,28 @@ export const AddParticipants: FunctionComponent = () => {
           parent: { trainingStart },
         } = validationContext;
 
-        if (!isEmpty(value) && !isEmpty(trainingStart)) {
-          if (dayjs(value).isBefore(dayjs(from), "day")) {
+        if (dayjs(from).isSame(dayjs(to), "day")) {
+          if (dayjs(value).isBefore(dayjs(to), "day")) {
             return createError({
-              message: `Date shouldn't be less than the training date`,
+              message: `Date shouldn't be before the training date`,
+            });
+          } else if (dayjs(value).isAfter(dayjs(to), "day")) {
+            return createError({
+              message: `Date shouldn't be after the training date`,
             });
           } else return true;
-        }
-        // another logic here
-        else if (!isEmpty(value) && isEmpty(trainingStart)) {
-          //
-          if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to))) {
-            return createError({
-              message: `Date shouldn't be outside the training date`,
-            });
-          } else return true;
+        } else {
+          if (!isEmpty(value) && !isEmpty(trainingStart)) {
+            if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
+              return createError({ message: `Date shouldn't be outside the training date` });
+            } else if (dayjs(value).isBefore(dayjs(trainingStart))) {
+              return createError({ message: `Date from shouldn't be before the start of training date` });
+            } else return true;
+          } else if (!isEmpty(value) && isEmpty(trainingStart)) {
+            if (dayjs(value).isBefore(dayjs(from), "day") || dayjs(value).isAfter(dayjs(to), "day")) {
+              return createError({ message: `Date shouldn't be outside the training date` });
+            } else return true;
+          }
         }
       }),
 
@@ -163,7 +170,13 @@ export const AddParticipants: FunctionComponent = () => {
           name: yup.string().required(),
         })
       )
-      .required(),
+      .required()
+      .test("test-employees", (value, validationContext) => {
+        const { createError } = validationContext;
+        if (value.length === 0) {
+          createError({ message: "Employees should not be empty!" });
+        } else return true;
+      }),
   });
 
   const [selectedEmployees, setSelectedEmployees] = useState<EmployeeWithSupervisor[]>([]);
@@ -171,6 +184,9 @@ export const AddParticipants: FunctionComponent = () => {
   const [tempEmployeePool, setTempEmployeePool] = useState<EmployeeWithSupervisor[]>(employeePool);
   const [initialLoadedEmp, setInitialLoadedEmp] = useState<boolean>(false);
   const { totalSelectedEmployees, setTotalSelectedEmployees } = useContext(TrainingNoticeContext);
+  const [fromIsLocked, setFromIsLocked] = useState<boolean>(false);
+  const [toIsLocked, setToIsLocked] = useState<boolean>(false);
+  const [sdtIsLocked, setSdtIsLocked] = useState<boolean>(false);
 
   const {
     handleSubmit,
@@ -221,6 +237,9 @@ export const AddParticipants: FunctionComponent = () => {
       setInitialLoadedEmp(false);
       setSelectedEmployees([]);
       setEmployeePool(tempEmployeePool);
+      setFromIsLocked(false);
+      setToIsLocked(false);
+      setSdtIsLocked(false);
       setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { to: undefined, from: "" } });
     }
   };
@@ -237,7 +256,8 @@ export const AddParticipants: FunctionComponent = () => {
     register("trainingEnd");
 
     setEmployeePool(
-      employeesWithSupervisor
+      // employeesWithSupervisor
+      employeePool
         .sort((a, b) => (a.name > b.name ? 1 : -1))
         .sort((a, b) =>
           a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
@@ -258,13 +278,35 @@ export const AddParticipants: FunctionComponent = () => {
         setSelectedBatch({ ...selectedBatch, trainingDate: { ...selectedBatch.trainingDate, to: "" } });
       }
     }
-  }, [selectedBatch.isOneDayTraining]);
+  }, [selectedBatch.isOneDayTraining, selectedBatch]);
 
   useEffect(() => {
-    if (selectedBatchModalIsOpen === true) {
+    if (selectedBatchModalIsOpen === true && initialLoadedEmp === false) {
       setTempEmployeePool(employeePool);
       if (batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees);
+      }
+      // if training date from and to is the same
+      if (dayjs(from).isSame(dayjs(to), "day")) {
+        setValue("trainingStart", dayjs(from).format("YYYY-MM-DD"));
+        setValue("trainingEnd", dayjs(to).format("YYYY-MM-DD"));
+
+        setSelectedBatch({
+          ...selectedBatch,
+          isOneDayTraining: true,
+          trainingDate: { from: dayjs(from).format("YYYY-MM-DD"), to: dayjs(to).format("YYYY-MM-DD") },
+        });
+        setFromIsLocked(true);
+        setToIsLocked(true);
+        setSdtIsLocked(true);
+      }
+      // if current training date from and to is  the same
+      else if (dayjs(selectedBatch.trainingDate.from).isSame(dayjs(selectedBatch.trainingDate.to), "day")) {
+        setSelectedBatch({
+          ...selectedBatch,
+          isOneDayTraining: true,
+          //  trainingDate: { from: dayjs(from).format("YYYY-MM-DD"), to: dayjs(to).format("YYYY-MM-DD") },
+        });
       }
       setInitialLoadedEmp(true);
     }
@@ -297,6 +339,9 @@ export const AddParticipants: FunctionComponent = () => {
           setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { from: "", to: "" } });
           setSelectedEmployees([]);
           setInitialLoadedEmp(false);
+          setFromIsLocked(false);
+          setToIsLocked(false);
+          setSdtIsLocked(false);
         }}
       >
         <ModalContent>
@@ -320,42 +365,12 @@ export const AddParticipants: FunctionComponent = () => {
             </header>
             <div className="flex items-start justify-between w-full gap-2 text-xs h-[4rem]">
               {/* DATE FROM */}
-              {/* <input
-                className="w-full text-sm border rounded border-zinc-300"
-                type="date"
-                {...register("trainingStart", {
-                  value: selectedBatch.trainingDate?.from,
-                  onChange: (e) => {
-                    setValue("trainingStart", e.target.value);
-                    setValue(
-                      "trainingEnd",
-                      selectedBatch.isOneDayTraining === true
-                        ? e.target.value
-                        : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
-                        ? selectedBatch.trainingDate.to
-                        : ""
-                    );
-                    setSelectedBatch({
-                      employees: selectedBatch.employees,
-                      batchNumber: selectedBatch.batchNumber,
-                      isOneDayTraining: selectedBatch.isOneDayTraining,
-                      trainingDate: {
-                        from: e.target.value,
-                        to:
-                          selectedBatch.isOneDayTraining === true
-                            ? e.target.value
-                            : selectedBatch.isOneDayTraining === false && !isEmpty(selectedBatch.trainingDate?.to)
-                            ? selectedBatch.trainingDate.to
-                            : "",
-                      },
-                    });
-                  },
-                })}
-              /> */}
-              <div className="flex flex-col gap-2 w-[24rem]">
+
+              <div className="flex flex-col gap-2 w-[12rem] pl-2">
                 <input
                   className="w-full text-sm border rounded border-zinc-300"
                   type="date"
+                  disabled={fromIsLocked}
                   value={selectedBatch.trainingDate?.from}
                   onChange={(e) => {
                     setValue("trainingStart", e.target.value);
@@ -379,35 +394,12 @@ export const AddParticipants: FunctionComponent = () => {
               </div>
 
               {/* DATE END */}
-              {/* <input
-                className="w-full text-sm border rounded border-zinc-300"
-                type="date"
-                disabled={selectedBatch.isOneDayTraining}
-                {...register("trainingEnd", {
-                  value: selectedBatch.trainingDate?.to!,
-                  onChange: (e) => {
-                    setValue(
-                      "trainingEnd",
-                      selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value
-                    );
-                    setSelectedBatch({
-                      employees: selectedBatch.employees,
-                      batchNumber: selectedBatch.batchNumber,
-                      isOneDayTraining: selectedBatch.isOneDayTraining,
-                      trainingDate: {
-                        ...selectedBatch.trainingDate,
-                        to: selectedBatch.isOneDayTraining ? selectedBatch.trainingDate.from : e.target.value,
-                      },
-                    });
-                  },
-                })}
-              /> */}
 
-              <div className="flex flex-col w-[24rem] gap-2">
+              <div className="flex flex-col gap-2 w-[12rem] pr-2">
                 <input
                   className="w-full text-sm border rounded border-zinc-300"
                   type="date"
-                  disabled={selectedBatch.isOneDayTraining}
+                  disabled={selectedBatch.isOneDayTraining || toIsLocked ? true : false}
                   value={selectedBatch.trainingDate?.to!}
                   onChange={(e) => {
                     setValue(
@@ -428,11 +420,12 @@ export const AddParticipants: FunctionComponent = () => {
                 <div className="text-xs text-red-700">{errors.trainingEnd?.message}</div>
               </div>
 
-              <div className="flex items-center w-full gap-2">
+              <div className="flex items-center w-auto gap-2 px-2">
                 <Checkbox
                   id={`checkbox-same-day-training`}
                   label="Same day training?"
                   // disabled={isEmpty(selectedBatch.date?.from)}
+                  disabled={sdtIsLocked}
                   checked={selectedBatch.isOneDayTraining}
                   onChange={() => {
                     setSelectedBatch({ ...selectedBatch, isOneDayTraining: !selectedBatch.isOneDayTraining });
@@ -446,15 +439,17 @@ export const AddParticipants: FunctionComponent = () => {
             <form id="addBatchingForm" key="addBatchingForm" onSubmit={handleSubmit(onSubmit)}>
               <main className="px-2 space-y-4 min-h-[22rem] max-h-[30rem]">
                 <div className="mt-1">
-                  <div className="mb-2">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
                       Participants
-                      {/* <span className="text-red-600 text-md">*</span> */}
                     </label>
+
                     <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
                   </div>
-
-                  <div className="relative">
+                  {errors.employees?.message ? (
+                    <div className="text-xs text-red-700">List should not be empty!</div>
+                  ) : null}
+                  <div className="relative mt-2">
                     <Combobox
                       value={selectedEmployees}
                       multiple
@@ -592,12 +587,12 @@ export const AddParticipants: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
-                <button
+                {/* <button
                   className="px-3 py-2 text-white bg-indigo-600"
                   onClick={() => console.log(getValues("trainingEnd"))}
                 >
                   Training End
-                </button>
+                </button> */}
                 <Button
                   size="small"
                   // type="button"

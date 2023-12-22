@@ -66,7 +66,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
           // setCourseContent(data.courseContent);
           if (data.source.name === "Internal") {
             setId(data.id);
-            setSelectedTrainingSource({ name: "Internal" });
+            setSelectedTrainingSource({ name: "Internal", id: data.source.id });
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
             setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
@@ -84,7 +84,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
             // setInternalTrainingNotice(data);
           } else if (data.source.name === "External") {
             setId(data.id);
-            setSelectedTrainingSource({ name: "External" });
+            setSelectedTrainingSource({ name: "External", id: data.source.id });
             setCourseTitle(data.courseTitle);
             setCourseContent(data.courseContent);
             setSelectedTrainingType(getTrainingTypeFromString(data.type));

@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { FunctionComponent, useContext, useEffect } from "react";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
@@ -20,6 +20,7 @@ export const BatchModal: FunctionComponent = () => {
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
+
   const {
     id,
     viewDocumentsModalIsOpen,
@@ -48,6 +49,10 @@ export const BatchModal: FunctionComponent = () => {
           setCourseTitle(data.courseTitle);
           setTrainingStart(data.trainingStart);
           setTrainingEnd(data.trainingEnd);
+
+          const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
+          console.log(acceptedNominees);
+          setEmployeePool(acceptedNominees);
         }
 
         return data;
@@ -77,7 +82,7 @@ export const BatchModal: FunctionComponent = () => {
           setSelectedTrainingType(undefined);
           setTotalSelectedEmployees([]);
           setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
-          setEmployeePool(employeesWithSupervisor); //TODO Replace this with the route from sir henry
+          setEmployeePool([]); //TODO Replace this with the route from sir henry
           reset();
         }}
       >
@@ -100,7 +105,7 @@ export const BatchModal: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-2 pt-2 pb-3">
               <div className="flex items-center justify-end w-full gap-2">
-                <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
+                {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
                   Batches
                 </button>
 
@@ -110,13 +115,15 @@ export const BatchModal: FunctionComponent = () => {
                 >
                   Pool
                 </button>
-                {/* 
+                
                 <button
                   className="px-3 py-2 text-white bg-indigo-500 rounded "
                   onClick={() => console.log(totalSelectedEmployees)}
                 >
                   Selected
                 </button> */}
+
+                <button className="px-3 py-2 text-white bg-indigo-500 rounded ">Submit</button>
               </div>
             </div>
           </ModalContent.Footer>

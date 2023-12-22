@@ -23,29 +23,29 @@ export const BatchNumbering: FunctionComponent = () => {
   return (
     <>
       <div className="p-3 border rounded shadow-md bg-zinc-100">
-        <div className="text-lg font-medium text-gray-700">{courseTitle}</div>
-        <div className="flex text-sm ">
+        <div className="text-xl font-medium text-center text-gray-700">{courseTitle}</div>
+        <div className="flex justify-center px-5 text-center">
           <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
-          <span>
+          <div>
             &nbsp;
             {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
             &nbsp;
-          </span>
+          </div>
           {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
             <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
           )}
         </div>
       </div>
-      <div className="flex justify-between gap-2">
-        <div className="flex items-center justify-center w-full gap-2 py-1 bg-indigo-700 rounded">
+      <div className="flex justify-between gap-1">
+        <div className="flex flex-col items-center justify-center w-full gap-0 py-2 bg-indigo-700 rounded-xl">
           <div className="text-3xl text-white">{numberOfParticipants}</div>
           <div className="text-sm font-medium text-gray-200">Max Participants</div>
         </div>
 
         <div
-          className={`flex items-center justify-center w-full gap-2 py-1 ${
-            employeePool.length === 0 ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
-          } rounded`}
+          className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
+            totalSelectedEmployees.length === numberOfParticipants ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
+          } rounded-xl`}
           role="button"
           onClick={() => console.log(totalSelectedEmployees)}
         >
@@ -54,9 +54,9 @@ export const BatchNumbering: FunctionComponent = () => {
         </div>
 
         <div
-          className={`flex items-center justify-center w-full gap-2 py-1 ${
+          className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
             employeePool.length === 0 ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
-          } rounded`}
+          } rounded-xl`}
           role="button"
           onClick={() => console.log(employeePool)}
         >
@@ -64,9 +64,9 @@ export const BatchNumbering: FunctionComponent = () => {
           <div className="text-sm font-medium text-gray-100">Available</div>
         </div>
 
-        <div className="flex items-center justify-center w-full gap-2 py-1 border-2 border-indigo-700 rounded bg-zinc-100">
+        <div className="flex items-center justify-center w-full gap-0 py-2 border-2 border-indigo-700 rounded-xl ring ring-indigo-200 ring-inset bg-gradient-to-r from-zinc-100 to-gray-300/50">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center gap-0">
               <div className="text-3xl text-indigo-700">{batches.length}</div>
               <div className="text-sm font-medium text-gray-700"> {batches.length > 1 ? "Batches" : "Batch"}</div>
             </div>
@@ -74,7 +74,7 @@ export const BatchNumbering: FunctionComponent = () => {
               <div className="flex flex-col gap-1">
                 {/* Arrow up */}
                 <button
-                  className="text-white bg-indigo-600 rounded hover:bg-indigo-300 hover:text-zinc-800"
+                  className="text-white bg-indigo-600 rounded-full hover:bg-indigo-300 hover:text-zinc-800"
                   onClick={() =>
                     setBatches([
                       ...batches,
@@ -100,7 +100,7 @@ export const BatchNumbering: FunctionComponent = () => {
 
                 {/* Arrow down */}
                 <button
-                  className="text-white rounded bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-800"
+                  className="text-white rounded-full bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-800"
                   onClick={() => {
                     if (batches.length > 1) {
                       const updatedBatches = [...batches];

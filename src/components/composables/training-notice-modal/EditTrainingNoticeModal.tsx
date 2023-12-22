@@ -272,6 +272,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         }),
 
         trainingRequirements,
+        bucketFiles,
       });
 
       return response.data;

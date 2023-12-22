@@ -71,57 +71,34 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       // console.log(error);
     },
     mutationFn: async () => {
-      console.log({
-        id,
-        trainingSource:
-          selectedTrainingSource.name === "Internal"
-            ? "ea0d9d86-28b5-42f7-9073-b071fe28fee1"
-            : selectedTrainingSource.name === "External"
-            ? "1d429794-4aa6-4bd7-844e-cdc1f766bc45"
-            : "",
-        trainingDesign: selectedTrainingDesign?.id,
-        trainingType: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        location,
-        slotDistribution,
-        trainingStart: from,
-        trainingEnd: to,
-        numberOfHours,
-        deadlineForSubmission: dayjs().add(3, "day"),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
-        }),
-
-        trainingRequirements,
-      });
-
       const response = await axios.patch(`${url}/training-notices/internal`, {
         id,
-        trainingSource:
-          selectedTrainingSource.name === "Internal"
-            ? "ea0d9d86-28b5-42f7-9073-b071fe28fee1"
-            : selectedTrainingSource.name === "External"
-            ? "1d429794-4aa6-4bd7-844e-cdc1f766bc45"
-            : "",
-        trainingDesign: selectedTrainingDesign?.id,
-        trainingType: selectedTrainingType,
+        source: { id: selectedTrainingSource.id }, // updated
+        trainingDesign: { id: selectedTrainingDesign.id },
+        type: selectedTrainingType,
         courseContent,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id };
         }),
         location,
-        slotDistribution,
+        slotDistribution: slotDistribution.map((slot) => {
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
+          });
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
+        }),
         trainingStart: from,
         trainingEnd: to,
         numberOfHours,
-        deadlineForSubmission: dayjs().add(3, "day"),
+        // deadlineForSubmission: dayjs().add(3, "day"),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
 
         trainingRequirements,
@@ -146,57 +123,36 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       // console.log(error);
     },
     mutationFn: async () => {
-      console.log({
+      const response = await axios.patch(`${url}/training-notices/external`, {
         id,
-        trainingSource:
-          selectedTrainingSource.name === "Internal"
-            ? "ea0d9d86-28b5-42f7-9073-b071fe28fee1"
-            : selectedTrainingSource.name === "External"
-            ? "1d429794-4aa6-4bd7-844e-cdc1f766bc45"
-            : "",
-        trainingDesign: selectedTrainingDesign?.id,
-        trainingType: selectedTrainingType,
+        source: { id: selectedTrainingSource.id },
+        // trainingDesign: selectedTrainingDesign?.id,
+        type: selectedTrainingType,
+        courseTitle,
         courseContent,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id };
         }),
         location,
-        slotDistribution,
+        bucketFiles,
+        slotDistribution: slotDistribution.map((slot) => {
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
+          });
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
+        }),
         trainingStart: from,
         trainingEnd: to,
         numberOfHours,
-        deadlineForSubmission: dayjs().add(3, "day"),
+        // deadlineForSubmission: dayjs().add(3, "day"),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
-        }),
-
-        trainingRequirements,
-      });
-
-      const response = await axios.patch(`${url}/training-notices/internal`, {
-        id,
-        trainingSource:
-          selectedTrainingSource.name === "Internal"
-            ? "ea0d9d86-28b5-42f7-9073-b071fe28fee1"
-            : selectedTrainingSource.name === "External"
-            ? "1d429794-4aa6-4bd7-844e-cdc1f766bc45"
-            : "",
-        trainingDesign: selectedTrainingDesign?.id,
-        trainingType: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        location,
-        slotDistribution,
-        trainingStart: from,
-        trainingEnd: to,
-        numberOfHours,
-        deadlineForSubmission: dayjs().add(3, "day"),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { tag: tag.id };
+          return { id: tag.id };
         }),
 
         trainingRequirements,
