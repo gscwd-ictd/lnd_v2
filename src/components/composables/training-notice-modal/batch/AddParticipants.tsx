@@ -301,7 +301,7 @@ export const AddParticipants: FunctionComponent = () => {
       if (dayjs(from).isSame(dayjs(to), "day")) {
         setValue("trainingStart", dayjs(from).format("YYYY-MM-DD"));
         setValue("trainingEnd", dayjs(to).format("YYYY-MM-DD"));
-
+        //
         setSelectedBatch({
           ...selectedBatch,
           isOneDayTraining: true,
