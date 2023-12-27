@@ -244,6 +244,16 @@ export const AddParticipants: FunctionComponent = () => {
     }
   };
 
+  // add all participants with this function
+  const addAllParticipants = () => {
+    const allEmployees = [...tempEmployeePool];
+    const tempSelEmployees = [...selectedEmployees];
+    tempSelEmployees.push(...allEmployees);
+    setSelectedEmployees(tempSelEmployees);
+    setValue("employees", tempSelEmployees);
+    setTempEmployeePool([]);
+  };
+
   // filtered facilitators
   const filteredEmployees =
     searchEmployee === ""
@@ -282,7 +292,8 @@ export const AddParticipants: FunctionComponent = () => {
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true && initialLoadedEmp === false) {
-      setTempEmployeePool(employeePool);
+      // setTempEmployeePool(employeePool);
+      setTempEmployeePool(employeesWithSupervisor);
       if (batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees);
       }
@@ -438,17 +449,38 @@ export const AddParticipants: FunctionComponent = () => {
           <ModalContent.Body>
             <form id="addBatchingForm" key="addBatchingForm" onSubmit={handleSubmit(onSubmit)}>
               <main className="px-2 space-y-4 min-h-[22rem] max-h-[30rem]">
-                <div className="mt-1">
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
-                      Participants
-                    </label>
+                <div className="mt-1 ">
+                  <div className="flex justify-between w-full">
+                    <div className="flex flex-col gap-1 ">
+                      <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
+                        Participants
+                      </label>
 
-                    <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
+                      <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
+                      {errors.employees?.message ? (
+                        <div className="text-xs text-red-700">List should not be empty!</div>
+                      ) : null}
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={addAllParticipants}
+                        disabled={tempEmployeePool.length === 0 ? true : false}
+                        className={`"w-auto rounded ${
+                          tempEmployeePool.length === 0
+                            ? "bg-gray-700 cursor-not-allowed"
+                            : "bg-orange-500 hover:bg-orange-400"
+                        } text-xs text-white px-3 py-2`}
+                      >
+                        {tempEmployeePool.length === 0
+                          ? "No participants left"
+                          : tempEmployeePool.length > 1 && selectedEmployees.length === 0
+                          ? "Add All Participants"
+                          : `Add ${tempEmployeePool.length} Remaining Participants`}
+                      </button>
+                    </div>
                   </div>
-                  {errors.employees?.message ? (
-                    <div className="text-xs text-red-700">List should not be empty!</div>
-                  ) : null}
+
                   <div className="relative mt-2">
                     <Combobox
                       value={selectedEmployees}
