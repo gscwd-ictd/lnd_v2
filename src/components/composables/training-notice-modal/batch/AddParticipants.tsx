@@ -95,6 +95,7 @@ export const AddParticipants: FunctionComponent = () => {
     trainingStart: yup
       .string()
       .required()
+      .nonNullable()
       .label("Training start")
       .test("test-training-start", (value, validationContext) => {
         const {
@@ -129,6 +130,7 @@ export const AddParticipants: FunctionComponent = () => {
     trainingEnd: yup
       .string()
       .required()
+      .nonNullable()
       .label("Training end")
       .test("test-training-end", (value, validationContext) => {
         const {
@@ -199,6 +201,7 @@ export const AddParticipants: FunctionComponent = () => {
   } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
+    // defaultValues: { employees: [], trainingEnd: "", trainingStart: "" },
 
     resolver: yupResolver(schema),
   });
@@ -235,6 +238,9 @@ export const AddParticipants: FunctionComponent = () => {
       // this logic here should not only be adding but comparing the current selected employees
       setSelectedBatchModalIsOpen(false);
       setInitialLoadedEmp(false);
+      // setValue("trainingEnd", "");
+      // setValue("trainingStart", "");
+      // setValue("employees", []);
       setSelectedEmployees([]);
       setEmployeePool(tempEmployeePool);
       setFromIsLocked(false);
@@ -249,8 +255,21 @@ export const AddParticipants: FunctionComponent = () => {
     const allEmployees = [...tempEmployeePool];
     const tempSelEmployees = [...selectedEmployees];
     tempSelEmployees.push(...allEmployees);
-    setSelectedEmployees(tempSelEmployees);
-    setValue("employees", tempSelEmployees);
+    setSelectedEmployees(
+      tempSelEmployees
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .sort((a, b) =>
+          a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
+        )
+    );
+    setValue(
+      "employees",
+      tempSelEmployees
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+        .sort((a, b) =>
+          a.supervisor.name! > b.supervisor.name! ? 1 : a.supervisor.name! === b.supervisor.name ? 0 : -1
+        )
+    );
     setTempEmployeePool([]);
   };
 
@@ -333,6 +352,16 @@ export const AddParticipants: FunctionComponent = () => {
     );
   }, [selectedBatch.employees]);
 
+  // everytime the value of date from input changes, react hook form receives the same value
+  useEffect(() => {
+    setValue("trainingStart", selectedBatch.trainingDate.from!);
+  }, [selectedBatch.trainingDate.from]);
+
+  // everytime the value of date to input changes, react hook form receives the same value
+  useEffect(() => {
+    setValue("trainingEnd", selectedBatch.trainingDate.to!);
+  }, [selectedBatch.trainingDate.to]);
+
   useEffect(() => {
     console.log(errors);
   }, [errors]);
@@ -342,13 +371,19 @@ export const AddParticipants: FunctionComponent = () => {
       <Modal
         isOpen={selectedBatchModalIsOpen}
         setIsOpen={setSelectedBatchModalIsOpen}
-        size="2md"
+        size="3md"
         animate={false}
         isStatic
         onClose={() => {
           setSelectedBatchModalIsOpen(false);
           setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { from: "", to: "" } });
           setSelectedEmployees([]);
+          clearErrors("employees");
+          clearErrors("trainingStart");
+          clearErrors("trainingEnd");
+          // setValue("trainingEnd", "");
+          // setValue("trainingStart", "");
+          // setValue("employees", []);
           setInitialLoadedEmp(false);
           setFromIsLocked(false);
           setToIsLocked(false);
