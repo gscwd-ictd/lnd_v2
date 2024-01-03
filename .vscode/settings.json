@@ -1,3 +1,4 @@
 {
-  "tailwindCSS.experimental.classRegex": [["cls\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]]
+  "tailwindCSS.experimental.classRegex": [["cls\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]],
+  "cSpell.words": ["arialregular"]
 }

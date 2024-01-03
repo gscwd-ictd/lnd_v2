@@ -1,17 +1,18 @@
 "use client";
 
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { FunctionComponent, useContext, useEffect, useState } from "react";
+import { FunctionComponent, useContext, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
-import { BatchNumbering } from "./BatchNumbering";
-import { employeesWithSupervisor } from "./AddParticipants";
+import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
+import PdfHeader from "../../documents/PdfHeader";
+import ApprovedTrainingPdf from "../../documents/training/ApprovedTrainingPdf";
 
-export const BatchModal: FunctionComponent = () => {
+export const ViewDocumentModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const reset = useTrainingNoticeStore((state) => state.reset);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -20,23 +21,23 @@ export const BatchModal: FunctionComponent = () => {
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
+  const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
 
   const {
     id,
-
     employeePool,
     batches,
     setBatches,
     setEmployeePool,
     setTotalSelectedEmployees,
-    batchingModalIsOpen,
-    setBatchingModalIsOpen,
+    viewDocumentsModalIsOpen,
+    setViewDocumentsModalIsOpen,
   } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
     queryKey: ["training-details-nominees", trainingNoticeId],
-    enabled: !!trainingNoticeId && batchingModalIsOpen !== false,
+    enabled: !!trainingNoticeId && viewDocumentsModalIsOpen !== false,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -68,17 +69,16 @@ export const BatchModal: FunctionComponent = () => {
     if (isEmpty(trainingNoticeId) && !isEmpty(id)) {
       setTrainingNoticeId(id);
     }
-  }, [id, trainingNoticeId, batchingModalIsOpen]);
+  }, [id, trainingNoticeId, viewDocumentsModalIsOpen]);
 
   return (
     <>
       <Modal
-        isOpen={batchingModalIsOpen}
-        setIsOpen={setBatchingModalIsOpen}
-        size="3md"
-        animate={false}
-        isStatic
+        isOpen={viewDocumentsModalIsOpen}
+        setIsOpen={setViewDocumentsModalIsOpen}
+        size="full"
         fixedHeight
+        animate={false}
         onClose={() => {
           setSelectedTrainingType(undefined);
           setTotalSelectedEmployees([]);
@@ -94,40 +94,22 @@ export const BatchModal: FunctionComponent = () => {
               <div className="flex items-start gap-2">
                 <h3 className="text-lg font-semibold text-gray-600">Training Notice</h3>
               </div>
-              <p className="text-sm text-gray-400">Batch details</p>
+              <p className="text-sm text-gray-400">Details</p>
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
             <main className="px-2 space-y-4">
-              <BatchNumbering />
+              {/* <ApprovedTrainingPdf/> */}
+              <PDFViewer width={"100%"} height={1400}>
+                <Document title=" ">
+                  <Page style={{ paddingHorizontal: 72, paddingVertical: 24, height: 792 }}>
+                    <PdfHeader isoCode="HRD-4444-4" withIsoLogo />
+                    <ApprovedTrainingPdf courseTitle={courseTitle} />
+                  </Page>
+                </Document>
+              </PDFViewer>
             </main>
           </ModalContent.Body>
-
-          <ModalContent.Footer>
-            <div className="px-2 pt-2 pb-3">
-              <div className="flex items-center justify-end w-full gap-2">
-                {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
-                  Batches
-                </button>
-
-                <button
-                  className="px-3 py-2 text-white bg-indigo-500 rounded "
-                  onClick={() => console.log(employeePool)}
-                >
-                  Pool
-                </button>
-                
-                <button
-                  className="px-3 py-2 text-white bg-indigo-500 rounded "
-                  onClick={() => console.log(totalSelectedEmployees)}
-                >
-                  Selected
-                </button> */}
-
-                <button className="px-3 py-2 text-white bg-indigo-500 rounded ">Submit</button>
-              </div>
-            </div>
-          </ModalContent.Footer>
         </ModalContent>
       </Modal>
     </>

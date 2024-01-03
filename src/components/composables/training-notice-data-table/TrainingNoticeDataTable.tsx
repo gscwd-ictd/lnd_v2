@@ -16,6 +16,7 @@ import { ViewTrainingNoticeModal } from "../training-notice-modal/view/ViewTrain
 import { BatchModal } from "../training-notice-modal/batch/BatchModal";
 import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { AddParticipants } from "../training-notice-modal/batch/AddParticipants";
+import { ViewDocumentModal } from "../training-notice-modal/documents/ViewDocumentModal";
 
 type TrainingNoticeState = {
   id: string;
@@ -49,6 +50,8 @@ type TrainingNoticeState = {
   setTotalSelectedEmployees: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
   employeesWithStatus: EmployeeWithSupervisor[];
   setEmployeesWithStatus: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
+  batchingModalIsOpen: boolean;
+  setBatchingModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -72,6 +75,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     employeePool,
     totalSelectedEmployees,
     employeesWithStatus,
+    batchingModalIsOpen,
+    setBatchingModalIsOpen,
     setEmployeesWithStatus,
     setTotalSelectedEmployees,
     setEmployeePool,
@@ -117,6 +122,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           employeePool,
           totalSelectedEmployees,
           employeesWithStatus,
+          batchingModalIsOpen,
+          setBatchingModalIsOpen,
           setEmployeesWithStatus,
           setTotalSelectedEmployees,
           setEmployeePool,
@@ -144,6 +151,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <ViewTrainingNoticeModal />
         <BatchModal />
         <AddParticipants />
+        <ViewDocumentModal />
       </TrainingNoticeContext.Provider>
     </>
   );

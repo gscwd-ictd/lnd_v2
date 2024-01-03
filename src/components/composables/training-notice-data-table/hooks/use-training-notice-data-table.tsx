@@ -27,6 +27,8 @@ export const useTrainingNoticeDataTable = () => {
   const [submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen] = useState<boolean>(false);
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
+  const [batchingModalIsOpen, setBatchingModalIsOpen] = useState<boolean>(false);
+  // const [printDocumentModalIsOpen, set]
   const [selectedBatch, setSelectedBatch] = useState<Batch>({
     employees: [],
     batchNumber: 1,
@@ -207,29 +209,29 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
-              {/* {props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL && (
-                <button
-                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                  onClick={(e) => {
-                    // set modal to true
-                    e.stopPropagation();
-                    setViewDocumentsModalIsOpen(true);
-                  }}
-                >
-                  View Documents
-                </button>
-              )} */}
-
               <button
                 className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                 onClick={(e) => {
                   // set modal to true
                   e.stopPropagation();
                   setTrainingNoticeId(props.row.original.id);
-                  setViewDocumentsModalIsOpen(true);
+                  // setViewDocumentsModalIsOpen(true); changed to batching
+                  setBatchingModalIsOpen(true);
                 }}
               >
                 Batching
+              </button>
+
+              {/* Training Status */}
+              <button
+                className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTrainingNoticeId(props.row.original.id);
+                  setViewDocumentsModalIsOpen(true);
+                }}
+              >
+                Test Document
               </button>
 
               {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
@@ -304,6 +306,8 @@ export const useTrainingNoticeDataTable = () => {
     employeePool,
     totalSelectedEmployees,
     employeesWithStatus,
+    batchingModalIsOpen,
+    setBatchingModalIsOpen,
     setEmployeesWithStatus,
     setTotalSelectedEmployees,
     setEmployeePool,

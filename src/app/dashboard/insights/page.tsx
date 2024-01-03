@@ -1,3 +1,3 @@
 export default function DashboardInsights() {
-  return <div className="h-full w-full flex items-center justify-center">Insights</div>;
+  return <div className="flex items-center justify-center w-full h-full ">Insights</div>;
 }
