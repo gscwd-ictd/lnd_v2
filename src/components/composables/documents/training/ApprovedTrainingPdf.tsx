@@ -98,6 +98,14 @@ const ApprovedTrainingPdf: FunctionComponent<ApprovedTrainingPdfProps> = ({ cour
         </View>
 
         <View style={[styles.rowContainer, { paddingTop: 5, borderBottom: "2px solid #0000" }]}></View>
+
+        <View style={[styles.rowContainer, { paddingTop: 3 }]}>
+          <Text style={{ fontSize: 10, paddingRight: 22, textAlign: "justify" }}>
+            The Personnel Development Committee (PDC) upon review and evaluation of the nominees&apos; qualifications,
+            hereby recommend for your approval of the following employees to attend the {courseTitle.toString()} which
+            will held. Blah blah blah.
+          </Text>
+        </View>
       </View>
     </>
   );
