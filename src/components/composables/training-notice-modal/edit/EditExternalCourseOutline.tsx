@@ -251,7 +251,7 @@ export const EditExternalCourseOutline: FunctionComponent = () => {
           <div className="mt-1 mb-4">
             <div className="mb-2">
               <label htmlFor="course-title" className="block text-xs font-medium text-gray-700">
-                Course title
+                Course title <span className="text-red-600 text-md">*</span>
               </label>
               <p className="text-xs text-gray-500">
                 A concise and descriptive identifier that reflects the content, focus, or objectives of the training.
@@ -272,7 +272,7 @@ export const EditExternalCourseOutline: FunctionComponent = () => {
         <div className="mt-1">
           <div className="mb-2">
             <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
-              Facilitator
+              Facilitator <span className="text-red-600 text-md">*</span>
             </label>
             <p className="text-xs text-gray-500">The ones responsible for leading and guiding the training process.</p>
           </div>
@@ -447,7 +447,9 @@ export const EditExternalCourseOutline: FunctionComponent = () => {
 
         <div className="flex items-center justify-between w-full mt-3 mb-2">
           <div>
-            <p className="text-xs font-medium text-gray-600">Course Content</p>
+            <p className="text-xs font-medium text-gray-600">
+              Course Content <span className="text-red-600 text-md">*</span>
+            </p>
             <p className="text-xs text-gray-500">The specific subject matter & topics covered in the training.</p>
           </div>
           <Tooltip

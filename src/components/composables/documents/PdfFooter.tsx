@@ -25,6 +25,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "stretch",
   },
+  footer: {
+    position: "absolute",
+    bottom: 12,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+  },
+
   gscwdLogo: {
     width: 60,
     height: 60,
@@ -92,48 +100,16 @@ Font.register({
   src: "/fonts/arialitalic.ttf",
 });
 
-type HeaderProps = {
-  isoCode?: string;
-  withIsoLogo?: boolean;
-  isFixed?: boolean;
-};
-
-const PdfHeader: FunctionComponent<HeaderProps> = ({ isFixed, isoCode, withIsoLogo }) => {
+const PdfFooter: FunctionComponent = () => {
   return (
     <>
       {/* HEADER */}
-      <View style={[styles.rowContainer, { paddingBottom: 10, paddingTop: 5 }]} fixed={isFixed}>
-        {/* Logo */}
-        <View style={[styles.w20, { paddingRight: 30 }]}>
-          <Image src={GSCWDLogo.src} style={[styles.gscwdLogo]} />
-        </View>
-
-        {/* CENTER  */}
-        <View style={[styles.w60, styles.horizontalCenter]}>
-          <Text style={{ fontSize: 10 }}>Republic of the Philippines</Text>
-          <Text style={{ fontSize: 10, paddingTop: 2, fontFamily: "Helvetica-Bold", color: "#026fbd" }}>
-            GENERAL SANTOS CITY WATER DISTRICT
-          </Text>
-          <Text style={{ fontSize: 10, paddingTop: 2 }}>E. Fernandez St., Brgy. Lagao, General Santos City</Text>
-          <Text style={{ fontSize: 10, paddingTop: 2 }}>Telephone No.: 552-3824; Telefax No.: 553-4960</Text>
-          <Text style={{ fontSize: 10, paddingTop: 2 }}>Email Address: gscwaterdistrict@yahoo.com</Text>
-          <Text style={{ fontSize: 10, paddingTop: 1, color: "#126eb9" }}>www.gensanwater.gov.ph</Text>
-        </View>
-
-        {/* RIGHT */}
-        <View style={[styles.w20, { paddingLeft: 30 }]}>
-          {/* ISO CODE */}
-          {!isEmpty(isoCode) ? (
-            <View style={[{ position: "absolute", right: 0 }]}>
-              <Text style={{ fontSize: 8, fontFamily: "Helvetica" }}>{isoCode}</Text>
-            </View>
-          ) : null}
-
-          {/* ISO LOGO */}
-          {withIsoLogo ? <Image src={IsoAccreditorLogo.src} style={[styles.isoLogo]} /> : null}
-        </View>
+      <View style={[styles.footer]}>
+        <Text style={{ fontFamily: "Times-Italic", color: "#026fbd", fontSize: "12", textAlign: "center" }}>
+          Safe Water... Our Thrust, Our Service, Our Commitment.
+        </Text>
       </View>
     </>
   );
 };
-export default PdfHeader;
+export default PdfFooter;

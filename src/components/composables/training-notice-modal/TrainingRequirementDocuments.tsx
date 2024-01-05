@@ -116,7 +116,9 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
               errors.trainingRequirements ? "text-red-600" : "text-gray-700"
             }`}
           >
-            <div>Training Requirement Documents</div>
+            <div>
+              Training Requirement Documents <span className="text-red-600 text-md">*</span>
+            </div>
             {errors.trainingRequirements ? <div className="text-xs font-normal">Select at least one (1)</div> : null}
           </div>
 

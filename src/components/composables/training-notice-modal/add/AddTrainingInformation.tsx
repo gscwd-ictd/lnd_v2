@@ -343,11 +343,11 @@ export const AddTrainingInformation: FunctionComponent = () => {
                 type="button"
                 onClick={() => {
                   setLocation(
-                    "General Santos City Water District - Training Hall, E. Fernandez St., Lagao, General Santos City"
+                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
                   );
                   setValue(
                     "location",
-                    "General Santos City Water District - Training Hall, E. Fernandez St., Lagao, General Santos City"
+                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
                   );
                   clearErrors("location");
                 }}
@@ -355,7 +355,7 @@ export const AddTrainingInformation: FunctionComponent = () => {
                 onMouseLeave={() => setIsHovered(false)}
               >
                 <div className="flex items-center gap-1 text-xs text-center transition-all">
-                  <span>GSCWD Training Hall</span>
+                  <span>GSCWD Multi-Purpose Hall</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

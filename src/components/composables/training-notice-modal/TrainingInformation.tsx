@@ -13,6 +13,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import Select from "react-select";
+import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 
 const schema = yup.object({
   selectedTags: yup
@@ -76,6 +77,8 @@ export const TrainingInformation: FunctionComponent = () => {
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setHasFetchedRecommendations = useTrainingNoticeStore((state) => state.setHasFetchedRecommendations);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
+  const setIsOnline = useTrainingNoticeStore((state) => state.setIsOnline);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const {
     register,
@@ -132,7 +135,7 @@ export const TrainingInformation: FunctionComponent = () => {
           <div className="mt-1 mb-4">
             <div className="mb-2">
               <label htmlFor="keyword" className="block text-xs font-medium text-gray-700">
-                Keyword
+                Keyword <span className="text-red-600 text-md">*</span>
               </label>
               <p className="text-xs text-gray-500">
                 Tag this training to a certain keyword to identify recommended personnel.
@@ -174,7 +177,7 @@ export const TrainingInformation: FunctionComponent = () => {
           <div className="mt-1 mb-4">
             <div className="mb-2">
               <label htmlFor="no-of-participants" className="block text-xs font-medium text-gray-700">
-                No. of participants
+                No. of participants <span className="text-red-600 text-md">*</span>
               </label>
               <p className="text-xs text-gray-500">The total number of persons who will take part of the training.</p>
             </div>
@@ -274,29 +277,84 @@ export const TrainingInformation: FunctionComponent = () => {
         </div>
 
         <div className="mt-1">
-          <div className="mb-2">
+          <div className="items-center mt-2">
             <label htmlFor="location" className="block text-xs font-medium text-gray-700">
-              Location
+              Location <span className="text-red-600 text-md">*</span>
             </label>
-            <p className="text-xs text-gray-500">The designated venue or setting for the training.</p>
+            <div className="flex w-full">
+              <div className="text-xs text-gray-500">The designated venue or setting for the training.</div>
+              <div className="flex items-center w-auto gap-2 pb-2 text-xs">
+                <Checkbox
+                  id={`checkboxLocation`}
+                  label="Conducted online"
+                  checked={isOnline}
+                  onChange={(e) => {
+                    setIsOnline(!isOnline);
+                    if (e.currentTarget.checked === true) {
+                      setValue("location", "Online");
+                      setLocation("Online");
+                      clearErrors("location");
+                    } else if (e.currentTarget.checked === false) {
+                      setValue("location", "");
+                      setLocation("");
+                    }
+                  }}
+                />
+              </div>
+            </div>
           </div>
-          <textarea
-            {...register("location", { value: location, onChange: (e) => setLocation(e.target.value) })}
-            id="location"
-            style={{ resize: "none" }}
-            rows={2}
-            placeholder="Please indicate the training's venue"
-            // className="block w-full px-4 py-3 text-sm border-gray-200 rounded-md placeholder:text-gray-300 placeholder:text-xs focus:border-indigo-500 focus:ring-indigo-500"
+          {!isOnline ? (
+            <textarea
+              {...register("location", { value: location, onChange: (e) => setLocation(e.target.value) })}
+              id="location"
+              style={{ resize: "none" }}
+              rows={2}
+              placeholder="Please indicate the training's venue"
+              // className="block w-full px-4 py-3 text-sm border-gray-200 rounded-md placeholder:text-gray-300 placeholder:text-xs focus:border-indigo-500 focus:ring-indigo-500"
 
-            className={`block w-full px-4 py-3 placeholder:text-gray-300 rounded-md  ${
-              errors.location
-                ? "outline-none border focus:ring-2 text-sm transition-colors border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
-                : "outline-none border focus:ring-2 text-sm transition-colors border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
-            }`}
-          />
-          <span className="text-xs text-red-600">
-            {!isEmpty(errors.location) ? errors.location?.message : undefined}
-          </span>
+              className={`block w-full px-4 py-3 placeholder:text-gray-300 rounded-md  ${
+                errors.location
+                  ? "outline-none border focus:ring-2 text-sm transition-colors border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
+                  : "outline-none border focus:ring-2 text-sm transition-colors border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
+              }`}
+            />
+          ) : null}
+          <div className="text-xs text-red-600">{!isEmpty(errors.location) ? errors.location?.message : undefined}</div>
+          {!isOnline ? (
+            <div className="flex items-center float-right gap-2">
+              <div className="text-xs text-gray-600">Suggested: </div>
+              <button
+                tabIndex={-1}
+                className="px-1.5 py-0.5 mt-1 bg-orange-200 border border-orange-500 text-orange-700 rounded hover:bg-orange-500 hover:text-white"
+                type="button"
+                onClick={() => {
+                  setLocation(
+                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
+                  );
+                  setValue(
+                    "location",
+                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
+                  );
+                  clearErrors("location");
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <div className="flex items-center gap-1 text-xs text-center transition-all">
+                  <span>GSCWD Multi-Purpose Hall</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    className={`w-3 h-3 ${isHovered ? "stroke-orange-800" : "stroke-orange-600"} `}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          ) : null}
         </div>
       </form>
     </>

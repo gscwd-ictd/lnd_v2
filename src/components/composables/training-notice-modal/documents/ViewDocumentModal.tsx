@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { FunctionComponent, useContext, useEffect } from "react";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
@@ -10,11 +10,21 @@ import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
 import PdfHeader from "../../documents/PdfHeader";
-import ApprovedTrainingPdf from "../../documents/training/ApprovedTrainingPdf";
+import TrainingDocumentPdf from "../../documents/training/TrainingDocumentPdf";
+import PdfFooter from "../../documents/PdfFooter";
+
+type PointPerson = {
+  name: string;
+  position: string;
+  signatureUrl?: string;
+};
 
 export const ViewDocumentModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
+  const setLocation = useTrainingNoticeStore((state) => state.setLocation);
   const reset = useTrainingNoticeStore((state) => state.reset);
+  const setFrom = useTrainingNoticeStore((state) => state.setTrainingStart);
+  const setTo = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
@@ -22,17 +32,13 @@ export const ViewDocumentModal: FunctionComponent = () => {
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
+  const from = useTrainingNoticeStore((state) => state.trainingStart);
+  const to = useTrainingNoticeStore((state) => state.trainingEnd);
+  const location = useTrainingNoticeStore((state) => state.location);
+  const [notedBy, setNotedBy] = useState<PointPerson>({ name: " ", signatureUrl: "", position: "" });
+  const [preparedBy, setPreparedBy] = useState<PointPerson>({ name: " ", signatureUrl: "", position: "" });
 
-  const {
-    id,
-    employeePool,
-    batches,
-    setBatches,
-    setEmployeePool,
-    setTotalSelectedEmployees,
-    viewDocumentsModalIsOpen,
-    setViewDocumentsModalIsOpen,
-  } = useContext(TrainingNoticeContext);
+  const { id, viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
   useQuery({
@@ -51,10 +57,17 @@ export const ViewDocumentModal: FunctionComponent = () => {
           setCourseTitle(data.courseTitle);
           setTrainingStart(data.trainingStart);
           setTrainingEnd(data.trainingEnd);
-
-          const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
-          console.log(acceptedNominees);
-          setEmployeePool(acceptedNominees);
+          setFrom(data.trainingStart);
+          setTo(data.trainingEnd);
+          setLocation(data.location);
+          setPreparedBy({
+            name: "HANELLE B. BALANSAG, MPA",
+            position: "Acting Department Manager A, HR Head, PDC Secretariat",
+          });
+          setNotedBy({
+            name: "FERDINAND S. FERRER, MPA",
+            position: "Acting General Manager / PDC Chairperson",
+          });
         }
 
         return data;
@@ -80,10 +93,6 @@ export const ViewDocumentModal: FunctionComponent = () => {
         fixedHeight
         animate={false}
         onClose={() => {
-          setSelectedTrainingType(undefined);
-          setTotalSelectedEmployees([]);
-          setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
-          setEmployeePool([]); //TODO Replace this with the route from sir henry
           reset();
         }}
       >
@@ -102,10 +111,14 @@ export const ViewDocumentModal: FunctionComponent = () => {
               {/* <ApprovedTrainingPdf/> */}
               <PDFViewer width={"100%"} height={1400}>
                 <Document title=" ">
-                  <Page style={{ paddingHorizontal: 72, paddingVertical: 24, height: 792 }}>
+                  <Page size="A4" style={{ paddingHorizontal: 72, paddingVertical: 24 }}>
                     <PdfHeader isoCode="HRD-4444-4" withIsoLogo />
-                    <ApprovedTrainingPdf courseTitle={courseTitle} />
+                    <TrainingDocumentPdf
+                      data={{ courseTitle, from, to, location, notedBy, preparedBy, isApproved: true }}
+                    />
+                    <PdfFooter />
                   </Page>
+                  <Page></Page>
                 </Document>
               </PDFViewer>
             </main>

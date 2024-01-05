@@ -366,8 +366,7 @@ export const AddInternalCourseOutline: FunctionComponent = () => {
         <div className="mt-1">
           <div className="mb-2">
             <label htmlFor="facilitator" className="block text-xs font-medium text-gray-700">
-              Facilitator
-              {/* <span className="text-red-600 text-md">*</span> */}
+              Facilitator <span className="text-red-600 text-md">*</span>
             </label>
             <p className="text-xs text-gray-500">The ones responsible for leading and guiding the training process.</p>
           </div>
