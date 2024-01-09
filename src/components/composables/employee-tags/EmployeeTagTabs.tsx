@@ -34,10 +34,6 @@ export default function EmployeeTagTabs() {
   const setSelectedTag = useTabStore((state) => state.setSelectedTag);
   const selectedTag = useTabStore((state) => state.selectedTag);
 
-  // useEffect(() => {
-  //   console.log(selectedEmployee);
-  // }, [selectedEmployee]);
-
   useEffect(() => {
     if (query.length >= 3) {
       const getEmployee = async () => {

@@ -9,7 +9,6 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { BatchNumbering } from "./BatchNumbering";
-import { employeesWithSupervisor } from "./AddParticipants";
 
 export const BatchModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);

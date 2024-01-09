@@ -13,6 +13,12 @@ type Employee2Props = {
   positionTitle: string;
 };
 
+export type Employee = {
+  employeeId: string;
+  name: string;
+  positionTitle: string;
+};
+
 type activeTab = {
   activeTab: string;
   setActiveTab: (activeTab: string) => void;
@@ -21,8 +27,8 @@ type activeTab = {
   selectedTag?: Tag;
   setSelectedTag: (selectedTag: Tag) => void;
   // const [employees, setEmployees] = useState<EmployeeProps[]>();
-  employees: Employee2Props[];
-  setEmployees: (employees: Employee2Props[]) => void;
+  employees: Employee[]; //! Replaced Employee2Props
+  setEmployees: (employees: Employee[]) => void; //! Replaced Employee2Props
   // const [employeeTags, setEmployeeTags] = useState<Tags[]>([]);
   employeeTags: Tag[];
   setEmployeeTags: (employeeTags: Tag[]) => void;

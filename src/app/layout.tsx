@@ -5,6 +5,7 @@ import { PageContent } from "@lms/components/osprey/page-content/view/PageConten
 import { Sidebar } from "@lms/components/osprey/navigations/side/sidebar/view/Sidebar";
 import { AppwriteClientContainer } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
 import localFont from "next/dist/compiled/@next/font/dist/local";
+import { PageWrapper } from "@lms/components/osprey/page-content/view/PageWrapper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RootContainer>
           <AppwriteClientContainer>
             <Sidebar />
-            <PageContent>{children}</PageContent>
+            <PageContent>
+              <PageWrapper>{children}</PageWrapper>
+            </PageContent>
           </AppwriteClientContainer>
         </RootContainer>
       </body>

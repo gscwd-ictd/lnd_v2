@@ -222,6 +222,20 @@ export const useTrainingNoticeDataTable = () => {
                 Batching
               </button>
 
+              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    // set modal to true
+                    e.stopPropagation();
+                    setSubmitToPdcSecModalIsOpen(true);
+                  }}
+                >
+                  Submit to PDC Secretariat
+                </button>
+              ) : null}
+
               {/* Training Status */}
               <button
                 className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -231,7 +245,7 @@ export const useTrainingNoticeDataTable = () => {
                   setViewDocumentsModalIsOpen(true);
                 }}
               >
-                Test Document
+                Training Approval Document
               </button>
 
               {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
@@ -253,20 +267,6 @@ export const useTrainingNoticeDataTable = () => {
                     </svg>
                   </button>
                 </Tooltip>
-              ) : null}
-
-              {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
-                <button
-                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                  onClick={(e) => {
-                    // set modal to true
-                    e.stopPropagation();
-                    setSubmitToPdcSecModalIsOpen(true);
-                  }}
-                >
-                  Submit to PDC Secretariat
-                </button>
               ) : null}
 
               <button

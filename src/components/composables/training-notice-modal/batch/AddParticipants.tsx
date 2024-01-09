@@ -19,62 +19,62 @@ import isBetween from "dayjs/plugin/isBetween";
 
 dayjs.extend(isBetween);
 
-export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
-  {
-    employeeId: "001",
-    name: "Richard Vincent Narvaez",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "123", name: "Michael Gabales" },
-  },
-  {
-    employeeId: "002",
-    name: "Hafez Benanben Saiyou",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "123", name: "Michael Gabales" },
-  },
-  {
-    employeeId: "003",
-    name: "Jan Freigseg Lared",
-    status: TrainingNomineeStatus.DECLINED,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "004",
-    name: "Xavier Dale Dabuco",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "005",
-    name: "Paul Ryner Uchiha",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-  },
-  {
-    employeeId: "006",
-    name: "Joel Amoguis",
-    status: TrainingNomineeStatus.DECLINED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "007",
-    name: "Mark Leandre Gamutin",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "008",
-    name: "Ralph Mari Dayot",
-    status: TrainingNomineeStatus.ACCEPTED,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-  {
-    employeeId: "009",
-    name: "Louise Mae Soledad",
-    status: TrainingNomineeStatus.PENDING,
-    supervisor: { supervisorId: "345", name: "Anjo Turija" },
-  },
-];
+// export const employeesWithSupervisor: EmployeeWithSupervisor[] = [
+//   {
+//     employeeId: "001",
+//     name: "Richard Vincent Narvaez",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
+//   },
+//   {
+//     employeeId: "002",
+//     name: "Hafez Benanben Saiyou",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
+//   },
+//   {
+//     employeeId: "003",
+//     name: "Jan Freigseg Lared",
+//     status: TrainingNomineeStatus.DECLINED,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "004",
+//     name: "Xavier Dale Dabuco",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "005",
+//     name: "Paul Ryner Uchiha",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
+//   },
+//   {
+//     employeeId: "006",
+//     name: "Joel Amoguis",
+//     status: TrainingNomineeStatus.DECLINED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "007",
+//     name: "Mark Leandre Gamutin",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "008",
+//     name: "Ralph Mari Dayot",
+//     status: TrainingNomineeStatus.ACCEPTED,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+//   {
+//     employeeId: "009",
+//     name: "Louise Mae Soledad",
+//     status: TrainingNomineeStatus.PENDING,
+//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
+//   },
+// ];
 
 export const AddParticipants: FunctionComponent = () => {
   const {
@@ -311,8 +311,8 @@ export const AddParticipants: FunctionComponent = () => {
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true && initialLoadedEmp === false) {
-      // setTempEmployeePool(employeePool);
-      setTempEmployeePool(employeesWithSupervisor);
+      setTempEmployeePool(employeePool);
+      // setTempEmployeePool(employeesWithSupervisor);
       if (batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees);
       }
@@ -361,10 +361,6 @@ export const AddParticipants: FunctionComponent = () => {
   useEffect(() => {
     setValue("trainingEnd", selectedBatch.trainingDate.to!);
   }, [selectedBatch.trainingDate.to]);
-
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
 
   return (
     <>

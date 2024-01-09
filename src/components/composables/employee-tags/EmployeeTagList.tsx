@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
-import { useTabStore } from "@lms/utilities/stores/employee-tags-store";
+import { Employee, useTabStore } from "@lms/utilities/stores/employee-tags-store";
 import { useEffect, useState } from "react";
 import { UndrawAddSvg } from "./UndrawAddSvg";
 import axios from "axios";
@@ -94,7 +94,7 @@ export default function EmployeeTagList() {
     queryKey: ["getTagsByEmployeeId", selectedEmployee],
     enabled: !!selectedEmployee,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/hrms/employee-tags/${selectedEmployee?.employeeId}`);
+      const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); //! added /employee
       setEmployeeTags(data);
       return data;
     },
@@ -105,11 +105,11 @@ export default function EmployeeTagList() {
     enabled: !!selectedTag,
     queryFn: async () => {
       const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+      console.log(data);
+      var employeesFromTag: Array<Employee> = [];
 
-      var employeesFromTag: Array<Employee2Props> = [];
-
-      data.forEach((test: any) => {
-        test.employees.forEach((emp: Employee2Props) => {
+      data.forEach((employeeAndSupervisors: any) => {
+        employeeAndSupervisors.employees.forEach((emp: Employee) => {
           employeesFromTag.push(emp);
         });
       });
@@ -130,10 +130,10 @@ export default function EmployeeTagList() {
           setEmployeeTags(data);
         } else {
           const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
-          var employeesFromTag: Array<Employee2Props> = [];
+          var employeesFromTag: Array<Employee> = [];
 
           data.forEach((test: any) => {
-            test.employees.forEach((emp: Employee2Props) => {
+            test.employees.forEach((emp: Employee) => {
               employeesFromTag.push(emp);
             });
           });
@@ -296,11 +296,11 @@ export default function EmployeeTagList() {
                 ) : (
                   <>
                     <ul role="list" className="divide-y h-[calc(100vh-240px)] overflow-auto bg-gray-50/50 shadow-inner">
-                      {employees?.map((item, index) => (
+                      {employees?.map((item: Employee, index) => (
                         <li key={index} className="flex justify-between py-3 text-sm group/item hover:bg-slate-100">
                           <div className="col-span-10 pl-4">
                             <div className="flex flex-col">
-                              <h3 className="font-sm">{item.employeeFullName}</h3>
+                              <h3 className="font-sm">{item.name}</h3>
                               <div className="text-xs text-gray-500">{item.positionTitle}</div>
                             </div>
                           </div>

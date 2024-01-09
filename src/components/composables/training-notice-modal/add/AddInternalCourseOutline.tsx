@@ -52,7 +52,7 @@ const internalSchema = yup.object({
         title: yup.string().required(),
       })
     )
-    .notRequired(),
+    .required(),
 });
 
 export const AddInternalCourseOutline: FunctionComponent = () => {

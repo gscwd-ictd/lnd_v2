@@ -1,4 +1,4 @@
-import { Page, Text, Document, StyleSheet, PDFViewer, View, Image, Font } from "@react-pdf/renderer";
+import { Text, StyleSheet, View, Image, Font } from "@react-pdf/renderer";
 import defaultSignature from "../../../../../public/images/document/default-signature.jpeg";
 import dayjs from "dayjs";
 import { FunctionComponent } from "react";
@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   allBorders: {
-    border: "1px solid #000000",
+    border: "1px solid  #000000",
   },
   rowContainer: {
     flexDirection: "row",
@@ -127,14 +127,16 @@ const TrainingDocumentPdf: FunctionComponent<ApprovedTrainingPdfProps> = ({ data
         <View style={[styles.rowContainer, { paddingTop: 5 }]}>
           <Text style={{ fontSize: 10, textAlign: "justify", fontFamily: "Helvetica", lineHeight: 1.5 }}>
             The Personnel Development Committee (PDC) upon review and evaluation of the nominees&apos; qualifications,
-            hereby recommend for your approval of the following employees to attend the{" "}
+            hereby recommend your approval of the following employees to attend the{" "}
             <Text style={{ fontFamily: "Helvetica-Bold" }}>{data.courseTitle.toString()}</Text> which will be held on{" "}
             {dayjs(data.from).isSame(dayjs(data.to), "day") === true
               ? dayjs(data.from).format("MMMM D, YYYY")
               : dayjs(data.from).format("MMMM D")}{" "}
             {dayjs(data.from).isSame(dayjs(data.to), "day") === true ? "" : `-${dayjs(data.to).format("D, YYYY")}`}{" "}
-            {data.location.toLowerCase() === "online" ? "and would take place via online" : `at ${data.location}`}.
-            Please see attached list.
+            {data.location && data.location.toLowerCase() === "online"
+              ? "and would take place via online"
+              : `at ${data.location}`}
+            . Please see attached list.
           </Text>
         </View>
 
@@ -237,4 +239,5 @@ const TrainingDocumentPdf: FunctionComponent<ApprovedTrainingPdfProps> = ({ data
     </>
   );
 };
+
 export default TrainingDocumentPdf;
