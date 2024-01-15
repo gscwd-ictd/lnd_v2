@@ -4,24 +4,21 @@ import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Employee, useTabStore } from "@lms/utilities/stores/employee-tags-store";
 import { useEffect, useState } from "react";
 import { UndrawAddSvg } from "./UndrawAddSvg";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { EmployeeProps, Tag } from "@lms/utilities/types/tags";
 import { url } from "@lms/utilities/url/api-url";
 import { UndrawSelectSvg } from "./UndrawSelectSvg";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { DeleteEmployeeTag } from "../employee-tags-modal/DeleteEmployeeTag";
 import { DeleteEmployee } from "../employee-tags-modal/DeleteEmployee";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 type EmployeeTags = {
   employees: string[];
   tags: string[];
-};
-
-type Employee2Props = {
-  employeeFullName: string;
-  employeeId: string;
-  positionTitle: string;
 };
 
 type SelectProps = {
@@ -33,6 +30,8 @@ export default function EmployeeTagList() {
   const open = useTabStore((state) => state.activeTab);
   const [queryTags, setQueryTags] = useState("");
   const [queryEmployee, setQueryEmployee] = useState("");
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
 
   //search tags combobox
   const [selectTags, setSelectTags] = useState<Array<Tag>>([]);
@@ -56,6 +55,12 @@ export default function EmployeeTagList() {
   const selectedTag = useTabStore((state) => state.selectedTag);
 
   const activeTab = useTabStore((state) => state.activeTab);
+
+  // this function opens the toast with the following attributes
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
 
   useEffect(() => {
     const getTags = async () => {
@@ -120,31 +125,76 @@ export default function EmployeeTagList() {
     },
   });
 
-  const submitEmployeeTag = async (data: EmployeeTags) => {
-    try {
+  // const submitEmployeeTag = async (data: EmployeeTags) => {
+  //   try {
+  //     const result = await axios.post(`${url}/hrms/employee-tags/`, data);
+
+  //     if (result) {
+  //       if (activeTab === "employee") {
+  //         if (result.status === 201) {
+  //           setToastOptions("success", "Success", "You have successfully added a training tag!");
+  //           const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
+  //           setEmployeeTags(data);
+  //         } else
+  //           setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
+  //       } else {
+  //         if (result.status === 201) {
+  //           setToastOptions("success", "Success", "You have successfully an employee to the tag");
+
+  //           const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+  //           var employeesFromTag: Array<Employee> = [];
+
+  //           data.forEach((test: any) => {
+  //             test.employees.forEach((emp: Employee) => {
+  //               employeesFromTag.push(emp);
+  //             });
+  //           });
+
+  //           setEmployees(employeesFromTag);
+  //         } else
+  //           setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
+  //       }
+  //     }
+  //   } catch {
+  //     setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
+  //   }
+  // };
+
+  // on error
+  const submitEmployeeTags = useMutation({
+    onMutate: () => {},
+    mutationFn: async (data: EmployeeTags) => {
       const result = await axios.post(`${url}/hrms/employee-tags/`, data);
-
-      if (result) {
-        if (activeTab === "employee") {
-          const { data } = await axios.get(`${url}/hrms/employee-tags/${selectedEmployee?.employeeId}`);
-          setEmployeeTags(data);
-        } else {
-          const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
-          var employeesFromTag: Array<Employee> = [];
-
-          data.forEach((test: any) => {
-            test.employees.forEach((emp: Employee) => {
-              employeesFromTag.push(emp);
-            });
-          });
-
-          setEmployees(employeesFromTag);
-        }
+      return result;
+    },
+    onError: () => {
+      setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
+    },
+    onSuccess: async () => {
+      // if active tab is employee
+      if (activeTab === "employee") {
+        setToastOptions("success", "Success", "You have successfully added a training tag!");
+        const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
+        setEmployeeTags(data);
       }
-    } catch {
-      console.log("error");
-    }
-  };
+
+      // if active tab is not employee
+      else {
+        setToastOptions("success", "Success", "You have successfully an employee to the tag");
+
+        const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+        var employeesFromTag: Array<Employee> = [];
+
+        data.forEach((test: any) => {
+          test.employees.forEach((emp: Employee) => {
+            employeesFromTag.push(emp);
+          });
+        });
+
+        setEmployees(employeesFromTag);
+      }
+    },
+  });
 
   return (
     <>
@@ -182,10 +232,11 @@ export default function EmployeeTagList() {
                       });
 
                       //submit employee tags
-                      submitEmployeeTag({
-                        employees: [selectedEmployee.employeeId],
-                        tags: tagData,
-                      });
+                      submitEmployeeTags.mutateAsync({ employees: [selectedEmployee.employeeId], tags: tagData });
+                      // submitEmployeeTags({
+                      //   employees: [selectedEmployee.employeeId],
+                      //   tags: tagData,
+                      // });
 
                       //clear input values
                       setTag([]);
@@ -193,7 +244,9 @@ export default function EmployeeTagList() {
                   >
                     Add Tag
                   </Button>
+                  {submitEmployeeTags.isLoading ? <Spinner size="small" borderSize={4} color={"blue"} /> : null}
                 </div>
+
                 <hr />
                 {employeeTags?.length === 0 ? (
                   <>
@@ -272,10 +325,12 @@ export default function EmployeeTagList() {
                       });
 
                       //submit employee tags
-                      submitEmployeeTag({
-                        employees: employeeData,
-                        tags: [selectedTag.id],
-                      });
+                      submitEmployeeTags.mutateAsync({ employees: employeeData, tags: [selectedTag.id] });
+
+                      // submitEmployeeTag({
+                      //   employees: employeeData,
+                      //   tags: [selectedTag.id],
+                      // });
 
                       //clear input values
                       setEmployee([]);
@@ -285,6 +340,7 @@ export default function EmployeeTagList() {
                   </Button>
                 </div>
                 <hr />
+
                 {employees?.length === 0 ? (
                   <>
                     <div className="flex items-center justify-center w-full h-full border-2 border-dashed rounded-lg bg-gray-50/50">
@@ -329,6 +385,16 @@ export default function EmployeeTagList() {
           </>
         )}
       </div>
+
+      {/* Toast options here */}
+      <Toast
+        duration={2000}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { OnGoingDataTable } from "@lms/components/composables/on-going-data-table/OnGoingDataTable";
 import Link from "next/link";
 
 export default async function OnGoingTrainings() {
@@ -10,10 +11,11 @@ export default async function OnGoingTrainings() {
               <Link href="/trainings/on-going" className="text-gray-700">
                 Trainings /
               </Link>
-              <li className="text-gray-500">On-going</li>
+              <li className="text-gray-500">On-Going</li>
             </ul>
           </div>
         </div>
+        <OnGoingDataTable />
       </div>
     </>
   );

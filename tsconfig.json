@@ -23,6 +23,12 @@
       "@lms/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/components/composables/on-going-data-table/hooks/use-on-going-data-table.jsx"
+  ],
   "exclude": ["node_modules"]
 }

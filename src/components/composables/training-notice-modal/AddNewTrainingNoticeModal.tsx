@@ -96,6 +96,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
     onError: (error) => console.log(error),
+
     mutationFn: async () => {
       const {
         trainingSource,

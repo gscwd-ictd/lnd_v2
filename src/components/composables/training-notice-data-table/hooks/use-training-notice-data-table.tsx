@@ -58,7 +58,7 @@ export const useTrainingNoticeDataTable = () => {
 
     helper.accessor("location", {
       header: "Location",
-      cell: (info) => info.getValue(),
+      cell: (info) => <div className="truncate max-w-[15rem]">{info.getValue()}</div>,
     }),
 
     helper.accessor("trainingStart", {
