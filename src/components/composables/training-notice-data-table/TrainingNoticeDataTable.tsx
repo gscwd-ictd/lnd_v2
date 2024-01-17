@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { EmployeeWithSupervisor, TrainingNotice } from "@lms/utilities/types/training";
+import { EmployeeWithSupervisor, TrainingNotice, TrainingPreparationStatus } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
 import { Dispatch, FunctionComponent, SetStateAction, createContext } from "react";
 import { useTrainingNoticeDataTable } from "./hooks/use-training-notice-data-table";
@@ -52,6 +52,8 @@ type TrainingNoticeState = {
   setEmployeesWithStatus: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
   batchingModalIsOpen: boolean;
   setBatchingModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  trainingPreparationStatus: TrainingPreparationStatus | undefined;
+  setTrainingPreparationStatus: Dispatch<SetStateAction<TrainingPreparationStatus | undefined>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -76,6 +78,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     totalSelectedEmployees,
     employeesWithStatus,
     batchingModalIsOpen,
+    trainingPreparationStatus,
+    setTrainingPreparationStatus,
     setBatchingModalIsOpen,
     setEmployeesWithStatus,
     setTotalSelectedEmployees,
@@ -123,6 +127,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           totalSelectedEmployees,
           employeesWithStatus,
           batchingModalIsOpen,
+          trainingPreparationStatus,
+          setTrainingPreparationStatus,
           setBatchingModalIsOpen,
           setEmployeesWithStatus,
           setTotalSelectedEmployees,

@@ -212,7 +212,7 @@ export const AddParticipants: FunctionComponent = () => {
       // assign the object to the specific array (selected batch number)
       Object.assign(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!, {
         trainingDate: { from: selectedBatch.trainingDate.from, to: selectedBatch.trainingDate.to },
-        number: selectedBatch.batchNumber,
+        batchNumber: selectedBatch.batchNumber,
         employees: selectedEmployees,
         isOneDayTraining: selectedBatch.isOneDayTraining,
       });
@@ -300,14 +300,14 @@ export const AddParticipants: FunctionComponent = () => {
         ...selectedBatch,
         trainingDate: { ...selectedBatch.trainingDate, to: selectedBatch.trainingDate?.from },
       });
-      setValue("trainingEnd", selectedBatch.trainingDate.from!);
+      setValue("trainingEnd", selectedBatch.trainingDate?.from!);
     } else if (selectedBatch.isOneDayTraining === false) {
       if (isEmpty(getValues("trainingEnd"))) {
         setValue("trainingEnd", "");
         setSelectedBatch({ ...selectedBatch, trainingDate: { ...selectedBatch.trainingDate, to: "" } });
       }
     }
-  }, [selectedBatch.isOneDayTraining, selectedBatch]);
+  }, [selectedBatch.isOneDayTraining]);
 
   useEffect(() => {
     if (selectedBatchModalIsOpen === true && initialLoadedEmp === false) {
@@ -331,7 +331,7 @@ export const AddParticipants: FunctionComponent = () => {
         setSdtIsLocked(true);
       }
       // if current training date from and to is  the same
-      else if (dayjs(selectedBatch.trainingDate.from).isSame(dayjs(selectedBatch.trainingDate.to), "day")) {
+      else if (dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day")) {
         setSelectedBatch({
           ...selectedBatch,
           isOneDayTraining: true,
@@ -354,13 +354,13 @@ export const AddParticipants: FunctionComponent = () => {
 
   // everytime the value of date from input changes, react hook form receives the same value
   useEffect(() => {
-    setValue("trainingStart", selectedBatch.trainingDate.from!);
-  }, [selectedBatch.trainingDate.from]);
+    setValue("trainingStart", selectedBatch.trainingDate?.from!);
+  }, [selectedBatch.trainingDate?.from]);
 
   // everytime the value of date to input changes, react hook form receives the same value
   useEffect(() => {
-    setValue("trainingEnd", selectedBatch.trainingDate.to!);
-  }, [selectedBatch.trainingDate.to]);
+    setValue("trainingEnd", selectedBatch.trainingDate?.to!);
+  }, [selectedBatch.trainingDate?.to]);
 
   return (
     <>

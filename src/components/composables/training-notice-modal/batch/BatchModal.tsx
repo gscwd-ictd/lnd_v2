@@ -2,15 +2,23 @@
 
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
-import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
+import { Batch, useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { BatchNumbering } from "./BatchNumbering";
+import { EmployeeWithSupervisor, TrainingPreparationStatus } from "@lms/utilities/types/training";
+import dayjs from "dayjs";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 
 export const BatchModal: FunctionComponent = () => {
+  const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
+  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
+  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const reset = useTrainingNoticeStore((state) => state.reset);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -19,12 +27,32 @@ export const BatchModal: FunctionComponent = () => {
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+
+  // this function checks if a batch is empty
+  const checkBatchForEmptyEmployees = (batches: Batch[]) => {
+    let emptyEmployeesBatch: number = 0;
+    batches.map((batch) => {
+      if (batch.employees.length === 0) emptyEmployeesBatch++;
+      return batch;
+    });
+
+    return emptyEmployeesBatch;
+  };
+
+  // set the toast option according to the type color, and title
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
 
   const {
     id,
-
     employeePool,
     batches,
+    trainingPreparationStatus,
+    setTrainingPreparationStatus,
     setBatches,
     setEmployeePool,
     setTotalSelectedEmployees,
@@ -32,9 +60,76 @@ export const BatchModal: FunctionComponent = () => {
     setBatchingModalIsOpen,
   } = useContext(TrainingNoticeContext);
 
-  // per training notice query
-  useQuery({
-    queryKey: ["training-details-nominees", trainingNoticeId],
+  // execute this function when submit is clicked
+  const submitBatching = useMutation({
+    mutationFn: async (batches: Batch[]) => {
+      const newBatches = batches.map((batch) => {
+        const { isOneDayTraining, ...restOfBatch } = batch;
+        const emp = restOfBatch.employees.map((employee) => {
+          return { nomineeId: employee.nomineeId };
+        });
+        return { ...restOfBatch, employees: emp };
+      });
+      console.log(newBatches);
+
+      const trainingWithBatches = {
+        trainingId: id,
+        batches: newBatches,
+      };
+
+      const data = await axios.post(`${url}/training-nominees/batch`, newBatches);
+      return data;
+    },
+
+    onSuccess: () => {
+      setBatchingModalIsOpen(false);
+      setSelectedTrainingType(undefined);
+      setTotalSelectedEmployees([]);
+      setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
+      setEmployeePool([]); //TODO Replace this with the route from sir henry
+      setTrainingPreparationStatus(undefined);
+      setToastOptions("success", "Success", "The changes you've made have been saved.");
+      reset();
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try again later");
+    },
+  });
+
+  // execute this function when submit is clicked
+  const updateBatching = useMutation({
+    mutationFn: async (batches: Batch[]) => {
+      const cleanData = batches.map((batch) => {
+        const { isOneDayTraining, ...restOfBatch } = batch;
+        const emp = restOfBatch.employees.map((employee) => {
+          return { nomineeId: employee.nomineeId };
+        });
+        return { ...restOfBatch, employees: emp };
+      });
+      console.log(cleanData);
+
+      const data = await axios.patch(`${url}/training-nominees/batch`, cleanData);
+      return data;
+    },
+
+    onSuccess: () => {
+      setBatchingModalIsOpen(false);
+      setSelectedTrainingType(undefined);
+      setTotalSelectedEmployees([]);
+      setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
+      setEmployeePool([]); //TODO Replace this with the route from sir henry
+      setTrainingPreparationStatus(undefined);
+      setToastOptions("success", "Success", "The changes you've made have been saved.");
+      reset();
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try again later");
+    },
+  });
+
+  // this is to fetch the training details
+  const { isLoading: trainingDetailsIsLoading } = useQuery({
+    queryKey: ["training-details", trainingNoticeId],
     enabled: !!trainingNoticeId && batchingModalIsOpen !== false,
     staleTime: 2,
     refetchOnReconnect: false,
@@ -42,19 +137,83 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = await axios.get(`${url}/training-details/${id}` as any);
+
         if (!isEmpty(data)) {
           setNumberOfParticipants(data.numberOfParticipants);
           setCourseTitle(data.courseTitle);
           setTrainingStart(data.trainingStart);
           setTrainingEnd(data.trainingEnd);
-
-          const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
-          console.log(acceptedNominees);
-          setEmployeePool(acceptedNominees);
         }
-
         return data;
+      } catch (error) {
+        return error;
+      }
+    },
+  });
+
+  // this is to check if the status for batching and fetch the accepted nominees
+  useQuery({
+    queryKey: ["training-details-nominees-accepted", trainingNoticeId],
+    enabled:
+      !!trainingNoticeId &&
+      batchingModalIsOpen !== false &&
+      trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING, //! CHANGE THIS TO FOR BATCHING
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      try {
+        const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
+        console.log(acceptedNominees);
+        setEmployeePool(acceptedNominees);
+
+        return acceptedNominees;
+      } catch (error) {
+        return error;
+      }
+    },
+  });
+
+  // this is to check the status if it already has batching and fetch the batches
+  useQuery({
+    queryKey: ["training-details-nominees-batches", trainingNoticeId],
+    enabled:
+      (!!trainingNoticeId &&
+        batchingModalIsOpen !== false &&
+        trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING) ||
+      trainingPreparationStatus === TrainingPreparationStatus.DONE, //! CHANGE THIS TO FOR BATCHING
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      try {
+        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
+        let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
+        const fetchedBatches = data.map((batch: Batch) => {
+          if (batch.employees) {
+            updatedSelectedEmployees.push(...batch.employees);
+          }
+          return {
+            batchNumber: batch.batchNumber,
+            trainingDate: {
+              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD"),
+              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD"),
+            },
+            isOneDayTraining:
+              dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
+            employees: batch.employees,
+          };
+        });
+
+        setBatches(fetchedBatches);
+
+        setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+        setEmployeePool([]);
+
+        return batches;
       } catch (error) {
         return error;
       }
@@ -76,58 +235,111 @@ export const BatchModal: FunctionComponent = () => {
         size="3md"
         animate={false}
         isStatic
-        fixedHeight
         onClose={() => {
           setSelectedTrainingType(undefined);
           setTotalSelectedEmployees([]);
           setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
           setEmployeePool([]); //TODO Replace this with the route from sir henry
+          setTrainingPreparationStatus(undefined);
           reset();
         }}
       >
         <ModalContent>
           <ModalContent.Title>
-            <header className="pl-2">
-              {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
+            <header className="px-5 mt-3">
               <div className="flex items-start gap-2">
-                <h3 className="text-lg font-semibold text-gray-600">Training Notice</h3>
+                <h3 className="text-2xl font-medium text-gray-700">{courseTitle}</h3>
               </div>
-              <p className="text-sm text-gray-400">Batch details</p>
+              <div className="flex text-sm text-center">
+                <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
+                <div>
+                  &nbsp;
+                  {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
+                  &nbsp;
+                </div>
+                {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
+                  <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
+                )}
+              </div>
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
-            <main className="px-2 space-y-4">
-              <BatchNumbering />
+            <main className="space-y-4">
+              {/* <BatchNumbering /> */}
+
+              {trainingDetailsIsLoading ? (
+                <div className="flex justify-center w-full h-full">
+                  <Spinner borderSize={4} />
+                </div>
+              ) : (
+                <BatchNumbering />
+              )}
             </main>
           </ModalContent.Body>
 
           <ModalContent.Footer>
-            <div className="px-2 pt-2 pb-3">
+            <div className="px-5 pt-2 pb-5">
               <div className="flex items-center justify-end w-full gap-2">
-                {/* <button className="px-3 py-2 text-white bg-indigo-500 rounded " onClick={() => console.log(batches)}>
-                  Batches
-                </button>
+                {trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING ? (
+                  <button
+                    className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
+                    disabled={employeePool.length === 0 ? false : true}
+                    onClick={() => {
+                      console.log(batches);
 
-                <button
-                  className="px-3 py-2 text-white bg-indigo-500 rounded "
-                  onClick={() => console.log(employeePool)}
-                >
-                  Pool
-                </button>
-                
-                <button
-                  className="px-3 py-2 text-white bg-indigo-500 rounded "
-                  onClick={() => console.log(totalSelectedEmployees)}
-                >
-                  Selected
-                </button> */}
-
-                <button className="px-3 py-2 text-white bg-indigo-500 rounded ">Submit</button>
+                      if (checkBatchForEmptyEmployees(batches) > 0)
+                        setToastOptions(
+                          "danger",
+                          "Error",
+                          ` ${
+                            checkBatchForEmptyEmployees(batches) > 1
+                              ? `${checkBatchForEmptyEmployees(batches)} batches are empty. Please check your input.`
+                              : "A batch is empty. Please check your input."
+                          }`
+                        );
+                      else submitBatching.mutateAsync(batches);
+                    }}
+                    // disabled={employeePool.length === 0 ? true : false}
+                  >
+                    Submit
+                  </button>
+                ) : trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+                  trainingPreparationStatus === TrainingPreparationStatus.DONE ? (
+                  <button
+                    className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
+                    disabled={employeePool.length === 0 ? false : true}
+                    onClick={() => {
+                      console.log(batches);
+                      if (checkBatchForEmptyEmployees(batches) > 0)
+                        setToastOptions(
+                          "danger",
+                          "Error",
+                          ` ${
+                            checkBatchForEmptyEmployees(batches) > 1
+                              ? `${checkBatchForEmptyEmployees(batches)} batches are empty. Please check your input.`
+                              : "A batch is empty. Please check your input."
+                          }`
+                        );
+                      else updateBatching.mutateAsync(batches);
+                    }}
+                    // disabled={employeePool.length === 0 ? true : false}
+                  >
+                    Update
+                  </button>
+                ) : null}
               </div>
             </div>
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
+      <Toast
+        duration={2000}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
     </>
   );
 };

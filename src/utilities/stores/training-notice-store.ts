@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CourseContent, TrainingType } from "../types/training";
+import { CourseContent, TrainingPreparationStatus, TrainingType } from "../types/training";
 import { TrainingSource } from "@lms/lib/types/training-source.type";
 import { TrainingDesign } from "@lms/lib/types/training-design.type";
 import { LspSource } from "./lsp-details-store";
@@ -209,8 +209,7 @@ export type TrainingNoticeStore = {
   setSlotDistribution: (slotDistribution: Recommendation[]) => void;
   // trainingDocuments: TrainingDocument[];
   // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => void;
-  status: string;
-  setStatus: (status: string) => void;
+
   selectedTrainingSource: TrainingSource;
   setSelectedTrainingSource: (selectedTrainingSource: TrainingSource) => void;
   // initialTrainingDocuments: InitialTrainingDocuments[];
@@ -224,6 +223,12 @@ export type TrainingNoticeStore = {
   setTrainingRequirements: (trainingRequirements: TrainingRequirement[]) => void;
   initialTrainingRequirements: TrainingRequirement[];
   setInitialTrainingRequirements: (initialTrainingRequirements: TrainingRequirement[]) => void;
+
+  preparationStatus: TrainingPreparationStatus | "";
+  setPreparationStatus: (preparationStatus: TrainingPreparationStatus | "") => void;
+
+  status: string;
+  setStatus: (status: string) => void;
 };
 
 export const useTrainingTypesStore = create<TrainingTypesStore>((set) => ({
@@ -310,8 +315,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     setTrainingSource: (trainingSource) => set({ trainingSource }),
     hasFetchedRecommendations: false,
     setHasFetchedRecommendations: (hasFetchedRecommendations: boolean) => set({ hasFetchedRecommendations }),
-    status: "",
-    setStatus: (status: string) => set({ status }),
+
     lspDetails: "",
     setLspDetails: (lspDetails) => set({ lspDetails }),
     location: "",
@@ -345,6 +349,12 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
 
     initialTrainingRequirements: [],
     setInitialTrainingRequirements: (initialTrainingRequirements) => set({ initialTrainingRequirements }),
+
+    status: "",
+    setStatus: (status: string) => set({ status }),
+
+    preparationStatus: "",
+    setPreparationStatus: (preparationStatus: TrainingPreparationStatus | "") => set({ preparationStatus }),
 
     // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => set({ trainingDocuments }),
     reset: () =>
@@ -381,6 +391,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         trainingRequirements: [],
         hasFetchedRecommendations: false,
         initialTrainingRequirements: [],
+        preparationStatus: "",
       }),
   }))
 );

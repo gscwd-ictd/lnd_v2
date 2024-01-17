@@ -176,6 +176,7 @@ export default function EmployeeTagList() {
         setToastOptions("success", "Success", "You have successfully added a training tag!");
         const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
         setEmployeeTags(data);
+        setTag([]);
       }
 
       // if active tab is not employee
@@ -192,6 +193,8 @@ export default function EmployeeTagList() {
         });
 
         setEmployees(employeesFromTag);
+        // clear the input
+        setEmployee([]);
       }
     },
   });
@@ -237,9 +240,6 @@ export default function EmployeeTagList() {
                       //   employees: [selectedEmployee.employeeId],
                       //   tags: tagData,
                       // });
-
-                      //clear input values
-                      setTag([]);
                     }}
                   >
                     Add Tag
@@ -331,9 +331,6 @@ export default function EmployeeTagList() {
                       //   employees: employeeData,
                       //   tags: [selectedTag.id],
                       // });
-
-                      //clear input values
-                      setEmployee([]);
                     }}
                   >
                     Add Employee

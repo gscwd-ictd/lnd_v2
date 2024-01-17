@@ -6,37 +6,20 @@ import { EmployeeWithSupervisor } from "@lms/utilities/types/training";
 
 export const BatchNumbering: FunctionComponent = () => {
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
-  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
-  const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
-  const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
   const {
     batches,
-    setBatches,
-    setSelectedBatch,
-    setSelectedBatchModalIsOpen,
-    setTotalSelectedEmployees,
-    totalSelectedEmployees,
     employeePool,
+    totalSelectedEmployees,
+    setBatches,
     setEmployeePool,
+    setSelectedBatch,
+    setTotalSelectedEmployees,
+    setSelectedBatchModalIsOpen,
   } = useContext(TrainingNoticeContext);
 
   return (
     <>
-      <div className="p-3 border rounded shadow-md bg-zinc-100">
-        <div className="text-xl font-medium text-center text-gray-700">{courseTitle}</div>
-        <div className="flex justify-center px-5 text-center">
-          <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
-          <div>
-            &nbsp;
-            {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
-            &nbsp;
-          </div>
-          {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
-            <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
-          )}
-        </div>
-      </div>
-      <div className="flex justify-between gap-1">
+      <div className="flex justify-between gap-1 px-5">
         <div className="flex flex-col items-center justify-center w-full gap-0 py-2 bg-indigo-700 rounded-xl">
           <div className="text-3xl text-white">{numberOfParticipants}</div>
           <div className="text-sm font-medium text-gray-200">Max Participants</div>
@@ -44,7 +27,7 @@ export const BatchNumbering: FunctionComponent = () => {
 
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
-            totalSelectedEmployees.length === numberOfParticipants ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
+            totalSelectedEmployees.length === numberOfParticipants ? "bg-blue-400 hover:bg-blue-600" : "bg-zinc-500"
           } rounded-xl`}
           role="button"
           onClick={() => console.log(totalSelectedEmployees)}
@@ -55,7 +38,7 @@ export const BatchNumbering: FunctionComponent = () => {
 
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
-            employeePool.length === 0 ? "bg-green-500 hover:bg-green-700" : "bg-zinc-500"
+            employeePool.length === 0 ? "bg-blue-400 hover:bg-blue-600" : "bg-zinc-500"
           } rounded-xl`}
           role="button"
           onClick={() => console.log(employeePool)}
@@ -162,61 +145,83 @@ export const BatchNumbering: FunctionComponent = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 pt-5 ">
-        {batches.map((batch, idx) => {
-          return (
-            <div
-              key={batch.batchNumber}
-              role="button"
-              className="flex items-center justify-between w-full p-4 border rounded shadow-md bg-zinc-200 "
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedBatch({
-                  employees: batch.employees,
-                  batchNumber: idx + 1,
-                  trainingDate: batch.trainingDate!,
-                });
-                setSelectedBatchModalIsOpen(true);
-              }}
-            >
-              <div className="flex flex-col w-full text-indigo-800">
-                <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
-                {batch.trainingDate?.from && (
-                  <div className="flex text-gray-600 text-md">
-                    <div>
-                      {batch.trainingDate?.from ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY")} ` : null}{" "}
-                    </div>
-                    <div>
-                      {batch.trainingDate.to && batch.trainingDate.from === batch.trainingDate.to
-                        ? null
-                        : batch.trainingDate.to && batch.trainingDate.to !== batch.trainingDate.from
-                        ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY")}`
-                        : null}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-1 text-gray-700">
-                <span className="text-3xl">{batch.employees.length}</span>
+      <div className="flex flex-col gap-5 px-5 pt-5 ">
+        {batches
+          .sort((a, b) => (a.batchNumber > b.batchNumber ? 1 : -1))
+          .map((batch, idx) => {
+            return (
+              <div
+                key={batch.batchNumber}
+                role="button"
+                className={`flex items-center justify-between w-full px-6 py-4 ${
+                  batch.employees.length === 0 ? "bg-zinc-200" : "bg-blue-200 "
+                } border shadow-md rounded-xl`}
+                onClick={(e) => {
+                  e.stopPropagation();
 
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-8 h-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                  />
-                </svg>
+                  setSelectedBatch({
+                    employees: batch.employees,
+                    batchNumber: idx + 1,
+                    trainingDate: batch.trainingDate!,
+                  });
+                  setSelectedBatchModalIsOpen(true);
+                }}
+              >
+                <div className="flex flex-col w-full pl-4 text-indigo-800">
+                  <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
+                  {batch.trainingDate?.from && (
+                    <div className="flex gap-1 text-gray-600 rounded-xl text-md">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                        />
+                      </svg>
+
+                      <div>
+                        {batch.trainingDate?.from
+                          ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY")} `
+                          : null}{" "}
+                      </div>
+                      <div>
+                        {batch.trainingDate.to && batch.trainingDate.from === batch.trainingDate.to
+                          ? null
+                          : batch.trainingDate.to && batch.trainingDate.to !== batch.trainingDate.from
+                          ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY")}`
+                          : null}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-1 text-gray-700">
+                  <span className="text-3xl">{batch.employees.length}</span>
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-8 h-8"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                    />
+                  </svg>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </>
   );

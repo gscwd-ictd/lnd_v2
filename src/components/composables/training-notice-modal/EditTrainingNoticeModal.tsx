@@ -56,7 +56,8 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     trainingRequirements,
     setBucketFiles,
     reset,
-    setStatus,
+    setPreparationStatus,
+
     setLocation,
     setTrainingEnd,
     setCourseTitle,
@@ -307,7 +308,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setNomineeQualifications(data.nomineeQualifications);
             setNumberOfHours(data.numberOfHours);
             setNumberOfParticipants(data.numberOfParticipants);
-            setStatus(data.status);
+            setPreparationStatus(data.status);
             setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
             setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
@@ -334,7 +335,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setNumberOfHours(data.numberOfHours);
             setCourseTitle(data.courseTitle);
             setNumberOfParticipants(data.numberOfParticipants);
-            setStatus(data.status);
+            setPreparationStatus(data.status);
             setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
             setSlotDistribution(data.slotDistribution);
             setSelectedTags(data.trainingTags);

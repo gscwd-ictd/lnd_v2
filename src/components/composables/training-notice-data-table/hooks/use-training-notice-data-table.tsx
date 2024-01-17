@@ -28,6 +28,9 @@ export const useTrainingNoticeDataTable = () => {
   const [viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen] = useState<boolean>(false);
   const [viewDocumentsModalIsOpen, setViewDocumentsModalIsOpen] = useState<boolean>(false);
   const [batchingModalIsOpen, setBatchingModalIsOpen] = useState<boolean>(false);
+  const [trainingPreparationStatus, setTrainingPreparationStatus] = useState<TrainingPreparationStatus | undefined>(
+    undefined
+  );
   // const [printDocumentModalIsOpen, set]
   const [selectedBatch, setSelectedBatch] = useState<Batch>({
     employees: [],
@@ -49,6 +52,7 @@ export const useTrainingNoticeDataTable = () => {
   const setLspSource = useLspSourceStore((state) => state.setLspSource);
   const setHasFetchedRecommendations = useTrainingNoticeStore((state) => state.setHasFetchedRecommendations);
   const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
+  // const setPreparationStatus = useTrainingNoticeStore((state) => state.setPreparationStatus);
 
   const columns = [
     helper.accessor("courseTitle", {
@@ -161,7 +165,6 @@ export const useTrainingNoticeDataTable = () => {
                   Edit
                 </button>
               ) : null}
-
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
               props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
@@ -179,7 +182,6 @@ export const useTrainingNoticeDataTable = () => {
                   View
                 </button>
               ) : null}
-
               {props.row.original.preparationStatus === TrainingPreparationStatus.PENDING ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -196,6 +198,8 @@ export const useTrainingNoticeDataTable = () => {
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
               props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
               props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -208,19 +212,6 @@ export const useTrainingNoticeDataTable = () => {
                   Nominee Status
                 </button>
               ) : null}
-
-              <button
-                className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                onClick={(e) => {
-                  // set modal to true
-                  e.stopPropagation();
-                  setTrainingNoticeId(props.row.original.id);
-                  // setViewDocumentsModalIsOpen(true); changed to batching
-                  setBatchingModalIsOpen(true);
-                }}
-              >
-                Batching
-              </button>
 
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ? (
@@ -236,6 +227,23 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
+              {props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    // set modal to true
+                    e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
+                    // setViewDocumentsModalIsOpen(true); changed to batching
+                    setTrainingPreparationStatus(props.row.original.preparationStatus);
+                    setBatchingModalIsOpen(true);
+                  }}
+                >
+                  Batching
+                </button>
+              ) : null}
               {/* Training Status */}
               <button
                 className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
@@ -247,7 +255,6 @@ export const useTrainingNoticeDataTable = () => {
               >
                 Training Approval Document
               </button>
-
               {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
                 <Tooltip content="Generate document" withArrow>
                   <button
@@ -307,6 +314,8 @@ export const useTrainingNoticeDataTable = () => {
     totalSelectedEmployees,
     employeesWithStatus,
     batchingModalIsOpen,
+    trainingPreparationStatus,
+    setTrainingPreparationStatus,
     setBatchingModalIsOpen,
     setEmployeesWithStatus,
     setTotalSelectedEmployees,
@@ -357,6 +366,18 @@ export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-gray-700 bg-gray-300 border-gray-200">
         PDC Approval
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.FOR_BATCHING)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-gray-700 bg-gray-300 border-gray-200">
+        For Batching
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.DONE_BATCHING)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-gray-700 bg-gray-300 border-gray-200">
+        Done Batching
       </div>
     );
   else if (status === TrainingPreparationStatus.DONE)
