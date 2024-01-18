@@ -55,7 +55,6 @@ export const ViewDocumentModal: FunctionComponent = () => {
       try {
         const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
         if (!isEmpty(data)) {
-          console.log(data);
           setNumberOfParticipants(data.numberOfParticipants);
           setCourseTitle(data.courseTitle);
           setTrainingStart(data.trainingStart);

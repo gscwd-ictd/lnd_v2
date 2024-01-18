@@ -97,7 +97,7 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
         });
         return ir;
       });
-      // console.log(test);
+
       setInitialTrainingRequirements(newInitialTrainingRequirements);
       setHasSetTrainingRequirements(true);
     }

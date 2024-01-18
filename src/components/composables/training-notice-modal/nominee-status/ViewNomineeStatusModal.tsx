@@ -91,7 +91,6 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
       try {
         const { data } = (await axios.get(`${url}/training-nominees/${id}`)) as any;
         if (!isEmpty(data)) {
-          console.log(data);
           setEmployeesWithStatus(data);
         }
 

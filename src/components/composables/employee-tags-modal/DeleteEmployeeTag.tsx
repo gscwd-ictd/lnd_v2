@@ -21,8 +21,6 @@ export const DeleteEmployeeTag: FunctionComponent<DeleteEmployeeTagProp> = ({ ta
   const deleteEmployeeTag = async (data: DeleteEmployeeTagProp) => {
     var employeeId = data.employeeId;
 
-    console.log(data);
-
     try {
       const result = await axios.delete(`${url}/hrms/employee-tags/`, { data });
 

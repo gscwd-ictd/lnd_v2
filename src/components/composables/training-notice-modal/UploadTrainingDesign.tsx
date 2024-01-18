@@ -120,8 +120,6 @@ export const UploadTrainingDesign: FunctionComponent = () => {
                 //   onChange={(e) => handleAdd(e.target.files)}
                 accept="application/pdf, image/png, image/jpeg, image/jpg, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/plain, application/csv"
                 onChange={(e) => {
-                  // console.log(e.target.files);
-
                   if (e.target.files?.length === 0) {
                     //
                   } else if (e.target.files) {
@@ -129,7 +127,6 @@ export const UploadTrainingDesign: FunctionComponent = () => {
                     const files = [...filesToUpload];
                     files.push(e.target.files[0]);
 
-                    console.log(files);
                     setToastOptions("success", "Success!", `You have attached the file ${e.target.files[0].name}`);
                     setFilesToUpload(files);
                   }

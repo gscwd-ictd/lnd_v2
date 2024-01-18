@@ -193,7 +193,7 @@ export const AddInternalCourseOutline: FunctionComponent = () => {
         });
       });
       newFacilitators.sort((a, b) => (a.name > b.name ? 1 : -1));
-      console.log(newFacilitators);
+
       setFacilitators(newFacilitators);
       return { individualInternal, individualExternal, organization };
     },

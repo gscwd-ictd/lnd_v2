@@ -154,7 +154,6 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
       try {
         const { data } = (await axios.get(`${url}/lsp-details/${id}`)) as any;
         if (!isEmpty(data)) {
-          console.log(data);
           // setLspDetails(data);
           setLspSource(LspSource.EXTERNAL);
           setContactNumber(data.contactNumber);

@@ -85,8 +85,6 @@ export const DataTable = <T extends unknown>({
   // memoize table columns
   const tblCols = useMemo(() => columns, [columns]);
 
-  //console.log(data);
-
   const table = useReactTable({
     data: data as T[],
     columns: tblCols,

@@ -153,8 +153,10 @@ export const BatchNumbering: FunctionComponent = () => {
               <div
                 key={batch.batchNumber}
                 role="button"
-                className={`flex items-center justify-between w-full px-6 py-4 ${
-                  batch.employees.length === 0 ? "bg-zinc-200" : "bg-blue-200 "
+                className={`flex items-center justify-between min-h-[7rem] w-full px-6 py-4 ${
+                  batch.employees.length === 0
+                    ? "bg-zinc-200 hover:bg-zinc-400 hover:scale-105 hover:transition-all"
+                    : "bg-blue-50 hover:bg-blue-300 hover:scale-105 hover:transition-all "
                 } border shadow-md rounded-xl`}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -170,40 +172,156 @@ export const BatchNumbering: FunctionComponent = () => {
                 <div className="flex flex-col w-full pl-4 text-indigo-800">
                   <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
                   {batch.trainingDate?.from && (
-                    <div className="flex gap-1 text-gray-600 rounded-xl text-md">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-                        />
-                      </svg>
-
-                      <div>
+                    <div className="flex gap-1 rounded-xl text-md">
+                      {/* <div>
                         {batch.trainingDate?.from
-                          ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY")} `
+                          ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY hh:mm A")} `
                           : null}{" "}
                       </div>
                       <div>
                         {batch.trainingDate.to && batch.trainingDate.from === batch.trainingDate.to
                           ? null
                           : batch.trainingDate.to && batch.trainingDate.to !== batch.trainingDate.from
-                          ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY")}`
+                          ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY hh:mm A")}`
                           : null}
-                      </div>
+                      </div> */}
+                      {dayjs(batch.trainingDate?.from).isSame(dayjs(batch.trainingDate?.to), "day") === true ? (
+                        <div className="flex w-full">
+                          <div className="flex w-full gap-1">
+                            {/* <span className="w-[4.5rem]">Starts on</span> */}
+                            {/* Date From */}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="w-6 h-6 text-gray-800"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                              />
+                            </svg>
+                            <div className="font-medium text-gray-700">
+                              {dayjs(batch.trainingDate?.from).format("MMMM DD, YYYY")}
+                            </div>
+                          </div>
+                          <div className="flex w-full gap-1">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="w-6 h-6 text-gray-800"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                              />
+                            </svg>
+                            <div className="text-gray-500">
+                              {dayjs(batch.trainingDate?.from).format("hh:mmA")}-
+                              {dayjs(batch.trainingDate?.to).format("hh:mmA")}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col w-full gap-1">
+                          <div className="flex w-full ">
+                            <div className="flex w-full gap-1">
+                              {/* <span className="w-[4.5rem]">Starts on</span> */}
+                              {/* Date From */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6 text-gray-800"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                                />
+                              </svg>
+                              <div className="font-medium text-gray-700">
+                                {dayjs(batch.trainingDate?.from).format("MMMM DD, YYYY")}
+                              </div>
+                            </div>
+                            <div className="flex w-full gap-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6 text-gray-800"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                              </svg>
+                              <div className="text-gray-500">{dayjs(batch.trainingDate?.from).format("hh:mmA")}</div>
+                              <span className="w-[3rem]">Start</span>
+                            </div>
+                          </div>
+                          {/* <div className="text-gray-600">to</div> */}
+                          <div className="flex w-full">
+                            <div className="flex w-full gap-1">
+                              {/* <span className="w-[4.5rem]">Ends on</span> */}
+                              {/* Date to */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6 text-gray-800"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                                />
+                              </svg>
+
+                              <div className="font-medium text-gray-700">
+                                {dayjs(batch.trainingDate?.to).format("MMMM DD, YYYY")}
+                              </div>
+                            </div>
+                            <div className="flex w-full gap-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6 text-gray-800"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                              </svg>
+                              <div className="text-gray-500">{dayjs(batch.trainingDate?.to).format("hh:mmA")}</div>
+                              <span className="w-[3rem]">End</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
                 <div className="flex gap-1 text-gray-700">
                   <span className="text-3xl">{batch.employees.length}</span>
-
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

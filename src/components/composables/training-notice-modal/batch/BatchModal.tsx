@@ -29,6 +29,7 @@ export const BatchModal: FunctionComponent = () => {
   const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+  const [hasFetchedDetails, setHasFetchedDetails] = useState<boolean>(false);
 
   // this function checks if a batch is empty
   const checkBatchForEmptyEmployees = (batches: Batch[]) => {
@@ -70,26 +71,20 @@ export const BatchModal: FunctionComponent = () => {
         });
         return { ...restOfBatch, employees: emp };
       });
-      console.log(newBatches);
 
       const trainingWithBatches = {
         trainingId: id,
         batches: newBatches,
       };
 
-      const data = await axios.post(`${url}/training-nominees/batch`, newBatches);
+      const data = await axios.post(`${url}/training-nominees/batch`, trainingWithBatches);
       return data;
     },
 
     onSuccess: () => {
       setBatchingModalIsOpen(false);
-      setSelectedTrainingType(undefined);
-      setTotalSelectedEmployees([]);
-      setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
-      setEmployeePool([]); //TODO Replace this with the route from sir henry
-      setTrainingPreparationStatus(undefined);
       setToastOptions("success", "Success", "The changes you've made have been saved.");
-      reset();
+      setHasFetchedDetails(false);
     },
     onError: () => {
       setToastOptions("danger", "Error", "Something went wrong. Please try again later");
@@ -99,28 +94,27 @@ export const BatchModal: FunctionComponent = () => {
   // execute this function when submit is clicked
   const updateBatching = useMutation({
     mutationFn: async (batches: Batch[]) => {
-      const cleanData = batches.map((batch) => {
+      const newBatches = batches.map((batch) => {
         const { isOneDayTraining, ...restOfBatch } = batch;
         const emp = restOfBatch.employees.map((employee) => {
           return { nomineeId: employee.nomineeId };
         });
         return { ...restOfBatch, employees: emp };
       });
-      console.log(cleanData);
+      const trainingWithBatches = {
+        trainingId: id,
+        batches: newBatches,
+      };
 
-      const data = await axios.patch(`${url}/training-nominees/batch`, cleanData);
+      const data = await axios.patch(`${url}/training-nominees/batch`, trainingWithBatches);
       return data;
     },
 
     onSuccess: () => {
       setBatchingModalIsOpen(false);
-      setSelectedTrainingType(undefined);
       setTotalSelectedEmployees([]);
-      setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
-      setEmployeePool([]); //TODO Replace this with the route from sir henry
-      setTrainingPreparationStatus(undefined);
       setToastOptions("success", "Success", "The changes you've made have been saved.");
-      reset();
+      setHasFetchedDetails(false);
     },
     onError: () => {
       setToastOptions("danger", "Error", "Something went wrong. Please try again later");
@@ -138,12 +132,13 @@ export const BatchModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/training-details/${id}` as any);
-
+        setHasFetchedDetails(true);
         if (!isEmpty(data)) {
           setNumberOfParticipants(data.numberOfParticipants);
           setCourseTitle(data.courseTitle);
           setTrainingStart(data.trainingStart);
           setTrainingEnd(data.trainingEnd);
+          setBatches([{ batchNumber: 1, employees: [], trainingDate: { from: "", to: "" }, isOneDayTraining: false }]);
         }
         return data;
       } catch (error) {
@@ -157,6 +152,7 @@ export const BatchModal: FunctionComponent = () => {
     queryKey: ["training-details-nominees-accepted", trainingNoticeId],
     enabled:
       !!trainingNoticeId &&
+      hasFetchedDetails === true &&
       batchingModalIsOpen !== false &&
       trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING, //! CHANGE THIS TO FOR BATCHING
     staleTime: 2,
@@ -166,8 +162,9 @@ export const BatchModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
-        console.log(acceptedNominees);
+
         setEmployeePool(acceptedNominees);
+        setTotalSelectedEmployees([]);
 
         return acceptedNominees;
       } catch (error) {
@@ -181,6 +178,7 @@ export const BatchModal: FunctionComponent = () => {
     queryKey: ["training-details-nominees-batches", trainingNoticeId],
     enabled:
       (!!trainingNoticeId &&
+        hasFetchedDetails === true &&
         batchingModalIsOpen !== false &&
         trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING) ||
       trainingPreparationStatus === TrainingPreparationStatus.DONE, //! CHANGE THIS TO FOR BATCHING
@@ -199,8 +197,8 @@ export const BatchModal: FunctionComponent = () => {
           return {
             batchNumber: batch.batchNumber,
             trainingDate: {
-              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD"),
-              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD"),
+              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
             },
             isOneDayTraining:
               dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
@@ -236,12 +234,8 @@ export const BatchModal: FunctionComponent = () => {
         animate={false}
         isStatic
         onClose={() => {
-          setSelectedTrainingType(undefined);
-          setTotalSelectedEmployees([]);
-          setBatches([{ trainingDate: { from: "", to: "" }, employees: [], batchNumber: 1 }]); // initialize
-          setEmployeePool([]); //TODO Replace this with the route from sir henry
-          setTrainingPreparationStatus(undefined);
-          reset();
+          setTrainingNoticeId(null);
+          setHasFetchedDetails(false);
         }}
       >
         <ModalContent>
@@ -285,8 +279,6 @@ export const BatchModal: FunctionComponent = () => {
                     className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
                     disabled={employeePool.length === 0 ? false : true}
                     onClick={() => {
-                      console.log(batches);
-
                       if (checkBatchForEmptyEmployees(batches) > 0)
                         setToastOptions(
                           "danger",
@@ -299,7 +291,6 @@ export const BatchModal: FunctionComponent = () => {
                         );
                       else submitBatching.mutateAsync(batches);
                     }}
-                    // disabled={employeePool.length === 0 ? true : false}
                   >
                     Submit
                   </button>
@@ -309,7 +300,6 @@ export const BatchModal: FunctionComponent = () => {
                     className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
                     disabled={employeePool.length === 0 ? false : true}
                     onClick={() => {
-                      console.log(batches);
                       if (checkBatchForEmptyEmployees(batches) > 0)
                         setToastOptions(
                           "danger",

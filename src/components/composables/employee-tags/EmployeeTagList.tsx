@@ -110,7 +110,6 @@ export default function EmployeeTagList() {
     enabled: !!selectedTag,
     queryFn: async () => {
       const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
-      console.log(data);
       var employeesFromTag: Array<Employee> = [];
 
       data.forEach((employeeAndSupervisors: any) => {

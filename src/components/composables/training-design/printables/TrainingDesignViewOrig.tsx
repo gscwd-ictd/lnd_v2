@@ -25,7 +25,7 @@ export const TrainingDesignViewOrig: FunctionComponent<TrainingDesignViewProps> 
     queryKey: ["training-design", id],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training-designs/${id}`);
-      console.log(data);
+
       setTrainingDesignId(data.id);
       setCourseTitle(data.courseTitle);
       setRationale(data.rationale);

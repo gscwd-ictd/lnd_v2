@@ -139,10 +139,9 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
   useQuery({
     queryKey: ["employee-pds", employeeId],
     queryFn: async () => {
-      console.log("FETCHING");
       try {
         const { data } = await axios.get(`http://172.20.110.45:4001/api/pds/v2/${employeeId}`);
-        console.log(data);
+
         setEmployeePds(data);
         return data;
       } catch (error) {

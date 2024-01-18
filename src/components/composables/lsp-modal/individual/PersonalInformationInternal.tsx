@@ -82,7 +82,7 @@ export const PersonalInformationInternal: FunctionComponent = () => {
     queryKey: ["employee-names", search],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/employees/q?name=${search}`);
-      console.log("FROM PERSONAL INFO:", data);
+
       return data as EmployeeSearch[];
     },
     enabled: search !== "",

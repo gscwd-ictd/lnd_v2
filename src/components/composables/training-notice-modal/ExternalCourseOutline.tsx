@@ -130,7 +130,6 @@ export const ExternalCourseOutline: FunctionComponent<CourseOutlineProps> = ({ s
       });
 
       setFacilitators(newInd);
-      //console.log({ ind: individual.data.items, org: organization.data.items });
     };
 
     fetchFacilitators();

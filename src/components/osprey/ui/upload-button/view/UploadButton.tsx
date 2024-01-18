@@ -8,7 +8,6 @@ export default function UploadButton() {
 
   const handleUpload = () => {
     if (!files) {
-      console.log;
       return;
     }
 
@@ -36,7 +35,6 @@ export default function UploadButton() {
       })
       .then((res) => {
         setMsg("Upload successful");
-        console.log(res.data);
       })
 
       .catch((err) => {

@@ -29,17 +29,11 @@ export const AddNewTagModal: FunctionComponent = () => {
 
   const mutation = useMutation({
     onSuccess: (data, variable) => {
-      // console.log(data);
       setOpen(false);
       queryClient.refetchQueries({ queryKey: ["tags"], type: "all", exact: true, stale: true });
     },
     onError: () => console.log("error"),
     mutationFn: async () => {
-      // console.log(tagName);
-      // const response = await axios.post(`${url}/lsp-details`, data);
-      // return response.data;
-      // console.log(name);
-
       const response = await axios.post(`${url}/tags/`, { name });
       setIsOpenToast(true);
       return response.data;

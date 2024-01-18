@@ -208,41 +208,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         initialTrainingRequirements,
       } = training;
 
-      console.log(
-        {
-          id: trainingNoticeId,
-          source: { id: selectedTrainingSource.id },
-          courseTitle,
-          type: selectedTrainingType,
-          courseContent,
-          trainingLspDetails: selectedFacilitators.map((faci) => {
-            return { id: faci.id };
-          }),
-          location,
-          slotDistribution: slotDistribution.map((slot) => {
-            const employees = slot.employees.map((emp) => {
-              return { employeeId: emp.employeeId };
-            });
-
-            return {
-              supervisor: { supervisorId: slot.supervisor.supervisorId },
-              numberOfSlots: slot.numberOfSlots,
-              employees,
-            };
-          }),
-          trainingStart: new Date(training.trainingStart).toISOString(),
-          trainingEnd: new Date(training.trainingEnd).toISOString(),
-          numberOfHours,
-          numberOfParticipants,
-          trainingTags: selectedTags.map((tag) => {
-            return { id: tag.id };
-          }),
-
-          trainingRequirements,
-        },
-        "HELLOASKDJASKLD"
-      );
-
       const response = await axios.put(`${url}/training-details/external`, {
         id: trainingNoticeId,
         source: { id: selectedTrainingSource.id },
@@ -288,7 +253,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
         // INTERNAL
         if (!isEmpty(data)) {
-          console.log(data);
           setCourseContent(data.courseContent);
           setTrainingRequirements(data.trainingRequirements);
           if (data.source.name === "Internal") {
@@ -325,7 +289,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
 
           // EXTERNAL
           else if (data.source.name === "External") {
-            console.log("EXTERNAL NI");
+           
             setSelectedTrainingSource({ id: data.source.id, name: "External" });
             assignBucketFile(data.bucketFiles);
             setDeadlineForSubmission(data.deadlineForSubmission);

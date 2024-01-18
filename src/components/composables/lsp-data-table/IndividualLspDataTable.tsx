@@ -24,7 +24,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
     queryKey: ["lsp-details", rowId],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/lsp-details/${rowId}`);
-      console.log(data);
+
       return data;
     },
     enabled: !!rowId,

@@ -88,16 +88,6 @@ export const CreateTrainingDesignComponent: FunctionComponent = () => {
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      console.log({
-        courseTitle,
-        rationale,
-        courseDescription,
-        courseObjective: courseObjective,
-        targetParticipants,
-        methodologies,
-        expectedOutput,
-        recognition,
-      });
       const response = await axios.post(`${url}/training-designs`, {
         courseTitle,
         rationale,

@@ -68,7 +68,6 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
     },
     onError: (error) => {
       setToastOptions("danger", "Error", `There is a problem with the request: ${error}`);
-      // console.log(error);
     },
     mutationFn: async () => {
       const response = await axios.patch(`${url}/training-notices/internal`, {
@@ -120,7 +119,6 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
     },
     onError: (error) => {
       setToastOptions("danger", "Error", `There is a problem with the request: ${error}`);
-      // console.log(error);
     },
     mutationFn: async () => {
       const response = await axios.patch(`${url}/training-notices/external`, {

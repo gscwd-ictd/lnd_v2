@@ -191,7 +191,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp-details/${id}`);
-        console.log(data);
+
         if (!isEmpty(data)) {
           if (lspSource === "internal") {
             setTin(data.tin);
@@ -292,25 +292,6 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
       setToastOptions("danger", "Error", "Please try again in a few seconds");
     },
     mutationFn: async () => {
-      console.log({
-        id: lspId,
-        firstName,
-        lastName,
-        contactNumber,
-        email,
-        postalAddress,
-        experience,
-        photoUrl,
-        expertise,
-        affiliations,
-        awards,
-        certifications,
-        coaching,
-        education,
-        projects,
-        trainings,
-        introduction,
-      });
       try {
         const response = await axios.put(`${url}/lsp-details/individual/external`, {
           //data
@@ -333,7 +314,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
           trainings,
           introduction,
         });
-        console.log(response);
+
         return response.data;
       } catch (error) {
         return error;
@@ -373,7 +354,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
           projects,
           trainings,
         });
-        console.log(response);
+
         return response.data;
       } catch (error) {
         return error;

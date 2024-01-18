@@ -62,7 +62,6 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
       try {
         const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
         if (!isEmpty(data)) {
-          console.log(data);
           // setCourseContent(data.courseContent);
           if (data.source.name === "Internal") {
             setId(data.id);
