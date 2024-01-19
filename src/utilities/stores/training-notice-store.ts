@@ -207,6 +207,8 @@ export type TrainingNoticeStore = {
   setRecommendations: (recommendations: Recommendation[]) => void;
   slotDistribution: Recommendation[];
   setSlotDistribution: (slotDistribution: Recommendation[]) => void;
+  previousSlotDistribution: Recommendation[];
+  setPreviousSlotDistribution: (previousSlotDistribution: Recommendation[]) => void;
   // trainingDocuments: TrainingDocument[];
   // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => void;
 
@@ -346,7 +348,8 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
 
     slotDistribution: [],
     setSlotDistribution: (slotDistribution: Recommendation[]) => set({ slotDistribution }),
-
+    previousSlotDistribution: [],
+    setPreviousSlotDistribution: (previousSlotDistribution: Recommendation[]) => set({ previousSlotDistribution }),
     initialTrainingRequirements: [],
     setInitialTrainingRequirements: (initialTrainingRequirements) => set({ initialTrainingRequirements }),
 
@@ -392,6 +395,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         hasFetchedRecommendations: false,
         initialTrainingRequirements: [],
         preparationStatus: "",
+        previousSlotDistribution: [],
       }),
   }))
 );

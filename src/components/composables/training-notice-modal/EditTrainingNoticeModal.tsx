@@ -76,6 +76,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setSelectedTags,
     setHasFetchedRecommendations,
     setTrainingRequirements,
+    setPreviousSlotDistribution,
   } = useTrainingNoticeStore();
 
   const lspSource = useLspSourceStore((state) => state.lspSource);
@@ -262,8 +263,9 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
               courseTitle: data.trainingDesign.courseTitle,
               id: data.trainingDesign.id,
             });
-
-            setSlotDistribution(data.slotDistribution);
+            setHasFetchedRecommendations(false);
+            // setSlotDistribution(data.slotDistribution);
+            setPreviousSlotDistribution(data.slotDistribution);
             setSelectedFacilitators(data.trainingLspDetails);
             setSelectedTags(data.trainingTags);
             setDeadlineForSubmission(data.deadlineForSubmission);
@@ -289,7 +291,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
 
           // EXTERNAL
           else if (data.source.name === "External") {
-           
             setSelectedTrainingSource({ id: data.source.id, name: "External" });
             assignBucketFile(data.bucketFiles);
             setDeadlineForSubmission(data.deadlineForSubmission);

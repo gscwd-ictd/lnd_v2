@@ -8,6 +8,7 @@ import axios from "axios";
 import { FunctionComponent, useEffect } from "react";
 import { Disclosure } from "@headlessui/react";
 import { isEmpty } from "lodash";
+import { useQuery } from "@tanstack/react-query";
 
 export const Recommendations: FunctionComponent = () => {
   //const [recommendation, setRecommendation] = useState<Recommendation[]>([]);
@@ -22,28 +23,83 @@ export const Recommendations: FunctionComponent = () => {
   const setSlotDistribution = useTrainingNoticeStore((state) => state.setSlotDistribution);
   const action = useTrainingNoticeModalStore((state) => state.action);
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
+  const previousSlotDistribution = useTrainingNoticeStore((state) => state.previousSlotDistribution);
 
-  useEffect(() => {
-    if (hasFetchedRecommendations === false && !isEmpty(selectedTags)) {
-      const getRecommendedEmployees = async () => {
-        const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
-        console.log(result.data);
-        result.data.map((slot: Recommendation) => {
-          slot.numberOfSlots = 0;
+  // useEffect(() => {
+  //   if (hasFetchedRecommendations === false && !isEmpty(selectedTags)) {
+  //     const selectedTagIds = selectedTags.map((tag) => {
+  //       return tag.id;
+  //     });
+
+  //     const getRecommendedEmployees = async () => {
+  //       const result = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+
+  //       result.data.map((slot: Recommendation) => {
+  //         slot.numberOfSlots = 0;
+  //         return slot;
+  //       });
+  //       // setSlotDistribution(result.data);
+
+  //       if (!isEmpty(result.data)) {
+  //         const mergedSlotDistribution = result.data.map((slot: Recommendation) => {
+  //           if (
+  //             previousSlotDistribution.find(
+  //               (prevSlot: Recommendation) => prevSlot.supervisor.supervisorId === slot.supervisor.supervisorId
+  //             )
+  //           ) {
+  //             slot = previousSlotDistribution.find(
+  //               (prevSlot: Recommendation) => prevSlot.supervisor.supervisorId === slot.supervisor.supervisorId
+  //             )!;
+  //           }
+  //           return slot;
+  //         });
+
+  //         setSlotDistribution(mergedSlotDistribution);
+  //         setHasFetchedRecommendations(true);
+  //       }
+  //     };
+
+  //     getRecommendedEmployees();
+  //   }
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedTags, hasFetchedRecommendations, action]);
+
+  useQuery({
+    queryKey: ["tag-recommendations", selectedTags],
+    enabled: hasFetchedRecommendations === false,
+    queryFn: async () => {
+      const selectedTagIds = selectedTags.map((tag) => {
+        return tag.id;
+      });
+      const { data } = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+      data.map((slot: Recommendation) => {
+        slot.numberOfSlots = 0;
+        return slot;
+      });
+      // setSlotDistribution(result.data);
+
+      if (!isEmpty(data)) {
+        const mergedSlotDistribution = data.map((slot: Recommendation) => {
+          if (
+            previousSlotDistribution.find(
+              (prevSlot: Recommendation) => prevSlot.supervisor.supervisorId === slot.supervisor.supervisorId
+            )
+          ) {
+            slot = previousSlotDistribution.find(
+              (prevSlot: Recommendation) => prevSlot.supervisor.supervisorId === slot.supervisor.supervisorId
+            )!;
+          }
           return slot;
         });
-        setSlotDistribution(result.data);
 
-        if (!isEmpty(result.data)) {
-          setHasFetchedRecommendations(true);
-        }
-      };
+        setSlotDistribution(mergedSlotDistribution);
+        setHasFetchedRecommendations(true);
+      } else setSlotDistribution([]);
 
-      getRecommendedEmployees();
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTags, hasFetchedRecommendations, action]);
+      return data;
+    },
+  });
 
   useEffect(() => {
     if (slotDistribution.length > 0) {
@@ -53,7 +109,7 @@ export const Recommendations: FunctionComponent = () => {
         } else return accumulator;
       }, 0);
       setConsumedSlots(sum);
-    }
+    } else setConsumedSlots(0);
   }, [slotDistribution]);
 
   return (
@@ -70,7 +126,12 @@ export const Recommendations: FunctionComponent = () => {
             / {numberOfParticipants}
           </p>
         </div>
-
+        {/* <button className="px-3 py-2 text-white bg-indigo-600" onClick={() => console.log(slotDistribution)}>
+          Log Current
+        </button>
+        <button className="px-3 py-2 text-white bg-indigo-600" onClick={() => console.log(previousSlotDistribution)}>
+          Log Previous
+        </button> */}
         <ul className="space-y-3">
           {slotDistribution.length > 0 ? (
             slotDistribution.map((data, index) => (

@@ -68,7 +68,7 @@ export type TrainingNotice = {
   type: "foundational" | "technical" | "professional" | "supervisory" | "leadership/managerial";
   preparationStatus: TrainingPreparationStatus;
   bucketFiles: Array<string>;
-  trainingStatus: TrainingStatus;
+  status: TrainingStatus;
 };
 
 export type TrainingType = {

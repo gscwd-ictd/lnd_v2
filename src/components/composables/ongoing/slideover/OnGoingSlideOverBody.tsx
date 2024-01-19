@@ -140,9 +140,17 @@ export const OnGoingSlideOverBody = () => {
                         >
                           <div className="text-sm font-semibold">Batch {batch.batchNumber}</div>
                           <div className="text-xs font-medium text-gray-500">
-                            {!isEmpty(from) && !isEmpty(to) && dayjs(from).isSame(dayjs(to), "day")
-                              ? `${dayjs(from).format("MMMM D, YYYY")}`
-                              : `${dayjs(from).format("MMMM D-")}${dayjs(to).format("D, YYYY")}`}
+                            {!isEmpty(batch.trainingDate.from) &&
+                            !isEmpty(batch.trainingDate.to) &&
+                            dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day")
+                              ? `${dayjs(batch.trainingDate.from).format("MMMM D, YYYY hh:mmA")}-${dayjs(
+                                  batch.trainingDate.to
+                                ).format("hh:mmA")}`
+                              : `${dayjs(batch.trainingDate.from).format("MMMM D-")}${dayjs(to).format(
+                                  "D, YYYY"
+                                )} ${dayjs(batch.trainingDate.from).format("hh:mmA")}-${dayjs(
+                                  batch.trainingDate.to
+                                ).format("hh:mmA")}`}
                           </div>
                           <svg
                             width="24"

@@ -225,24 +225,25 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {employeesWithStatus.map((employee) => {
-                      return (
-                        <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
-                          <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                          <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
-                          <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
-                          <td className="p-2 text-sm font-light text-center border ">
-                            {employee.remarks ? (
-                              <Tooltip content={employee.remarks}>
-                                <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
-                              </Tooltip>
-                            ) : (
-                              <span className="text-center">-</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {employeesWithStatus.length > 0 &&
+                      employeesWithStatus.map((employee) => {
+                        return (
+                          <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
+                            <td className="p-2 text-sm font-light border ">{employee.name}</td>
+                            <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
+                            <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
+                            <td className="p-2 text-sm font-light text-center border ">
+                              {employee.remarks ? (
+                                <Tooltip content={employee.remarks}>
+                                  <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
+                                </Tooltip>
+                              ) : (
+                                <span className="text-center">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>

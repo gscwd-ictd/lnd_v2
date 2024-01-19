@@ -245,6 +245,20 @@ export const AddParticipants: FunctionComponent = () => {
     }
   };
 
+  // on previous
+  const onPrevious = () => {
+    setSelectedBatchModalIsOpen(false);
+    setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { from: "", to: "" } });
+    setSelectedEmployees([]);
+    clearErrors("employees");
+    clearErrors("trainingStart");
+    clearErrors("trainingEnd");
+    setInitialLoadedEmp(false);
+    setFromIsLocked(false);
+    setToIsLocked(false);
+    setSdtIsLocked(false);
+  };
+
   // add all participants with this function
   const addAllParticipants = () => {
     const allEmployees = [...tempEmployeePool];
@@ -363,26 +377,28 @@ export const AddParticipants: FunctionComponent = () => {
         isOpen={selectedBatchModalIsOpen}
         setIsOpen={setSelectedBatchModalIsOpen}
         size="3md"
+        onClose={onPrevious}
         animate={false}
         isStatic
-        onClose={() => {
-          setSelectedBatchModalIsOpen(false);
-          setSelectedBatch({ employees: [], batchNumber: 1, trainingDate: { from: "", to: "" } });
-          setSelectedEmployees([]);
-          clearErrors("employees");
-          clearErrors("trainingStart");
-          clearErrors("trainingEnd");
-          setInitialLoadedEmp(false);
-          setFromIsLocked(false);
-          setToIsLocked(false);
-          setSdtIsLocked(false);
-        }}
       >
         <ModalContent>
           <ModalContent.Title>
             <header className="pl-2">
               {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
-              <div className="flex items-center gap-5">
+
+              <div className="flex items-center gap-2">
+                <button onClick={onPrevious}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-10 h-10 stroke-indigo-500"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
+                  </svg>
+                </button>
                 <h3 className="text-lg font-semibold text-gray-600">Batch {selectedBatch.batchNumber}</h3>
               </div>
               <div className="flex text-sm ">

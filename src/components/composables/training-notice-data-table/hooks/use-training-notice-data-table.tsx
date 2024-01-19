@@ -8,7 +8,12 @@ import {
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
-import { EmployeeWithSupervisor, TrainingNotice, TrainingPreparationStatus } from "@lms/utilities/types/training";
+import {
+  EmployeeWithSupervisor,
+  TrainingNotice,
+  TrainingPreparationStatus,
+  TrainingStatus,
+} from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -125,7 +130,10 @@ export const useTrainingNoticeDataTable = () => {
 
     helper.accessor("preparationStatus", {
       header: "Status",
-      cell: (info) => GetTrainingStatus(info.getValue()),
+      cell: (info) =>
+        info.row.original.preparationStatus === TrainingPreparationStatus.DONE
+          ? GetStatus(info.row.original.status)
+          : GetTrainingStatus(info.getValue()),
     }),
 
     helper.accessor("id", {
@@ -244,18 +252,22 @@ export const useTrainingNoticeDataTable = () => {
                   Batching
                 </button>
               ) : null}
+
               {/* Training Status */}
-              <button
-                className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTrainingNoticeId(props.row.original.id);
-                  setViewDocumentsModalIsOpen(true);
-                }}
-              >
-                Training Approval Document
-              </button>
-              {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+              {props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
+                    setViewDocumentsModalIsOpen(true);
+                  }}
+                >
+                  Training Approval Document
+                </button>
+              ) : null}
+              {/* {props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
                 <Tooltip content="Generate document" withArrow>
                   <button
                     className="text-gray-800 transition-colors rounded"
@@ -274,6 +286,21 @@ export const useTrainingNoticeDataTable = () => {
                     </svg>
                   </button>
                 </Tooltip>
+              ) : null} */}
+
+              {/* Rescheduling */}
+              {props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
+                    // setViewDocumentsModalIsOpen(true);
+                  }}
+                >
+                  Reschedule
+                </button>
               ) : null}
 
               <button
@@ -384,6 +411,39 @@ export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-green-700 bg-green-300 border-green-200">
         Done
+      </div>
+    );
+};
+
+export const GetStatus = (status: TrainingStatus | null) => {
+  if (status === TrainingStatus.UPCOMING)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
+        Upcoming
+      </div>
+    );
+  else if (status === TrainingStatus.ONGOING)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
+        Ongoing
+      </div>
+    );
+  else if (status === TrainingStatus.REQUIREMENTS_SUBMISSION)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
+        Requirements Submission
+      </div>
+    );
+  else if (status === TrainingStatus.COMPLETED)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
+        Completed
+      </div>
+    );
+  else
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-zinc-700 bg-zinc-100 border-zinc-200">
+        None
       </div>
     );
 };

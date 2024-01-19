@@ -4,7 +4,7 @@ import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/vi
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
-import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
+import { Batch, useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
@@ -14,6 +14,7 @@ import TrainingDocumentPdf from "../../documents/training/TrainingDocumentPdf";
 import PdfFooter from "../../documents/PdfFooter";
 import TrainingNomineesDocument from "../../documents/training/TrainingNomineesDocument";
 import { PageContentContext } from "@lms/components/osprey/page-content/view/PageWrapper";
+import dayjs from "dayjs";
 
 type PointPerson = {
   name: string;
@@ -45,7 +46,7 @@ export const ViewDocumentModal: FunctionComponent = () => {
 
   // per training notice query
   useQuery({
-    queryKey: ["training-details-nominees", trainingNoticeId],
+    queryKey: ["training-details", trainingNoticeId],
     enabled: !!trainingNoticeId && viewDocumentsModalIsOpen !== false,
     staleTime: 2,
     refetchOnReconnect: false,
@@ -72,690 +73,725 @@ export const ViewDocumentModal: FunctionComponent = () => {
           });
 
           //! this is a test setting of batches
-          setBatches([
-            {
-              batchNumber: 1,
-              trainingDate: { from: "01/28/2024", to: "01/28/2024" },
-              employees: [
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
+          // setBatches([
+          //   {
+          //     batchNumber: 1,
+          //     trainingDate: { from: "01/28/2024", to: "01/28/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
 
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-                {
-                  employeeId: "123",
-                  name: "Ricardo Vicente Narvaiza",
-                  supervisor: { name: "Michael Gabales", supervisorId: "1" },
-                  distributionId: "123",
-                  nomineeId: "123",
-                },
-              ],
-            },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //       {
+          //         employeeId: "123",
+          //         name: "Ricardo Vicente Narvaiza",
+          //         supervisor: { name: "Michael Gabales", supervisorId: "1" },
+          //         distributionId: "123",
+          //         nomineeId: "123",
+          //       },
+          //     ],
+          //   },
 
-            //2
-            {
-              batchNumber: 2,
-              trainingDate: { from: "01/28/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "John Seigfred Derla",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //2
+          //   {
+          //     batchNumber: 2,
+          //     trainingDate: { from: "01/28/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "John Seigfred Derla",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //3
-            {
-              batchNumber: 3,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //3
+          //   {
+          //     batchNumber: 3,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //4
-            {
-              batchNumber: 4,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //4
+          //   {
+          //     batchNumber: 4,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //5
-            {
-              batchNumber: 5,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //5
+          //   {
+          //     batchNumber: 5,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //6
-            {
-              batchNumber: 6,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //6
+          //   {
+          //     batchNumber: 6,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //7
-            {
-              batchNumber: 7,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
+          //   //7
+          //   {
+          //     batchNumber: 7,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
 
-            //8
-            {
-              batchNumber: 8,
-              trainingDate: { from: "01/29/2024", to: "01/29/2024" },
-              employees: [
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-                {
-                  employeeId: "124",
-                  name: "Hafez Ben Saiyadi",
-                  supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
-                  distributionId: "123",
-                  nomineeId: "124",
-                },
-              ],
-            },
-          ]);
+          //   //8
+          //   {
+          //     batchNumber: 8,
+          //     trainingDate: { from: "01/29/2024", to: "01/29/2024" },
+          //     employees: [
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //       {
+          //         employeeId: "124",
+          //         name: "Hafez Ben Saiyadi",
+          //         supervisor: { name: "Ferdinand Ferrer", supervisorId: "2" },
+          //         distributionId: "123",
+          //         nomineeId: "124",
+          //       },
+          //     ],
+          //   },
+          // ]);
         }
 
         return data;
+      } catch (error) {
+        return error;
+      }
+    },
+  });
+
+  // this is to check the status if it already has batching and fetch the batches
+  useQuery({
+    queryKey: ["training-details-nominees-batches", id],
+    enabled: !!id,
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      try {
+        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
+
+        const fetchedBatches = data.map((batch: Batch) => {
+          return {
+            batchNumber: batch.batchNumber,
+            trainingDate: {
+              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+            },
+            employees: batch.employees,
+          };
+        });
+
+        setBatches(fetchedBatches);
+
+        // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+        // setEmployeePool([]);
+
+        return batches;
       } catch (error) {
         return error;
       }

@@ -177,11 +177,11 @@ export const BatchModal: FunctionComponent = () => {
   useQuery({
     queryKey: ["training-details-nominees-batches", trainingNoticeId],
     enabled:
-      (!!trainingNoticeId &&
-        hasFetchedDetails === true &&
-        batchingModalIsOpen !== false &&
-        trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING) ||
-      trainingPreparationStatus === TrainingPreparationStatus.DONE, //! CHANGE THIS TO FOR BATCHING
+      !!trainingNoticeId &&
+      hasFetchedDetails === true &&
+      batchingModalIsOpen !== false &&
+      (trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+        trainingPreparationStatus === TrainingPreparationStatus.DONE),
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,

@@ -8,6 +8,7 @@ import axios from "axios";
 import { FunctionComponent, useEffect } from "react";
 import { Disclosure } from "@headlessui/react";
 import { isEmpty } from "lodash";
+import { useQuery } from "@tanstack/react-query";
 
 export const AddRecommendations: FunctionComponent = () => {
   //const [recommendation, setRecommendation] = useState<Recommendation[]>([]);
@@ -24,34 +25,57 @@ export const AddRecommendations: FunctionComponent = () => {
   const action = useTrainingNoticeModalStore((state) => state.action);
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
 
-  useEffect(() => {
-    if (!hasFetchedRecommendations && !isEmpty(selectedTags)) {
+  // useEffect(() => {
+  //   if (!hasFetchedRecommendations && !isEmpty(selectedTags)) {
+  //     const selectedTagIds = selectedTags.map((tag) => {
+  //       return tag.id;
+  //     });
+
+  //     const getRecommendedEmployees = async () => {
+  //       // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
+  //       const result = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+
+  //       console.log(result);
+
+  //       result.data.map((slot: Recommendation) => {
+  //         slot.numberOfSlots = 0;
+  //         return slot;
+  //       });
+
+  //       setSlotDistribution(result.data);
+  //       if (!isEmpty(result.data)) {
+  //         setHasFetchedRecommendations(true);
+  //       }
+  //     };
+
+  //     getRecommendedEmployees();
+  //   }
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedTags, hasFetchedRecommendations, action]);
+
+  useQuery({
+    queryKey: ["tag-recommendations", selectedTags],
+    enabled: hasFetchedRecommendations === false,
+    queryFn: async () => {
       const selectedTagIds = selectedTags.map((tag) => {
         return tag.id;
       });
+      const { data } = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+      data.map((slot: Recommendation) => {
+        slot.numberOfSlots = 0;
+        return slot;
+      });
+      // setSlotDistribution(result.data);
 
-      const getRecommendedEmployees = async () => {
-        // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
-        const result = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+      if (!isEmpty(data)) {
+        setSlotDistribution(data);
+      } else setSlotDistribution([]);
+      setHasFetchedRecommendations(true);
 
-        console.log(result);
-
-        result.data.map((slot: Recommendation) => {
-          slot.numberOfSlots = 0;
-          return slot;
-        });
-
-        setSlotDistribution(result.data);
-        if (!isEmpty(result.data)) {
-          setHasFetchedRecommendations(true);
-        }
-      };
-
-      getRecommendedEmployees();
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTags, hasFetchedRecommendations, action]);
+      return data;
+    },
+  });
 
   useEffect(() => {
     if (slotDistribution.length > 0) {
