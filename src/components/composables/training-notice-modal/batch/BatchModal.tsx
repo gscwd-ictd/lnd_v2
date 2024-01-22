@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Button } from "@lms/components/osprey/ui/button/view/Button";
 
 export const BatchModal: FunctionComponent = () => {
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
@@ -122,7 +123,7 @@ export const BatchModal: FunctionComponent = () => {
   });
 
   // this is to fetch the training details
-  const { isLoading: trainingDetailsIsLoading } = useQuery({
+  const { isLoading, isFetching, data } = useQuery({
     queryKey: ["training-details", trainingNoticeId],
     enabled: !!trainingNoticeId && batchingModalIsOpen !== false,
     staleTime: 2,
@@ -244,26 +245,29 @@ export const BatchModal: FunctionComponent = () => {
               <div className="flex items-start gap-2">
                 <h3 className="text-2xl font-medium text-gray-700">{courseTitle}</h3>
               </div>
-              <div className="flex text-sm text-center">
-                <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
-                <div>
-                  &nbsp;
-                  {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && "to"}
-                  &nbsp;
+              {isEmpty(trainingStart) ? null : (
+                <div className="flex text-sm text-center">
+                  <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
+                  <div>
+                    &nbsp;
+                    {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") &&
+                      "to"}
+                    &nbsp;
+                  </div>
+                  {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
+                    <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
+                  )}
                 </div>
-                {dayjs(trainingStart).format("MMMM DD, YYYY") !== dayjs(trainingEnd).format("MMMM DD, YYYY") && (
-                  <div className="text-gray-600 ">{dayjs(trainingEnd).format("MMMM DD, YYYY")}</div>
-                )}
-              </div>
+              )}
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
             <main className="space-y-4">
               {/* <BatchNumbering /> */}
 
-              {trainingDetailsIsLoading ? (
-                <div className="flex justify-center w-full h-full">
-                  <Spinner borderSize={4} />
+              {isLoading || isEmpty(data) || isFetching ? (
+                <div className="flex justify-center w-full h-full overflow-hidden">
+                  <Spinner borderSize={4} size="large" />
                 </div>
               ) : (
                 <BatchNumbering />
@@ -275,8 +279,9 @@ export const BatchModal: FunctionComponent = () => {
             <div className="px-5 pt-2 pb-5">
               <div className="flex items-center justify-end w-full gap-2">
                 {trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING ? (
-                  <button
-                    className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
+                  <Button
+                    variant="solid"
+                    size="default"
                     disabled={employeePool.length === 0 ? false : true}
                     onClick={() => {
                       if (checkBatchForEmptyEmployees(batches) > 0)
@@ -293,11 +298,12 @@ export const BatchModal: FunctionComponent = () => {
                     }}
                   >
                     Submit
-                  </button>
+                  </Button>
                 ) : trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
                   trainingPreparationStatus === TrainingPreparationStatus.DONE ? (
-                  <button
-                    className="px-3 py-2 text-white bg-indigo-600 rounded disabled:cursor-not-allowed"
+                  <Button
+                    variant="solid"
+                    size="default"
                     disabled={employeePool.length === 0 ? false : true}
                     onClick={() => {
                       if (checkBatchForEmptyEmployees(batches) > 0)
@@ -312,10 +318,9 @@ export const BatchModal: FunctionComponent = () => {
                         );
                       else updateBatching.mutateAsync(batches);
                     }}
-                    // disabled={employeePool.length === 0 ? true : false}
                   >
                     Update
-                  </button>
+                  </Button>
                 ) : null}
               </div>
             </div>

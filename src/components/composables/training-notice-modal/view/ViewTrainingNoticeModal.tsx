@@ -11,6 +11,7 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const ViewTrainingNoticeModal: FunctionComponent = () => {
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
@@ -35,7 +36,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
   const { id, viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
-  useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["training-details-sending", trainingNoticeId],
     enabled: !!trainingNoticeId && viewTrainingNoticeModalIsOpen !== false,
     staleTime: 2,
@@ -126,7 +127,14 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
-              <SendTrainingNoticeSummary />
+              {/* <SendTrainingNoticeSummary /> */}
+              {isEmpty(data) || isLoading || isFetching ? (
+                <div className="flex justify-center w-full h-full overflow-hidden">
+                  <Spinner size="large" color="blue" borderSize={4} />
+                </div>
+              ) : (
+                <SendTrainingNoticeSummary />
+              )}
             </main>
           </ModalContent.Body>
 

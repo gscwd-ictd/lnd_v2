@@ -9,6 +9,7 @@ import { isEmpty } from "lodash";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 //todo REMOVE
 // const employeesWithSupervisor: EmployeeWithSupervisor[] = [
@@ -80,7 +81,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
   const trainingId = useTrainingNoticeStore((state) => state.id);
 
   // per training notice query
-  useQuery({
+  const { isLoading, isFetching, data } = useQuery({
     queryKey: ["training-nominees", trainingId],
     enabled: !!trainingId && nomineeStatusIsOpen !== false,
     staleTime: 2,
@@ -169,85 +170,91 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
           </ModalContent.Title>
 
           <ModalContent.Body>
-            <main className="px-2 space-y-4">
-              <div className="flex items-end justify-between">
-                <div className="flex flex-col border-4 border-dashed border-zinc-200 bg-zinc-50  w-[12rem] py-2 px-4 rounded">
-                  <div className="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
-                        className=" fill-green-500"
-                      />
-                    </svg>
-                    <span className="text-sm text-gray-700 uppercase">{acceptedEmployees.length} accepted</span>
+            {isEmpty(data) || isLoading || isFetching ? (
+              <div className="flex justify-center w-full h-full overflow-hidden">
+                <Spinner size="large" borderSize={2} />
+              </div>
+            ) : (
+              <main className="px-2 space-y-4">
+                <div className="flex items-end justify-between">
+                  <div className="flex flex-col border-4 border-dashed border-zinc-200 bg-zinc-50  w-[12rem] py-2 px-4 rounded">
+                    <div className="flex items-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
+                          className=" fill-green-500"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-700 uppercase">{acceptedEmployees.length} accepted</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
+                          className=" fill-gray-500"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-700 uppercase">{nominatedEmployees.length} pending</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
+                          className=" fill-red-500"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-700 uppercase">{declinedEmployees.length} declined</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
-                        className=" fill-gray-500"
-                      />
-                    </svg>
-                    <span className="text-sm text-gray-700 uppercase">{nominatedEmployees.length} pending</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"
-                        className=" fill-red-500"
-                      />
-                    </svg>
-                    <span className="text-sm text-gray-700 uppercase">{declinedEmployees.length} declined</span>
+
+                  <div className="text-sm text-gray-700">
+                    <span className="font-medium text-md ">
+                      {acceptedEmployees.length} out of {countEmployees} accepted
+                    </span>
                   </div>
                 </div>
 
-                <div className="text-sm text-gray-700">
-                  <span className="font-medium text-md ">
-                    {acceptedEmployees.length} out of {countEmployees} accepted
-                  </span>
+                <div className="relative overflow-x-auto rounded-lg shadow-md">
+                  <table className="w-full text-left table-fixed">
+                    <thead className="text-white rounded-t bg-sky-600">
+                      <tr>
+                        <th className="p-2 font-medium border">Employee Name</th>
+                        <th className="p-2 font-medium border">Supervisor</th>
+                        <th className="p-2 font-medium text-center border">Status</th>
+                        <th className="p-2 font-medium text-center border">Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {employeesWithStatus.length > 0 &&
+                        employeesWithStatus.map((employee) => {
+                          return (
+                            <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
+                              <td className="p-2 text-sm font-light border ">{employee.name}</td>
+                              <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
+                              <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
+                              <td className="p-2 text-sm font-light text-center border ">
+                                {employee.remarks ? (
+                                  <Tooltip content={employee.remarks}>
+                                    <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
+                                  </Tooltip>
+                                ) : (
+                                  <span className="text-center">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
                 </div>
-              </div>
-
-              <div className="relative overflow-x-auto rounded-lg shadow-md">
-                <table className="w-full text-left table-fixed">
-                  <thead className="text-white bg-indigo-600 rounded-t">
-                    <tr>
-                      <th className="p-2 font-medium border">Employee Name</th>
-                      <th className="p-2 font-medium border">Supervisor</th>
-                      <th className="p-2 font-medium text-center border">Status</th>
-                      <th className="p-2 font-medium text-center border">Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {employeesWithStatus.length > 0 &&
-                      employeesWithStatus.map((employee) => {
-                        return (
-                          <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
-                            <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                            <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
-                            <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
-                            <td className="p-2 text-sm font-light text-center border ">
-                              {employee.remarks ? (
-                                <Tooltip content={employee.remarks}>
-                                  <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
-                                </Tooltip>
-                              ) : (
-                                <span className="text-center">-</span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </main>
+              </main>
+            )}
           </ModalContent.Body>
 
           <ModalContent.Footer>

@@ -174,7 +174,8 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
               props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.DONE ||
@@ -204,7 +205,8 @@ export const useTrainingNoticeDataTable = () => {
               ) : null}
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
               props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
@@ -383,9 +385,15 @@ export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
         Nomination Done
       </div>
     );
-  else if (status === TrainingPreparationStatus.PDC_APPROVAL)
+  else if (status === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-blue-700 bg-blue-300 border-blue-200">
+        PDC Approval
+      </div>
+    );
+  else if (status === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-green-700 bg-green-300 border-green-200">
         PDC Approval
       </div>
     );

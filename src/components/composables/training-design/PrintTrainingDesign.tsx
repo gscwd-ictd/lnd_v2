@@ -11,6 +11,7 @@ import { Tiptap } from "@lms/components/osprey/ui/tiptap/view/Tiptap";
 import Image from "next/image";
 import gscwd_logo from "../../../../public/images/document/gscwd_logo.png";
 import iso_logo from "../../../../public/images/document/iso_logo.jpg";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const PrintTrainingDesign = () => {
   const trainingDesignToPrintRef = useRef(null);
@@ -82,7 +83,9 @@ export const PrintTrainingDesign = () => {
         <div className="m-1 shadow-xl">
           <div className="w-[8.5in] px-20 py-10 bg-white text-sm">
             {!trainingDesignId ? (
-              <>Loading...</>
+              <div className="flex justify-center w-full h-full">
+                <Spinner borderSize={4} size="large" />
+              </div>
             ) : (
               <div ref={trainingDesignToPrintRef}>
                 <header className="flex items-center w-full h-full grid-cols-3 font-serif">

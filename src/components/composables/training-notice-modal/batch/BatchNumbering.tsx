@@ -19,16 +19,16 @@ export const BatchNumbering: FunctionComponent = () => {
 
   return (
     <>
-      <div className="flex justify-between gap-1 px-5">
-        <div className="flex flex-col items-center justify-center w-full gap-0 py-2 bg-indigo-700 rounded-xl">
+      <div className="flex justify-between gap-2 px-5">
+        <div className="flex flex-col items-center justify-center w-full gap-0 py-2 rounded-md bg-sky-700">
           <div className="text-3xl text-white">{numberOfParticipants}</div>
           <div className="text-sm font-medium text-gray-200">Max Participants</div>
         </div>
 
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
-            totalSelectedEmployees.length === numberOfParticipants ? "bg-blue-400 hover:bg-blue-600" : "bg-zinc-500"
-          } rounded-xl`}
+            totalSelectedEmployees.length === numberOfParticipants ? "bg-sky-400 hover:bg-sky-600" : "bg-zinc-500"
+          } rounded-md`}
           role="button"
           onClick={() => console.log(totalSelectedEmployees)}
         >
@@ -38,8 +38,8 @@ export const BatchNumbering: FunctionComponent = () => {
 
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
-            employeePool.length === 0 ? "bg-blue-400 hover:bg-blue-600" : "bg-zinc-500"
-          } rounded-xl`}
+            employeePool.length === 0 ? "bg-sky-400 hover:bg-sky-600" : "bg-zinc-500"
+          } rounded-md`}
           role="button"
           onClick={() => console.log(employeePool)}
         >
@@ -47,17 +47,17 @@ export const BatchNumbering: FunctionComponent = () => {
           <div className="text-sm font-medium text-gray-100">Available</div>
         </div>
 
-        <div className="flex items-center justify-center w-full gap-0 py-2 border-2 border-indigo-700 rounded-xl ring ring-indigo-200 ring-inset bg-gradient-to-r from-zinc-100 to-gray-300/50">
+        <div className="flex items-center justify-center w-full gap-0 py-2 border-2 rounded-md border-sky-700 ring ring-sky-200 ring-inset bg-gradient-to-r from-zinc-100 to-gray-300/50">
           <div className="flex items-center gap-2">
             <div className="flex flex-col items-center gap-0">
-              <div className="text-3xl text-indigo-700">{batches.length}</div>
+              <div className="text-3xl text-sky-700">{batches.length}</div>
               <div className="text-sm font-medium text-gray-700"> {batches.length > 1 ? "Batches" : "Batch"}</div>
             </div>
             <div className="flex items-center w-full">
               <div className="flex flex-col gap-1">
                 {/* Arrow up */}
                 <button
-                  className="text-white bg-indigo-600 rounded-full hover:bg-indigo-300 hover:text-zinc-800"
+                  className="text-white rounded-md bg-sky-600 hover:bg-sky-300 hover:text-zinc-800"
                   onClick={() =>
                     setBatches([
                       ...batches,
@@ -83,7 +83,7 @@ export const BatchNumbering: FunctionComponent = () => {
 
                 {/* Arrow down */}
                 <button
-                  className="text-white rounded-full bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-800"
+                  className="text-white rounded-md bg-zinc-600 hover:bg-zinc-300 hover:text-indigo-800"
                   onClick={() => {
                     if (batches.length > 1) {
                       const updatedBatches = [...batches];
@@ -155,9 +155,9 @@ export const BatchNumbering: FunctionComponent = () => {
                 role="button"
                 className={`flex items-center justify-between min-h-[7rem] w-full px-6 py-4 ${
                   batch.employees.length === 0
-                    ? "bg-zinc-200 hover:bg-zinc-400 hover:scale-105 hover:transition-all"
-                    : "bg-blue-50 hover:bg-blue-300 hover:scale-105 hover:transition-all "
-                } border shadow-md rounded-xl`}
+                    ? "bg-zinc-200 hover:border-r-8 hover:border-r-sky-300  hover:bg-sky-300/50 hover:transition-all"
+                    : "bg-blue-50 hover:border-r-8 hover:border-r-sky-300  hover:bg-sky-300/50 hover:transition-all "
+                } border shadow-md rounded-md`}
                 onClick={(e) => {
                   e.stopPropagation();
 
@@ -169,7 +169,7 @@ export const BatchNumbering: FunctionComponent = () => {
                   setSelectedBatchModalIsOpen(true);
                 }}
               >
-                <div className="flex flex-col w-full pl-4 text-indigo-800">
+                <div className="flex flex-col w-full pl-4 text-sky-800">
                   <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
                   {batch.trainingDate?.from && (
                     <div className="flex gap-1 rounded-xl text-md">

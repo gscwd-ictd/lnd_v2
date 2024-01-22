@@ -25,7 +25,8 @@ export const useOnGoingDataTable = () => {
 
     helper.accessor("numberOfParticipants", {
       header: "No. of Participants",
-      cell: () => Math.round(Math.random() * 100),
+      // cell: () => Math.round(Math.random() * 100),
+      cell: (info) => info.getValue(),
     }),
 
     helper.accessor("type", {

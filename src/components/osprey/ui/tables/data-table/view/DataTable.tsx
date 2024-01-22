@@ -26,6 +26,7 @@ import { DataTableColumnSort } from "../../data-table-column-sort/view/DataTable
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Spinner } from "../../../spinner/view/Spinner";
 
 export type DataTableProps<T extends unknown> = {
   datasource: string;
@@ -105,7 +106,12 @@ export const DataTable = <T extends unknown>({
   });
 
   if (error) return <>Cannot fetch table data</>;
-  if (isLoading) return <>Loading Data</>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center w-full h-full">
+        <Spinner borderSize={4} size="large" />
+      </div>
+    );
 
   return (
     <div className="border shadow-md shadow-gray-50">
