@@ -38,6 +38,7 @@ import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
@@ -77,6 +78,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setBucketStrings = useTrainingNoticeStore((state) => state.setBucketStrings);
   const resetTrainingTypes = useTrainingTypesStore((state) => state.reset);
+  // const [stepSuccess, setStepSuccess] = useState<number>(0);
 
   const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
     setToastType({ color, title, content });
@@ -84,7 +86,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   };
 
   const externalTrainingMutation = useMutation({
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       setModalIsOpen(false);
       reset();
       resetModal();
@@ -95,7 +97,46 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
-    onError: (error) => console.log(error),
+    onError: async (error: any) => {
+      console.log(error);
+      if (error.response.data.error.step === 1) {
+        // this step creates the training notice in the backend
+        // if this step fails, it should just show an error in toast
+        setToastOptions("danger", "1", "Encountered an error.");
+      } else if (error.response.data.error.step === 2) {
+        // this step creates the bucket(folder) in appwrite
+        // if this step fails, it should call the delete training notice by id function
+        // and show an error in toast
+
+        // call delete training here
+        const id = error.response.data.error.id;
+        await axios.delete(`${url}/training-details/${id}`);
+
+        setToastOptions(
+          "danger",
+          "2",
+          "Failed to create a folder for the training notice. Please try again in a few seconds."
+        );
+      } else if (error.response.data.error.step === 3) {
+        // this step creates the files inside the bucket in appwrite
+        // if this step fails, it should call the delete bucket
+        // and delete training notice by id function
+        // and show an error in toast
+
+        // call delete bucket here
+
+        await axios.delete(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/${error.response.data.error.id}`);
+
+        // call delete training notice here
+        await axios.delete(`${url}/training-details/${error.response.data.error.id}`);
+
+        setToastOptions(
+          "danger",
+          "2",
+          "Failed to create the file/s inside the folder. Please try again in a few seconds"
+        );
+      }
+    },
 
     mutationFn: async () => {
       const {
@@ -111,21 +152,22 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       let tempIds: Array<string> = [];
       const storage = new Storage(client!);
 
-      const files = await Promise.all(
-        filesToUpload.map(async (file) => {
-          const result = await storage.createFile(bucket, nanoid(), file);
-          tempIds.push(result.$id);
-        })
-      );
-      setBucketStrings(tempIds);
+      //! transferred this function after the training creation
+      // const files = await Promise.all(
+      //   filesToUpload.map(async (file) => {
+      //     const result = await storage.createFile(bucket, nanoid(), file);
+      //     tempIds.push(result.$id);
+      //   })
+      // );
+      // setBucketStrings(tempIds);
 
-      const response = await axios.post(`${url}/training-details/external`, {
+      const trainingCreationResponse = await axios.post(`${url}/training-details/external`, {
         source: { id: selectedTrainingSource.id },
+        // source: { id: "23c758bc-2172-40a8-9cb1-d176e3360f1e" },
         type: selectedTrainingType,
         trainingLspDetails: selectedFacilitators.map((faci) => {
           return { id: faci.id };
         }),
-        // trainingDesign: trainingDesign?.id,
         courseTitle,
         location,
         slotDistribution: slotDistribution.map((slot) => {
@@ -143,16 +185,31 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
         courseContent,
-        deadlineForSubmission: new Date(training.trainingStart).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
           return { id: tag.id };
         }),
-        bucketFiles: tempIds,
         trainingRequirements,
       });
 
-      return response.data;
+      // create the bucket according to the training creation response id and name
+      const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket`, {
+        id: trainingCreationResponse.data.id,
+        name: trainingCreationResponse.data.courseTitle,
+      });
+
+      // map the files to create it in appwrite bucket
+      try {
+        const files = await Promise.all(
+          filesToUpload.map(async (file) => {
+            const result = await storage.createFile(bucketCreationResponse.data.$id, uuidv4(), file);
+            // tempIds.push(result.$id);
+          })
+        );
+      } catch (error: any) {
+        return (error.response.data.error = 3);
+      }
+      // setBucketStrings(tempIds); //! Removed bucketstings settings
     },
   });
 
@@ -183,6 +240,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
       const response = await axios.post(`${url}/training-details/internal`, {
         source: { id: selectedTrainingSource.id },
+
         trainingDesign: { id: selectedTrainingDesign.id },
         type: selectedTrainingType,
         courseContent,

@@ -170,7 +170,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
           </ModalContent.Title>
 
           <ModalContent.Body>
-            {isEmpty(data) || isLoading || isFetching ? (
+            {isLoading || isFetching ? (
               <div className="flex justify-center w-full h-full overflow-hidden">
                 <Spinner size="large" borderSize={2} />
               </div>

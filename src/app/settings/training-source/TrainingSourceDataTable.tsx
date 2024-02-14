@@ -22,7 +22,7 @@ export const TrainingSourceDataTable: FunctionComponent = () => {
             header: "Description ",
           },
         ]}
-        datasource={`http://172.20.110.45:5286/api/lms/v1/training-sources`}
+        datasource={`${url}/training-sources`}
         queryKey={["trainingsource"]}
         onRowClick={() => {}}
       />

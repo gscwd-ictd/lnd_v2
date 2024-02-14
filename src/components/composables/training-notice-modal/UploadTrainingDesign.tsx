@@ -2,11 +2,26 @@ import { FileThumbnail } from "@lms/components/features/Thumbnail";
 import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { BucketFile, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
+import { useQuery } from "@tanstack/react-query";
 import convertSize from "convert-size";
-import Image from "next/image";
 import Link from "next/link";
-import { FunctionComponent, MutableRefObject, createContext, useContext, useRef, useState } from "react";
+import { Storage } from "appwrite";
+
+import {
+  FunctionComponent,
+  MutableRefObject,
+  Suspense,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
+import axios from "axios";
+import { isEmpty } from "lodash";
 
 type FileToUploadCardProps = {
   file: File;
@@ -42,6 +57,35 @@ export const UploadTrainingDesign: FunctionComponent = () => {
   const setFilesToUpload = useTrainingNoticeStore((state) => state.setFilesToUpload);
   const { setToastIsOpen, setToastOptions, toastIsOpen, toastType } = useToastOptions();
   const bucketFiles = useTrainingNoticeStore((state) => state.bucketFiles);
+  const id = useTrainingNoticeStore((state) => state.id);
+  const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
+  const { editModalIsOpen, setEditModalIsOpen } = useContext(TrainingNoticeContext);
+  const client = useAppwriteClient();
+
+  // const getBucketFiles = async (bucketId: string) => {
+  //   const storage = new Storage(client!);
+  //   const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
+
+  //   if (getBucketListFiles.data.files.length > 0) {
+  //     const newBucketFiles = Promise.all(
+  //       getBucketListFiles.data.files.map(async (file: any) => {
+  //         const fileDetails = await storage.getFile(bucketId, file.$id);
+  //         const filePreview = storage.getFilePreview(bucketId, file.$id);
+  //         const fileView = storage.getFileView(bucketId, file.$id);
+
+  //         return {
+  //           id: file.$id,
+  //           name: fileDetails.name,
+  //           href: fileView.href,
+  //           fileLink: fileView.href,
+  //           sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+  //           mimeType: fileDetails.mimeType,
+  //         };
+  //       })
+  //     );
+  //     setBucketFiles(await newBucketFiles);
+  //   } else setBucketFiles([]);
+  // };
 
   //   const handleAdd = async (file: FileList | null) => {
   //     const storage = new Storage(client!);
@@ -93,6 +137,44 @@ export const UploadTrainingDesign: FunctionComponent = () => {
   //     setBucketFiles(newBucketFiles);
   //   };
 
+  // fetch uploaded files
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["uploaded-files", id],
+    queryFn: async () => {
+      try {
+        const storage = new Storage(client!);
+        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${id}`);
+
+        if (getBucketListFiles.data.files.length > 0) {
+          const newBucketFiles = Promise.all(
+            getBucketListFiles.data.files.map(async (file: any) => {
+              const fileDetails = await storage.getFile(id!, file.$id);
+              const filePreview = storage.getFilePreview(id!, file.$id);
+              const fileView = storage.getFileView(id!, file.$id);
+
+              return {
+                id: file.$id,
+                name: fileDetails.name,
+                href: fileView.href,
+                fileLink: fileView.href,
+                sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+                mimeType: fileDetails.mimeType,
+              };
+            })
+          );
+          setBucketFiles(await newBucketFiles);
+        } else setBucketFiles([]);
+      } catch (error) {
+        return error;
+      }
+    },
+    enabled: !!id && editModalIsOpen !== false,
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <>
       <div className="pt-5">
@@ -103,13 +185,22 @@ export const UploadTrainingDesign: FunctionComponent = () => {
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
-          {bucketFiles && bucketFiles.length > 0 && (
-            <div className="px-4 py-4 mx-4 space-y-2 border-2 rounded ">
-              <span className="items-center text-gray-700 text-md">
-                Uploaded Files <span className="text-xs">(Click file name to preview the file)</span>
-              </span>
-              {bucketFiles && bucketFiles.map((file, index) => <UploadedCard key={index} file={file} />)}
+          {!isEmpty(data) || isLoading || isFetching ? (
+            <div className="flex items-center justify-center w-full h-full">
+              <Spinner borderSize={2} />
             </div>
+          ) : (
+            <>
+              {bucketFiles && bucketFiles.length > 0 && (
+                <div className="px-4 py-4 mx-4 space-y-2 border-2 rounded ">
+                  <span className="items-center text-gray-700 text-md">
+                    Uploaded Files <span className="text-xs">(Click file name to preview the file)</span>
+                  </span>
+
+                  {bucketFiles && bucketFiles.map((file, index) => <UploadedCard key={index} file={file} />)}
+                </div>
+              )}
+            </>
           )}
           <div className="flex flex-col gap-5 px-4 mt-5">
             <div className="w-full mb-2">
@@ -243,6 +334,10 @@ const UploadedCard: FunctionComponent<UploadedFileProps> = ({ file }) => {
   const filesToDelete = useTrainingNoticeStore((state) => state.filesToDelete);
   const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
   const setFilesToDelete = useTrainingNoticeStore((state) => state.setFilesToDelete);
+
+  useEffect(() => {
+    console.log(filesToDelete);
+  }, [filesToDelete]);
 
   return (
     <>

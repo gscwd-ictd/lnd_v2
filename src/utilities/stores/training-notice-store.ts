@@ -14,7 +14,7 @@ export const trainingTypesList: Array<{ label: string; value: string }> = [
   { label: "Foundational", value: "foundational" },
   { label: "Technical", value: "technical" },
   { label: "Professional", value: "professional" },
-  { label: "Supervisory", value: "supervisory" },
+  // { label: "Supervisory", value: "supervisory" },
   { label: "Leadership/Managerial", value: "leadership/managerial" },
 ];
 
@@ -87,13 +87,16 @@ export type Batch = {
   batchNumber: number;
   trainingDate: { from: string | undefined; to?: string | undefined };
   isOneDayTraining?: boolean;
-  employees: Array<{
-    employeeId: string;
-    nomineeId?: string;
-    name: string;
-    supervisor: { supervisorId: string; name: string };
-    distributionId?: string;
-  }>;
+  employees: Array<BatchEmployee>;
+};
+
+export type BatchEmployee = {
+  employeeId: string;
+  nomineeId?: string;
+  name: string;
+  supervisor: { supervisorId: string; name: string };
+  distributionId?: string;
+  isCompleteAttendance?: boolean;
 };
 
 export type TrainingNoticeModalStore = {
@@ -147,6 +150,9 @@ export type TrainingNoticeStore = {
   setFilesToDelete: (filesToDelete: Array<string>) => void;
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
+  initialCourseTitle: string;
+  setInitialCourseTitle: (initialCourseTitle: string) => void;
+
   bucket: string;
   bucketStrings: Array<string>;
   setBucketStrings: (bucketStrings: Array<string>) => void;
@@ -284,6 +290,8 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     setFilesToDelete: (filesToDelete) => set({ filesToDelete }),
     bucketStrings: [],
     setBucketStrings: (bucketStrings: Array<string>) => set({ bucketStrings }),
+    initialCourseTitle: "",
+    setInitialCourseTitle: (initialCourseTitle) => set({ initialCourseTitle }),
 
     setFacilitators: (facilitators) => set({ facilitators }),
 
@@ -365,6 +373,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         hasSetTrainingRequirements: false,
         isOnline: false,
         filesToUpload: [],
+        filesToDelete: [],
         bucketFiles: [],
         selectedTags: [],
         hasSelectedFacilitators: false,

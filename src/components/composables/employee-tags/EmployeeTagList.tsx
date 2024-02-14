@@ -234,7 +234,8 @@ export default function EmployeeTagList() {
                       });
 
                       //submit employee tags
-                      submitEmployeeTags.mutateAsync({ employees: [selectedEmployee.employeeId], tags: tagData });
+                      if (tag.length > 0)
+                        submitEmployeeTags.mutateAsync({ employees: [selectedEmployee.employeeId], tags: tagData });
                       // submitEmployeeTags({
                       //   employees: [selectedEmployee.employeeId],
                       //   tags: tagData,
@@ -324,7 +325,8 @@ export default function EmployeeTagList() {
                       });
 
                       //submit employee tags
-                      submitEmployeeTags.mutateAsync({ employees: employeeData, tags: [selectedTag.id] });
+                      if (employee.length > 0)
+                        submitEmployeeTags.mutateAsync({ employees: employeeData, tags: [selectedTag.id] });
 
                       // submitEmployeeTag({
                       //   employees: employeeData,

@@ -202,7 +202,7 @@ export const AddNewLspModal: FunctionComponent = () => {
       resetLspDetailsStore();
       resetEmployeeStore();
 
-      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp-details/individual?page=1&limit=40`);
+      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp-details/q?type=individual&page=1&limit=40`);
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
@@ -244,7 +244,7 @@ export const AddNewLspModal: FunctionComponent = () => {
       resetEmployeeStore();
       resetLspDetailsStore();
 
-      const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp-details/organization?page=1&limit=40`);
+      const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp-details/q?type=organization&page=1&limit=40`);
       queryClient.setQueryData(["lsp-organization"], getUpdatedOrganizationLsp.data.items);
     },
     onError: (error) => console.log(error),

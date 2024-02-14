@@ -31,6 +31,7 @@ export const AddNewTagModal: FunctionComponent = () => {
     onSuccess: (data, variable) => {
       setOpen(false);
       queryClient.refetchQueries({ queryKey: ["tags"], type: "all", exact: true, stale: true });
+      setTagName("");
     },
     onError: () => console.log("error"),
     mutationFn: async () => {
@@ -50,7 +51,6 @@ export const AddNewTagModal: FunctionComponent = () => {
         <Button
           onClick={() => {
             setOpen(true);
-            // setTagName("");
           }}
           size="small"
         >
@@ -77,6 +77,7 @@ export const AddNewTagModal: FunctionComponent = () => {
             onSubmit={(e) => {
               e.preventDefault();
               mutation.mutate();
+              // setTagName("");
             }}
           >
             <ModalContent.Body>

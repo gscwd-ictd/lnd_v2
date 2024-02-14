@@ -9,7 +9,12 @@ import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/S
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { isEmpty } from "lodash";
-import { Batch, useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
+import {
+  Batch,
+  BatchEmployee,
+  useTrainingNoticeStore,
+  useTrainingTypesStore,
+} from "@lms/utilities/stores/training-notice-store";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { OnGoingSlideOverBody } from "../ongoing/slideover/OnGoingSlideOverBody";
 import dayjs from "dayjs";
@@ -18,12 +23,20 @@ type OnGoingState = {
   id: string;
   batches: Array<Batch>;
   setBatches: Dispatch<SetStateAction<Array<Batch>>>;
+  selectedBatch: Batch;
+  setSelectedBatch: Dispatch<SetStateAction<Batch>>;
+  batchAttendanceIsOpen: boolean;
+  setBatchAttendanceIsOpen: Dispatch<SetStateAction<boolean>>;
+  hasFetchedBatches: boolean;
+  setHasFetchedBatches: Dispatch<SetStateAction<boolean>>;
 };
 export const OnGoingContext = createContext({} as OnGoingState);
 
 export const OnGoingDataTable: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
-  const { columns, id, setId, batches, setBatches } = useOnGoingDataTable();
+  const [selectedBatch, setSelectedBatch] = useState<Batch>({} as Batch);
+  const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
+  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useOnGoingDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -101,7 +114,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
   // this is to check the status if it already has batching and fetch the batches
   useQuery({
     queryKey: ["training-details-nominees-batches", id],
-    enabled: !!id,
+    enabled: !!id && hasFetchedBatches === false,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -109,13 +122,13 @@ export const OnGoingDataTable: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
-        let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
+        let updatedSelectedEmployees: BatchEmployee[] = [];
         const fetchedBatches = data.map((batch: Batch) => {
-          if (batch.employees) {
-            updatedSelectedEmployees.push(...batch.employees);
-          }
+          if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
+
           return {
             batchNumber: batch.batchNumber,
+
             trainingDate: {
               from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
               to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
@@ -126,6 +139,8 @@ export const OnGoingDataTable: FunctionComponent = () => {
           };
         });
 
+        // set fetched batches to true
+        setHasFetchedBatches(true);
         setBatches(fetchedBatches);
 
         // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
@@ -140,7 +155,19 @@ export const OnGoingDataTable: FunctionComponent = () => {
 
   return (
     <>
-      <OnGoingContext.Provider value={{ id, batches, setBatches }}>
+      <OnGoingContext.Provider
+        value={{
+          id,
+          batches,
+          selectedBatch,
+          batchAttendanceIsOpen,
+          hasFetchedBatches,
+          setHasFetchedBatches,
+          setBatchAttendanceIsOpen,
+          setSelectedBatch,
+          setBatches,
+        }}
+      >
         <SlideOver open={open} setOpen={setOpen} size="lg">
           <SlideOver.Body>
             <OnGoingSlideOverBody />
@@ -148,6 +175,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
         </SlideOver>
         <DataTable<TrainingNotice>
           datasource={`${url}/training-details/upcoming`}
+          // datasource={`${url}/training-details?page=1&limit=1000`}
           queryKey={["on-going-training"]}
           columns={columns}
           title="On-Going Trainings"

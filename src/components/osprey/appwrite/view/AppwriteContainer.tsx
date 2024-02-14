@@ -20,7 +20,9 @@ export const useAppwriteClient = () => {
 
 export const AppwriteClientContainer = ({ children }: AppwriteContainerProps) => {
   const [client] = useState(() =>
-    new Client().setEndpoint("http://172.20.110.55:8001/v1").setProject("6507a5e601e17c0ddd99")
+    new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
   );
 
   return <AppwriteClientContext.Provider value={{ client }}>{children}</AppwriteClientContext.Provider>;

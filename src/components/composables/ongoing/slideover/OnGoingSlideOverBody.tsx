@@ -1,10 +1,17 @@
-import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
+import {
+  BatchEmployee,
+  useTrainingNoticeStore,
+  useTrainingTypesStore,
+} from "@lms/utilities/stores/training-notice-store";
 import dayjs from "dayjs";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { OnGoingContext } from "../../on-going-data-table/OnGoingDataTable";
 import { Disclosure } from "@headlessui/react";
 import { isEmpty } from "lodash";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
+import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
+import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const OnGoingSlideOverBody = () => {
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
@@ -15,8 +22,37 @@ export const OnGoingSlideOverBody = () => {
   const from = useTrainingNoticeStore((state) => state.trainingStart);
   const to = useTrainingNoticeStore((state) => state.trainingEnd);
   const trainingHours = useTrainingNoticeStore((state) => state.numberOfHours);
-  const { batches } = useContext(OnGoingContext);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const {
+    batches,
+    batchAttendanceIsOpen,
+    selectedBatch,
+    hasFetchedBatches,
+    setHasFetchedBatches,
+    setBatchAttendanceIsOpen,
+    setSelectedBatch,
+  } = useContext(OnGoingContext);
   const participants = useTrainingNoticeStore((state) => state.numberOfParticipants);
+  const [employeeAttendance, setEmployeeAttendance] = useState<Array<BatchEmployee>>([]);
+
+  const onChangeAttendance = (idx: number) => {
+    const newEmployeeAttendance = [...employeeAttendance];
+    newEmployeeAttendance[idx].isCompleteAttendance = !newEmployeeAttendance[idx].isCompleteAttendance;
+    setEmployeeAttendance(newEmployeeAttendance);
+  };
+
+  useEffect(() => {
+    if (batchAttendanceIsOpen) {
+      const newSelectedBatchEmployees = selectedBatch.employees.map((employee) => {
+        return { ...employee, isCompleteAttendance: employee.isCompleteAttendance ?? false };
+      });
+
+      setEmployeeAttendance(newSelectedBatchEmployees ?? []);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+    }
+  }, [selectedBatch.employees, batchAttendanceIsOpen]);
 
   return (
     <>
@@ -169,11 +205,6 @@ export const OnGoingSlideOverBody = () => {
                       </div>
 
                       <Disclosure.Panel className="" as="ul">
-                        <div className="flex justify-end w-full mb-2">
-                          <Button size="small" variant="soft">
-                            Attendance
-                          </Button>
-                        </div>
                         {batch.employees && batch.employees.length > 0 ? (
                           batch.employees.map((emp, empIdx) => {
                             return (
@@ -188,6 +219,17 @@ export const OnGoingSlideOverBody = () => {
                             <span className="pl-2 space-y-3 text-sm text-gray-400">- No Batches Found</span>
                           </div>
                         )}
+                        <div className="flex justify-center w-full px-3 py-2 mt-4 text-white bg-indigo-600 rounded">
+                          <button
+                            className="w-full"
+                            onClick={() => {
+                              setBatchAttendanceIsOpen(true);
+                              setSelectedBatch(batch);
+                            }}
+                          >
+                            Attendance
+                          </button>
+                        </div>
                       </Disclosure.Panel>
                     </div>
                   )}
@@ -197,6 +239,87 @@ export const OnGoingSlideOverBody = () => {
           </div>
         </div>
       </div>
+      <Modal isOpen={batchAttendanceIsOpen} setIsOpen={setBatchAttendanceIsOpen} size="2md">
+        <ModalContent>
+          <ModalContent.Title>
+            <div className="p-3">
+              <p className="text-lg font-semibold text-gray-700">Batch {selectedBatch.batchNumber} Attendance</p>
+              <div className="flex gap-2">
+                {dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day") ===
+                true ? (
+                  <span className="text-sm text-gray-600">
+                    {dayjs(selectedBatch.trainingDate?.from).format("MMM DD, YYYY hh:mmA")}-
+                    {dayjs(selectedBatch.trainingDate?.to).format("hh:mmA")}
+                  </span>
+                ) : dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day") ===
+                  false ? (
+                  <span className="text-sm text-gray-600">
+                    {dayjs(selectedBatch.trainingDate?.from).format("MMM DD, YYYY hh:mmA")}-
+                    {dayjs(selectedBatch.trainingDate?.to).format("MMM DD, YYYY hh:mmA")}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>
+          </ModalContent.Title>
+          <ModalContent.Body>
+            {isLoading ? (
+              <div className="flex justify-center w-full h-full">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="p-2">
+                <table className="w-full ">
+                  <thead className="text-white rounded-t bg-gradient-to-r from-indigo-700 to-purple-500">
+                    <tr>
+                      <th className="p-2 font-medium border">Participant Name</th>
+
+                      <th className="p-2 font-medium border">Complete attendance?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {employeeAttendance?.map((employee, idx) => {
+                      return (
+                        <tr className="even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80" key={employee.employeeId}>
+                          <td className="p-2 text-sm font-light border ">{employee.name}</td>
+                          <td
+                            className="text-center border hover:cursor-pointer "
+                            onClick={() => onChangeAttendance(idx)}
+                          >
+                            <Checkbox
+                              id={`checkbox-${idx}`}
+                              checked={employee.isCompleteAttendance}
+                              readOnly
+                              // onChange={() => onChangeAttendance(idx)}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </ModalContent.Body>
+          <ModalContent.Footer>
+            <div className="flex justify-end w-full">
+              <Button
+                onClick={() => {
+                  console.log(employeeAttendance);
+
+                  // set this to false
+                  setBatchAttendanceIsOpen(false);
+                  // set this to true to fetch batches
+                  setHasFetchedBatches(true);
+                }}
+              >
+                Apply
+              </Button>
+            </div>
+          </ModalContent.Footer>
+        </ModalContent>
+      </Modal>
     </>
   );
 };

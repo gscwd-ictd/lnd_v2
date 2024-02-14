@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { TrainingType } from "@lms/utilities/types/training-type.type";
 import { UdpdateTrainingTypeModal } from "../training-type-modal/UpdateTrainingTypeModal";
 import { DeleteTrainingTypeModal } from "../training-type-modal/DeleteTrainingTypeModal";
+import { url } from "@lms/utilities/url/api-url";
 
 export const TrainingTypeDataTable: FunctionComponent = () => {
   const [update, setUpdate] = useState(false);
@@ -28,7 +29,7 @@ export const TrainingTypeDataTable: FunctionComponent = () => {
             cell: (info) => (
               <div className="flex items-center gap-1">
                 <button
-                  className="border px-2 py-1 rounded shadow-sm text-gray-700"
+                  className="px-2 py-1 text-gray-700 border rounded shadow-sm"
                   onClick={() => {
                     setTrainingId(info.getValue());
                     setUpdate(true);
@@ -50,7 +51,7 @@ export const TrainingTypeDataTable: FunctionComponent = () => {
                   </svg>
                 </button>
                 <button
-                  className="border px-2 py-1 rounded shadow-sm text-gray-700"
+                  className="px-2 py-1 text-gray-700 border rounded shadow-sm"
                   onClick={() => {
                     setTrainingId(info.getValue());
                     setRemove(true);
@@ -78,7 +79,7 @@ export const TrainingTypeDataTable: FunctionComponent = () => {
             header: "Actions",
           },
         ]}
-        datasource={`http://172.20.110.45:5286/api/lms/v1/training-types`}
+        datasource={`${url}/training-types`}
         queryKey={["training-type"]}
         onRowClick={() => {}}
       />

@@ -1,7 +1,6 @@
 import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { TrainingNotice } from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
-import dayjs from "dayjs";
 import { useState } from "react";
 
 export const useOnGoingDataTable = () => {
@@ -9,6 +8,7 @@ export const useOnGoingDataTable = () => {
   const [batches, setBatches] = useState<Batch[]>([
     { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
   ]);
+  const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
   const [viewSlideOverIsOpen, setViewSlideOverIsOpen] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
 
@@ -68,6 +68,8 @@ export const useOnGoingDataTable = () => {
     id,
     batches,
     viewSlideOverIsOpen,
+    hasFetchedBatches,
+    setHasFetchedBatches,
     setBatches,
     setViewSlideOverIsOpen,
     setId,

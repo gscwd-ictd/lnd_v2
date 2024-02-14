@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent, useEffect } from "react";
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
+import { Disclosure } from "@headlessui/react";
+import Link from "next/link";
 
 export const SendTrainingNoticeSummary: FunctionComponent = () => {
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
@@ -65,19 +67,45 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
       </div>
 
       {selectedTrainingSource.name === "External" ? (
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-start justify-start gap-2">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M14 0C16.7614 0 19 2.23858 19 5V17C19 20.866 15.866 24 12 24C8.13401 24 5 20.866 5 17V9H7V17C7 19.7614 9.23858 22 12 22C14.7614 22 17 19.7614 17 17V5C17 3.34315 15.6569 2 14 2C12.3431 2 11 3.34315 11 5V17C11 17.5523 11.4477 18 12 18C12.5523 18 13 17.5523 13 17V6H15V17C15 18.6569 13.6569 20 12 20C10.3431 20 9 18.6569 9 17V5C9 2.23858 11.2386 0 14 0Z"
               fill="currentColor"
             />
           </svg>
-          {bucketFiles.length}{" "}
-          {bucketFiles.length > 1
-            ? "attached training design files"
-            : bucketFiles.length === 1
-            ? "attached training design file"
-            : null}
+
+          <Disclosure>
+            {({ open }) => (
+              <div>
+                <Disclosure.Button className="flex items-center justify-between w-full transition-all " tabIndex={-1}>
+                  <div className="text-indigo-500 ">
+                    {bucketFiles.length}{" "}
+                    {bucketFiles.length > 1
+                      ? "attached training design files"
+                      : bucketFiles.length === 1
+                      ? "attached training design file"
+                      : null}
+                  </div>
+                </Disclosure.Button>
+
+                <Disclosure.Panel className="" as="ul">
+                  {bucketFiles.map((file, idx) => {
+                    return (
+                      <div key={idx} className="pb-1 pl-5">
+                        <span className="text-xs">{idx + 1}. </span>
+                        <Link href={file.href} target="_blank">
+                          <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
+                            {file.name}
+                          </span>
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </Disclosure.Panel>
+              </div>
+            )}
+          </Disclosure>
         </div>
       ) : null}
       <div className="flex items-center justify-start gap-2">

@@ -22,6 +22,7 @@ import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/Appwrite
 import { Storage } from "appwrite";
 import convertSize from "convert-size";
 import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
+import { v4 as uuidv4 } from "uuid";
 
 type ToastType = {
   color: "success" | "warning" | "info" | "default" | "danger";
@@ -54,10 +55,11 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     selectedTags,
     initialTrainingRequirements,
     trainingRequirements,
+    filesToDelete,
     setBucketFiles,
     reset,
     setPreparationStatus,
-
+    initialCourseTitle,
     setLocation,
     setTrainingEnd,
     setCourseTitle,
@@ -77,6 +79,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setHasFetchedRecommendations,
     setTrainingRequirements,
     setPreviousSlotDistribution,
+    setInitialCourseTitle,
   } = useTrainingNoticeStore();
 
   const lspSource = useLspSourceStore((state) => state.lspSource);
@@ -101,20 +104,45 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setToastIsOpen(true);
   };
 
-  const assignBucketFile = async (bucketFileIds: Array<string>) => {
-    const storage = new Storage(client!);
+  // const assignBucketFile = async (bucketFileIds: Array<string>) => {
+  //   const storage = new Storage(client!);
 
-    if (bucketFileIds.length > 0) {
+  //   if (bucketFileIds.length > 0) {
+  //     const newBucketFiles = Promise.all(
+  //       bucketFileIds.map(async (file) => {
+  //         const fileDetails = await storage.getFile(bucket, file);
+  //         const filePreview = storage.getFilePreview(bucket, file);
+  //         const fileView = storage.getFileView(bucket, file);
+
+  //         return {
+  //           id: file,
+  //           name: fileDetails.name,
+  //           href: filePreview.href,
+  //           fileLink: fileView.href,
+  //           sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+  //           mimeType: fileDetails.mimeType,
+  //         };
+  //       })
+  //     );
+  //     setBucketFiles(await newBucketFiles);
+  //   } else setBucketFiles([]);
+  // };
+
+  const getBucketFiles = async (bucketId: string) => {
+    const storage = new Storage(client!);
+    const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
+
+    if (getBucketListFiles.data.files.length > 0) {
       const newBucketFiles = Promise.all(
-        bucketFileIds.map(async (file) => {
-          const fileDetails = await storage.getFile(bucket, file);
-          const filePreview = storage.getFilePreview(bucket, file);
-          const fileView = storage.getFileView(bucket, file);
+        getBucketListFiles.data.files.map(async (file: any) => {
+          const fileDetails = await storage.getFile(bucketId, file.$id);
+          const filePreview = storage.getFilePreview(bucketId, file.$id);
+          const fileView = storage.getFileView(bucketId, file.$id);
 
           return {
-            id: file,
+            id: file.$id,
             name: fileDetails.name,
-            href: filePreview.href,
+            href: fileView.href,
             fileLink: fileView.href,
             sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
             mimeType: fileDetails.mimeType,
@@ -209,6 +237,44 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         initialTrainingRequirements,
       } = training;
 
+      const storage = new Storage(client!);
+
+      if (filesToDelete.length > 0) {
+        try {
+          const allFilesToDelete = await Promise.all(
+            filesToDelete.map(async (fileId) => {
+              return await storage.deleteFile(id!, fileId);
+              // await axios.delete(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/files/${trainingNoticeId}/${fileId}`);
+              // tempIds.push(result.$id);
+            })
+          );
+        } catch (error: any) {
+          return (error.response.data.error = 1);
+        }
+      }
+
+      if (filesToUpload.length > 0) {
+        // map the files to create it in appwrite bucket
+        try {
+          const allFilesToUpload = await Promise.all(
+            filesToUpload.map(async (file) => {
+              const result = await storage.createFile(trainingNoticeId!, uuidv4(), file);
+              // tempIds.push(result.$id);
+            })
+          );
+        } catch (error: any) {
+          return (error.response.data.error = 2);
+        }
+      }
+      // setBucketStrings(tempIds); //! Removed bucketstings settings
+
+      if (initialCourseTitle !== courseTitle) {
+        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/rename`, {
+          id: trainingNoticeId!,
+          name: courseTitle,
+        });
+      }
+
       const response = await axios.put(`${url}/training-details/external`, {
         id: trainingNoticeId,
         source: { id: selectedTrainingSource.id },
@@ -292,13 +358,15 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           // EXTERNAL
           else if (data.source.name === "External") {
             setSelectedTrainingSource({ id: data.source.id, name: "External" });
-            assignBucketFile(data.bucketFiles);
+            // assignBucketFile(data.bucketFiles);
+            getBucketFiles(trainingNoticeId!);
             setDeadlineForSubmission(data.deadlineForSubmission);
             setInvitationUrl!(data.invitationUrl);
             setLocation(data.location);
             setNomineeQualifications(data.nomineeQualifications);
             setNumberOfHours(data.numberOfHours);
             setCourseTitle(data.courseTitle);
+            setInitialCourseTitle(data.courseTitle);
             setNumberOfParticipants(data.numberOfParticipants);
             setPreparationStatus(data.status);
             setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
