@@ -6,7 +6,7 @@ import { TrainingInformation } from "./TrainingInformation";
 import { FunctionComponent } from "react";
 import { TrainingNoticeSummary } from "./TrainingNoticeSummary";
 import { ChooseLspSource } from "./ChooseLspSource";
-import { UploadTrainingAttachment } from "./TrainingDesignAttachment";
+import { UploadTrainingAttachment } from "./UploadTrainingAttachment";
 import { EditInternalCourseOutline } from "./edit/EditInternalCourseOutline";
 import { EditExternalCourseOutline } from "./edit/EditExternalCourseOutline";
 

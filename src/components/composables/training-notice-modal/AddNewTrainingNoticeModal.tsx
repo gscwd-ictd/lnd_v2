@@ -24,7 +24,7 @@ import { TrainingRequirementDocuments } from "./TrainingRequirementDocuments";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { isEmpty } from "lodash";
 import { TrainingNoticeSummary } from "./TrainingNoticeSummary";
-import { UploadTrainingAttachment } from "./TrainingDesignAttachment";
+import { UploadTrainingAttachment } from "./UploadTrainingAttachment";
 import { ChooseLspSource } from "./ChooseLspSource";
 import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { AddChooseTrainingType } from "./add/AddChooseTrainingType";
@@ -209,7 +209,6 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       } catch (error: any) {
         return (error.response.data.error = 3);
       }
-      // setBucketStrings(tempIds); //! Removed bucketstings settings
     },
   });
 
@@ -240,7 +239,6 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
       const response = await axios.post(`${url}/training-details/internal`, {
         source: { id: selectedTrainingSource.id },
-
         trainingDesign: { id: selectedTrainingDesign.id },
         type: selectedTrainingType,
         courseContent,
@@ -262,7 +260,6 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         trainingStart: new Date(training.trainingStart).toISOString(),
         trainingEnd: new Date(training.trainingEnd).toISOString(),
         numberOfHours,
-        // deadlineForSubmission: new Date(training.trainingStart).toISOString(),
         numberOfParticipants,
         trainingTags: selectedTags.map((tag) => {
           return { id: tag.id };

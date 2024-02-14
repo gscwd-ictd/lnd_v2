@@ -3,7 +3,11 @@ import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/Appwrite
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
-import { BucketFile, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
+import {
+  BucketFile,
+  useTrainingNoticeModalStore,
+  useTrainingNoticeStore,
+} from "@lms/utilities/stores/training-notice-store";
 import { useQuery } from "@tanstack/react-query";
 import convertSize from "convert-size";
 import Link from "next/link";
@@ -61,81 +65,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
   const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
   const { editModalIsOpen, setEditModalIsOpen } = useContext(TrainingNoticeContext);
   const client = useAppwriteClient();
-
-  // const getBucketFiles = async (bucketId: string) => {
-  //   const storage = new Storage(client!);
-  //   const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
-
-  //   if (getBucketListFiles.data.files.length > 0) {
-  //     const newBucketFiles = Promise.all(
-  //       getBucketListFiles.data.files.map(async (file: any) => {
-  //         const fileDetails = await storage.getFile(bucketId, file.$id);
-  //         const filePreview = storage.getFilePreview(bucketId, file.$id);
-  //         const fileView = storage.getFileView(bucketId, file.$id);
-
-  //         return {
-  //           id: file.$id,
-  //           name: fileDetails.name,
-  //           href: fileView.href,
-  //           fileLink: fileView.href,
-  //           sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
-  //           mimeType: fileDetails.mimeType,
-  //         };
-  //       })
-  //     );
-  //     setBucketFiles(await newBucketFiles);
-  //   } else setBucketFiles([]);
-  // };
-
-  //   const handleAdd = async (file: FileList | null) => {
-  //     const storage = new Storage(client!);
-
-  //     try {
-  //       //@ts-ignore
-  //       const result = await storage.createFile(bucket, nanoid(), file[0]);
-
-  //       const getFilePreview = storage.getFilePreview(bucket, result.$id);
-
-  //       const getFileView = storage.getFileView(bucket, result.$id);
-
-  //       inputFileRef.current.value = "";
-
-  //       const tempIdArray = [...bucketFiles];
-
-  //       tempIdArray.push({
-  //         id: result.$id,
-  //         name: result.name,
-  //         fileLink: getFileView.href,
-  //         href: getFilePreview.href,
-  //         sizeOriginal: convertSize(result.sizeOriginal, "KB", { stringify: true }),
-  //         mimeType: result.mimeType,
-  //       });
-
-  //       setBucketFiles(tempIdArray);
-  //       setToastOptions("success", "Upload successful", "Successfully added the resource.");
-  //     } catch (error) {
-  //       setToastOptions("danger", "Error", "Something went wrong. Please try again later.");
-  //     }
-  //   };
-
-  //   const handleDelete = async (idToRemove: string) => {
-  //     const deleteBucketFile = async () => {
-  //       const storage = new Storage(client!);
-
-  //       try {
-  //         await storage.deleteFile(bucket, idToRemove);
-  //         setToastOptions("success", "Delete Success", `You have removed the resource with id: ${idToRemove}`);
-  //       } catch (error) {
-  //         setToastOptions("danger", "Error", "File not found!");
-  //       }
-  //     };
-
-  //     deleteBucketFile();
-
-  //     const newBucketFiles = bucketFiles.filter((file) => file.id != idToRemove);
-
-  //     setBucketFiles(newBucketFiles);
-  //   };
+  const action = useTrainingNoticeModalStore((state) => state.action);
 
   // fetch uploaded files
   const { data, isLoading, isFetching } = useQuery({
@@ -168,7 +98,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
         return error;
       }
     },
-    enabled: !!id && editModalIsOpen !== false,
+    enabled: !!id && editModalIsOpen !== false && action === "update",
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -185,7 +115,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
-          {!isEmpty(data) || isLoading || isFetching ? (
+          {(!isEmpty(data) || isLoading || isFetching) && action === "update" ? (
             <div className="flex items-center justify-center w-full h-full">
               <Spinner borderSize={2} />
             </div>

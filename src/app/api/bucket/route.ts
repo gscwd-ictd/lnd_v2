@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
         Permission.read(Role.guests()),
         Permission.update(Role.guests()),
         Permission.delete(Role.guests()),
-      ],
-      false
+      ]
+      // false
     );
 
     return NextResponse.json(data);
