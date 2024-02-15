@@ -152,15 +152,6 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       let tempIds: Array<string> = [];
       const storage = new Storage(client!);
 
-      //! transferred this function after the training creation
-      // const files = await Promise.all(
-      //   filesToUpload.map(async (file) => {
-      //     const result = await storage.createFile(bucket, nanoid(), file);
-      //     tempIds.push(result.$id);
-      //   })
-      // );
-      // setBucketStrings(tempIds);
-
       const trainingCreationResponse = await axios.post(`${url}/training-details/external`, {
         source: { id: selectedTrainingSource.id },
         // source: { id: "23c758bc-2172-40a8-9cb1-d176e3360f1e" },

@@ -23,25 +23,3 @@ export type LspIndividualDetails = LearningServiceProvider & {
   photoUrl: string;
   experience: number;
 };
-
-// id: null | string | undefined; //! Recently added
-// employeeId: null | string | undefined;
-// photoUrl: string;
-// orgFullName: string;
-// firstName: string;
-// middleName: string;
-// lastName: string;
-// introduction: string;
-// contactNumber: string;
-// email: string;
-// postalAddress: string;
-// lspSource: string;
-// experience: number | null;
-// expertise: LspExpertise[];
-// education: LspEducation[];
-// trainings: LspTraining[];
-// projects: LspProject[];
-// coaching: LspCoaching[];
-// affiliations: LspAffiliation[];
-// awards: LspAward[];
-// certifications: LspCertification[];

@@ -242,7 +242,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           return (error.response.data.error = 2);
         }
       }
-      // setBucketStrings(tempIds); //! Removed bucketstings settings
 
       if (initialCourseTitle !== courseTitle) {
         await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/rename`, {

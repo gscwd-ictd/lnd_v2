@@ -99,7 +99,7 @@ export default function EmployeeTagList() {
     queryKey: ["getTagsByEmployeeId", selectedEmployee],
     enabled: !!selectedEmployee,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); //! added /employee
+      const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`);
       setEmployeeTags(data);
       return data;
     },

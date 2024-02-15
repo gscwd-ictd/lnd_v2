@@ -72,7 +72,7 @@ export const ViewDocumentModal: FunctionComponent = () => {
             position: "Acting General Manager / PDC Chairperson",
           });
 
-          //! this is a test setting of batches
+       
           // setBatches([
           //   {
           //     batchNumber: 1,

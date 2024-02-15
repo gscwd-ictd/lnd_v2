@@ -133,7 +133,7 @@ export type EmployeeSearch = {
 
 export type LspDetailsStore = {
   lspAction: "create" | "update" | undefined;
-  id: null | string | undefined; //! Recently added
+  id: null | string | undefined;
   employeeId: null | string | undefined;
   photoUrl: string;
   name: string;

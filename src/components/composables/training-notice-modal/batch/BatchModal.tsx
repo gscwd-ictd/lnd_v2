@@ -161,7 +161,7 @@ export const BatchModal: FunctionComponent = () => {
       !!trainingNoticeId &&
       hasFetchedDetails === true &&
       batchingModalIsOpen !== false &&
-      trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING, //! CHANGE THIS TO FOR BATCHING
+      trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
