@@ -1,3 +1,4 @@
+import { appwriteUrl } from "@lms/utilities/url/api-url";
 import { Client, Storage } from "appwrite";
 import { nanoid } from "nanoid";
 import sdk from "node-appwrite";
@@ -6,7 +7,7 @@ async function createFile(files: File[]) {
   try {
     const client = new Client();
     const storage = new Storage(client);
-    client.setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
     let tempIds: Array<string> = [];
 
@@ -29,7 +30,7 @@ async function createBucketFile(id: string, name: string) {
     const client = new sdk.Client();
     const storage = new sdk.Storage(client);
 
-    client.setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
     const data = await storage.createBucket(id, name);
 

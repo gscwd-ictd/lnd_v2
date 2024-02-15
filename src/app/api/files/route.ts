@@ -1,3 +1,4 @@
+import { appwriteUrl } from "@lms/utilities/url/api-url";
 import { AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import sdk, { InputFile } from "node-appwrite";
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     const storage = new sdk.Storage(client);
 
     client
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL!)
+      .setEndpoint(appwriteUrl!)
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
       .setKey(process.env.NEXT_PUBLIC_APPWRITE_SECRET_KEY!);
     console.log("files: ", filesToUpload);

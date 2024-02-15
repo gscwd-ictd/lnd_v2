@@ -3,6 +3,7 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 import { AppwriteClientContextState } from "../utils/types";
 import { Client } from "appwrite";
+import { appwriteUrl } from "@lms/utilities/url/api-url";
 
 const AppwriteClientContext = createContext({
   client: undefined,
@@ -20,9 +21,7 @@ export const useAppwriteClient = () => {
 
 export const AppwriteClientContainer = ({ children }: AppwriteContainerProps) => {
   const [client] = useState(() =>
-    new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_URL!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+    new Client().setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
   );
 
   return <AppwriteClientContext.Provider value={{ client }}>{children}</AppwriteClientContext.Provider>;

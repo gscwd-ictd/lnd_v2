@@ -19,7 +19,7 @@ export const metadata = {
 };
 
 async function getUserFromHrmsDashboard() {
-  // initial props here
+  // get the user from hrms here
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

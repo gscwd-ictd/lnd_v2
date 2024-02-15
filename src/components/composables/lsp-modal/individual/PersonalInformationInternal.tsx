@@ -12,7 +12,7 @@ import {
   useLspDetailsStore,
   useLspSourceStore,
 } from "@lms/utilities/stores/lsp-details-store";
-import { url } from "@lms/utilities/url/api-url";
+import { portalBackendUrl, url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { isEmpty } from "lodash";
@@ -94,7 +94,7 @@ export const PersonalInformationInternal: FunctionComponent = () => {
   useQuery({
     queryKey: ["employee-pds", employeeId],
     queryFn: async () => {
-      const { data } = await axios.get(`http://172.20.110.45:4001/api/pds/v2/${employeeId}`);
+      const { data } = await axios.get(`${portalBackendUrl}/${employeeId}`);
       setEmployeePds(data);
       return data;
     },

@@ -6,7 +6,6 @@ import { url } from "@lms/utilities/url/api-url";
 import { createColumnHelper } from "@tanstack/react-table";
 import { FunctionComponent, useEffect, useState } from "react";
 import { UpdateTagModal } from "../tags-modal/UpdateTagModal";
-import { DeleteTagModal } from "../tags-modal/DeleteTagModal";
 
 const helper = createColumnHelper<Tag>();
 
@@ -18,7 +17,7 @@ export const TagsDataTable: FunctionComponent = () => {
   return (
     <>
       <DataTable<Tag>
-        datasource={`http://172.20.110.45:5286/api/lms/v1/tags?limit=100`}
+        datasource={`${url}/tags?limit=100`}
         queryKey={["tags"]}
         columns={[
           helper.accessor("name", {
