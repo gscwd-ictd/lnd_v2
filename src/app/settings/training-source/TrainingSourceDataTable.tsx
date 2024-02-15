@@ -2,14 +2,10 @@
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
 import { FunctionComponent } from "react";
-import { useRouter } from "next/navigation";
 import { TrainingSource } from "@lms/lib/types/training-source.type";
 import { url } from "@lms/utilities/url/api-url";
 
 export const TrainingSourceDataTable: FunctionComponent = () => {
-  // const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-
   return (
     <>
       <DataTable<TrainingSource>

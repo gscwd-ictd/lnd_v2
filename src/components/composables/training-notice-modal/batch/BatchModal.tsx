@@ -2,7 +2,7 @@
 
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { Batch, useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import axios from "axios";
@@ -31,6 +31,7 @@ export const BatchModal: FunctionComponent = () => {
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const [hasFetchedDetails, setHasFetchedDetails] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
   // this function checks if a batch is empty
   const checkBatchForEmptyEmployees = (batches: Batch[]) => {
@@ -82,8 +83,13 @@ export const BatchModal: FunctionComponent = () => {
       return data;
     },
 
-    onSuccess: () => {
+    onSuccess: async () => {
       setBatchingModalIsOpen(false);
+
+      const getTrainingNotice = await axios.get(`${url}/training-details`);
+
+      queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
+
       setToastOptions("success", "Success", "The changes you've made have been saved.");
       setHasFetchedDetails(false);
     },

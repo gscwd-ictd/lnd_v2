@@ -10,11 +10,19 @@ import { FunctionComponent, useEffect } from "react";
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
+import { Storage } from "appwrite";
+import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
+import convertSize from "convert-size";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const SendTrainingNoticeSummary: FunctionComponent = () => {
+  const client = useAppwriteClient();
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
   const { isComplete, setIsComplete } = useTrainingNoticeDataTable();
   const {
+    id,
     bucketFiles,
     selectedFacilitators,
     selectedTrainingDesign,
@@ -29,7 +37,9 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
     slotDistribution,
     deadline,
     trainingRequirements,
+    setBucketFiles,
   } = useTrainingNoticeStore((state) => ({
+    id: state.id,
     selectedTrainingDesign: state.selectedTrainingDesign,
     bucketFiles: state.bucketFiles,
     selectedFacilitators: state.selectedFacilitators,
@@ -44,6 +54,7 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
     slotDistribution: state.slotDistribution,
     deadline: state.deadlineForSubmission,
     trainingRequirements: state.trainingRequirements,
+    setBucketFiles: state.setBucketFiles,
   }));
 
   return (
@@ -80,28 +91,29 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
               <div>
                 <Disclosure.Button className="flex items-center justify-between w-full transition-all " tabIndex={-1}>
                   <div className="text-indigo-500 ">
-                    {bucketFiles.length}{" "}
-                    {bucketFiles.length > 1
+                    {bucketFiles?.length}{" "}
+                    {bucketFiles?.length > 1
                       ? "attached training design files"
-                      : bucketFiles.length === 1
+                      : bucketFiles?.length === 1
                       ? "attached training design file"
                       : null}
                   </div>
                 </Disclosure.Button>
 
                 <Disclosure.Panel className="" as="ul">
-                  {bucketFiles.map((file, idx) => {
-                    return (
-                      <div key={idx} className="pb-1 pl-5">
-                        <span className="text-xs">{idx + 1}. </span>
-                        <Link href={file.href} target="_blank">
-                          <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
-                            {file.name}
-                          </span>
-                        </Link>
-                      </div>
-                    );
-                  })}
+                  {bucketFiles &&
+                    bucketFiles.map((file, idx) => {
+                      return (
+                        <div key={idx} className="pb-1 pl-5">
+                          <span className="text-xs">{idx + 1}. </span>
+                          <Link href={file.href} target="_blank">
+                            <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
+                              {file.name}
+                            </span>
+                          </Link>
+                        </div>
+                      );
+                    })}
                 </Disclosure.Panel>
               </div>
             )}

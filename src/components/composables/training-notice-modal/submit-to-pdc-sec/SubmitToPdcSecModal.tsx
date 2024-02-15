@@ -1,15 +1,48 @@
-import { useContext } from "react";
+"use client";
+import { useContext, useState } from "react";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { url } from "@lms/utilities/url/api-url";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 
 export const SubmitToPdcSecModal = () => {
+  const queryClient = useQueryClient();
+  const { id } = useContext(TrainingNoticeContext);
   const { submitToPdcSecModalIsOpen, setSubmitToPdcSecModalIsOpen } = useContext(TrainingNoticeContext);
 
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+
   // handle sending, change status to for PDC Review
-  const handleSend = () => {
-    setSubmitToPdcSecModalIsOpen(false);
+  const handleSend = () => {};
+
+  // toast options
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
   };
+
+  const submitToPdcMutation = useMutation({
+    onSuccess: async () => {
+      const getTrainingNotice = await axios.get(`${url}/training-details`);
+
+      queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
+      setToastOptions("success", "Success", "You have sent the training to the PDC Secretary.");
+      setSubmitToPdcSecModalIsOpen(false);
+    },
+    mutationFn: async () => {
+      console.log(id);
+      const response = await axios.post(`${url}/training-approvals`, { trainingDetails: id });
+      return response;
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try in a few seconds.");
+    },
+  });
 
   return (
     <>
@@ -44,7 +77,7 @@ export const SubmitToPdcSecModal = () => {
                   className="w-[5rem]"
                   type="button"
                   // onClick={() => setSendConfirmationModalIsOpen(true)}
-                  onClick={handleSend}
+                  onClick={async () => await submitToPdcMutation.mutateAsync()}
                 >
                   <span className="uppercase">Yes</span>
                 </Button>
@@ -63,6 +96,14 @@ export const SubmitToPdcSecModal = () => {
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
+      <Toast
+        duration={2000}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
     </>
   );
 };

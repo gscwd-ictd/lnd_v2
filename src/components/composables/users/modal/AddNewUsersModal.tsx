@@ -1,28 +1,24 @@
 "use client";
 
 import { Combobox } from "@headlessui/react";
+import { UsersContext } from "@lms/app/settings/users-data-table/UsersDataTable";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
-import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { useUsersStore } from "@lms/utilities/stores/users-store";
+import { User } from "@lms/lib/types/users";
+import { useUsersModalStore, useUsersStore } from "@lms/utilities/stores/users-store";
 import { url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { FunctionComponent, useState } from "react";
+import { isEmpty } from "lodash";
+import React, { FunctionComponent, useContext, useState } from "react";
 
 export const AddNewUsersModal: FunctionComponent = () => {
-  const [addModalIsOpen, setAddModalIsOpen] = useState<boolean>(false);
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-
-  // this function opens the toast with the following attributes
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-
+  const { id } = useContext(UsersContext);
+  const addModalIsOpen = useUsersModalStore((state) => state.addModalIsOpen);
+  const setAddModalIsOpen = useUsersModalStore((state) => state.setAddModalIsOpen);
+  const setConfirmAddIsOpen = useUsersModalStore((state) => state.setConfirmAddIsOpen);
+  const setId = useUsersStore((state) => state.setId);
   const users = useUsersStore((state) => state.users);
   const setUsers = useUsersStore((state) => state.setUsers);
   const selectedUser = useUsersStore((state) => state.selectedUser);
@@ -42,11 +38,22 @@ export const AddNewUsersModal: FunctionComponent = () => {
       const result = await axios.get(`${url}/hrms/lnd/assignable`);
 
       setUsers(result.data);
+      return result;
     },
   });
   return (
     <>
-      <Modal isOpen={addModalIsOpen} setIsOpen={setAddModalIsOpen} size="md" isStatic>
+      <Modal
+        isOpen={addModalIsOpen}
+        setIsOpen={setAddModalIsOpen}
+        size="md"
+        isStatic
+        onClose={() => {
+          setId("");
+          setSelectedUser({} as User);
+          setSearchValue("");
+        }}
+      >
         <Button size="small" onClick={() => setAddModalIsOpen(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -78,6 +85,7 @@ export const AddNewUsersModal: FunctionComponent = () => {
                   <Combobox
                     value={selectedUser}
                     onChange={(value) => {
+                      setId(value.employeeId);
                       setSelectedUser(value);
                     }}
                   >
@@ -111,9 +119,6 @@ export const AddNewUsersModal: FunctionComponent = () => {
                                     <h3 className={`${active ? "text-indigo-50" : "text-gray-700"} `}>
                                       <span className="font-medium"> {user.fullName} </span>
                                     </h3>
-                                    {/* <span className={`text-sm ${active ? "text-indigo-50" : "text-gray-500"}`}>
-                                  Updated on {dayjs(td.updatedAt ?? td.createdAt).format("MMM DD, YYYY HH:mm A")}
-                                </span> */}
                                   </div>
                                 );
                               }}
@@ -131,11 +136,9 @@ export const AddNewUsersModal: FunctionComponent = () => {
             <div className="flex justify-end gap-2 py-2">
               <Button
                 size="small"
-                className="w-[6rem]"
-                onClick={() => {
-                  setToastOptions("success", "Success", "You have successfully added an employee!");
-                  setAddModalIsOpen(false);
-                }}
+                className="w-[6rem] disabled:cursor-not-allowed"
+                onClick={() => setConfirmAddIsOpen(true)}
+                disabled={isEmpty(selectedUser) ? true : false}
               >
                 Add
               </Button>
@@ -143,14 +146,6 @@ export const AddNewUsersModal: FunctionComponent = () => {
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
-      <Toast
-        duration={2000}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

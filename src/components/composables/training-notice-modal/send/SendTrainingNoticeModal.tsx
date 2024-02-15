@@ -12,8 +12,13 @@ import { url } from "@lms/utilities/url/api-url";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
+import { Storage } from "appwrite";
+import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
+import convertSize from "convert-size";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const SendTrainingNoticeModal: FunctionComponent = () => {
+  const client = useAppwriteClient();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -108,6 +113,45 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
     },
   });
 
+  // fetch uploaded files
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["uploaded-files", trainingNoticeId],
+    enabled: !!trainingNoticeId && sendModalIsOpen !== false,
+    queryFn: async () => {
+      try {
+        const storage = new Storage(client!);
+        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${id}`);
+
+        if (getBucketListFiles.data.files.length > 0) {
+          const newBucketFiles = Promise.all(
+            getBucketListFiles.data.files.map(async (file: any) => {
+              const fileDetails = await storage.getFile(id!, file.$id);
+              const filePreview = storage.getFilePreview(id!, file.$id);
+              const fileView = storage.getFileView(id!, file.$id);
+
+              return {
+                id: file.$id,
+                name: fileDetails.name,
+                href: fileView.href,
+                fileLink: fileView.href,
+                sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+                mimeType: fileDetails.mimeType,
+              };
+            })
+          );
+          setBucketFiles(await newBucketFiles);
+          return await newBucketFiles;
+        } else setBucketFiles([]);
+      } catch (error) {
+        return setBucketFiles([]);
+      }
+    },
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   // set the training notice id only on one instance upon opening the modal
   useEffect(() => {
     if (isEmpty(trainingNoticeId) && !isEmpty(id)) {
@@ -138,7 +182,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
         !isEmpty(selectedTrainingType) &&
         !isEmpty(selectedTags) &&
         !isEmpty(selectedFacilitators) &&
-        bucketFiles.length > 0 &&
+        bucketFiles?.length > 0 &&
         numberOfParticipants > 0 &&
         numberOfHours > 0 &&
         !isEmpty(location) &&
@@ -189,7 +233,13 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
-              <SendTrainingNoticeSummary />
+              {isEmpty(data) || isLoading || isFetching ? (
+                <div className="flex items-center justify-center w-full h-full">
+                  <Spinner />
+                </div>
+              ) : (
+                <SendTrainingNoticeSummary />
+              )}
             </main>
           </ModalContent.Body>
 

@@ -104,20 +104,21 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setToastIsOpen(true);
   };
 
-  // const assignBucketFile = async (bucketFileIds: Array<string>) => {
+  // const getBucketFiles = async (bucketId: string) => {
   //   const storage = new Storage(client!);
+  //   const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
 
-  //   if (bucketFileIds.length > 0) {
+  //   if (getBucketListFiles.data.files.length > 0) {
   //     const newBucketFiles = Promise.all(
-  //       bucketFileIds.map(async (file) => {
-  //         const fileDetails = await storage.getFile(bucket, file);
-  //         const filePreview = storage.getFilePreview(bucket, file);
-  //         const fileView = storage.getFileView(bucket, file);
+  //       getBucketListFiles.data.files.map(async (file: any) => {
+  //         const fileDetails = await storage.getFile(bucketId, file.$id);
+  //         const filePreview = storage.getFilePreview(bucketId, file.$id);
+  //         const fileView = storage.getFileView(bucketId, file.$id);
 
   //         return {
-  //           id: file,
+  //           id: file.$id,
   //           name: fileDetails.name,
-  //           href: filePreview.href,
+  //           href: fileView.href,
   //           fileLink: fileView.href,
   //           sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
   //           mimeType: fileDetails.mimeType,
@@ -127,31 +128,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   //     setBucketFiles(await newBucketFiles);
   //   } else setBucketFiles([]);
   // };
-
-  const getBucketFiles = async (bucketId: string) => {
-    const storage = new Storage(client!);
-    const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
-
-    if (getBucketListFiles.data.files.length > 0) {
-      const newBucketFiles = Promise.all(
-        getBucketListFiles.data.files.map(async (file: any) => {
-          const fileDetails = await storage.getFile(bucketId, file.$id);
-          const filePreview = storage.getFilePreview(bucketId, file.$id);
-          const fileView = storage.getFileView(bucketId, file.$id);
-
-          return {
-            id: file.$id,
-            name: fileDetails.name,
-            href: fileView.href,
-            fileLink: fileView.href,
-            sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
-            mimeType: fileDetails.mimeType,
-          };
-        })
-      );
-      setBucketFiles(await newBucketFiles);
-    } else setBucketFiles([]);
-  };
 
   const internalTrainingMutation = useMutation({
     onSuccess: async (data) => {
@@ -358,8 +334,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           // EXTERNAL
           else if (data.source.name === "External") {
             setSelectedTrainingSource({ id: data.source.id, name: "External" });
-            // assignBucketFile(data.bucketFiles);
-            getBucketFiles(trainingNoticeId!);
+            // getBucketFiles(trainingNoticeId!);
             setDeadlineForSubmission(data.deadlineForSubmission);
             setInvitationUrl!(data.invitationUrl);
             setLocation(data.location);
@@ -485,7 +460,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         isOpen={editModalIsOpen}
         setIsOpen={setEditModalIsOpen}
         onClose={onClose}
-        size={page === 7 ? "lg" : "md"}
+        size={page === 7 ? "3md" : "md"}
         isStatic
       >
         <ModalContent>

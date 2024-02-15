@@ -4,7 +4,7 @@ import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/Data
 import { EmployeeWithSupervisor, TrainingNotice } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
 import { Dispatch, FunctionComponent, SetStateAction, createContext, useEffect, useState } from "react";
-import { useOnGoingDataTable } from "./hooks/use-on-going-data-table";
+import { useRecentDataTable } from "./hooks/use-recent-data-table";
 import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/SliderOver";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -22,7 +22,7 @@ import { OngoingAlertSubmission } from "../ongoing/alert/OngoingAlert";
 import { OngoingToastComponent } from "../ongoing/toast/ToastComponent";
 import { OngoingSlideOver } from "../ongoing/slideover/OngoingSlideOver";
 
-type OnGoingState = {
+type RecentState = {
   id: string;
   batches: Array<Batch>;
   setBatches: Dispatch<SetStateAction<Array<Batch>>>;
@@ -42,16 +42,16 @@ type OnGoingState = {
   toastType: ToastType;
   setToastType: Dispatch<SetStateAction<ToastType>>;
 };
-export const OnGoingContext = createContext({} as OnGoingState);
+export const RecentContext = createContext({} as RecentState);
 
-export const OnGoingDataTable: FunctionComponent = () => {
+export const RecentDataTable: FunctionComponent = () => {
   const [slideOverIsOpen, setSlideOverIsOpen] = useState<boolean>(false);
   const [alertSubmissionIsOpen, setAlertSubmissionIsOpen] = useState<boolean>(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch>({} as Batch);
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useOnGoingDataTable();
+  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useRecentDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -174,7 +174,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
 
   return (
     <>
-      <OnGoingContext.Provider
+      <RecentContext.Provider
         value={{
           id,
           batches,
@@ -197,20 +197,21 @@ export const OnGoingDataTable: FunctionComponent = () => {
         }}
       >
         <DataTable<TrainingNotice>
-          datasource={`${url}/training-details/upcoming`}
-          queryKey={["on-going-training"]}
+          // datasource={`${url}/training-details/recents`}
+          datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/recent`}
+          queryKey={["recent-trainings"]}
           columns={columns}
-          title="On-Going Trainings"
-          subtitle="Trainings in progress"
+          title="Recent Trainings"
+          subtitle="Newly finished trainings"
           onRowClick={(row) => {
             setSlideOverIsOpen(true);
             setId(row.original.id);
           }}
         />
-        <OngoingSlideOver />
+        {/* <OngoingSlideOver />
         <OngoingAlertSubmission />
-        <OngoingToastComponent />
-      </OnGoingContext.Provider>
+        <OngoingToastComponent /> */}
+      </RecentContext.Provider>
     </>
   );
 };

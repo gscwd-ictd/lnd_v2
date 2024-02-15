@@ -5,6 +5,9 @@ import { PageContent } from "@lms/components/osprey/page-content/view/PageConten
 import { Sidebar } from "@lms/components/osprey/navigations/side/sidebar/view/Sidebar";
 import { AppwriteClientContainer } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
 import { PageWrapper } from "@lms/components/osprey/page-content/view/PageWrapper";
+import axios from "axios";
+import { url } from "@lms/utilities/url/api-url";
+import { redirect } from "next/navigation";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,7 +18,11 @@ export const metadata = {
   title: "Learning Management System",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function getUserFromHrmsDashboard() {
+  // initial props here
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={poppins.className}>

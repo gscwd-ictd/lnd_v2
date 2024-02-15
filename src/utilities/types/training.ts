@@ -16,7 +16,7 @@ export enum TrainingPreparationStatus {
   PENDING = "pending",
   ON_GOING_NOMINATION = "on going nomination",
   NOMINATION_DONE = "nomination done",
-  PDC_SECRETARIAT_APPROVAL = "for pdc secretariat approval",
+  PDC_SECRETARY_APPROVAL = "for pdc secretary approval",
   PDC_CHAIRMAN_APPROVAL = "for pdc chairman approval",
   GM_APPROVAL = "for gm approval",
   FOR_BATCHING = "for batching",

@@ -405,7 +405,8 @@ export const AddParticipants: FunctionComponent = () => {
                 <div className="text-gray-600 ">{dayjs(from).format("MMMM DD, YYYY")}</div>
                 <span>
                   &nbsp;
-                  {dayjs(from).format("MMMM DD, YYYY ") !== dayjs(to).format("MMMM DD, YYYY") && "to"}
+                  {/* {dayjs(from).format("MMMM DD, YYYY ") !== dayjs(to).format("MMMM DD, YYYY") && "to"} */}
+                  {dayjs(from).isSame(dayjs(to), "day") === false ? "to" : ""}
                   &nbsp;
                 </span>
                 {dayjs(from).format("MMMM DD, YYYY") !== dayjs(to).format("MMMM DD, YYYY") && (

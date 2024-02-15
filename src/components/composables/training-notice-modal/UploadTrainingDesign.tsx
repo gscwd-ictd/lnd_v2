@@ -93,9 +93,10 @@ export const UploadTrainingDesign: FunctionComponent = () => {
             })
           );
           setBucketFiles(await newBucketFiles);
+          return await newBucketFiles;
         } else setBucketFiles([]);
       } catch (error) {
-        return error;
+        return setBucketFiles([]);
       }
     },
     enabled: !!id && editModalIsOpen !== false && action === "update",
@@ -115,7 +116,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
-          {(!isEmpty(data) || isLoading || isFetching) && action === "update" ? (
+          {(isEmpty(data) || isLoading || isFetching) && action === "update" ? (
             <div className="flex items-center justify-center w-full h-full">
               <Spinner borderSize={2} />
             </div>

@@ -132,8 +132,8 @@ export const useTrainingNoticeDataTable = () => {
       header: "Status",
       cell: (info) =>
         info.row.original.preparationStatus === TrainingPreparationStatus.DONE
-          ? GetStatus(info.row.original.status)
-          : GetTrainingStatus(info.getValue()),
+          ? GetTrainingStatus(info.row.original.status)
+          : GetTrainingPreparationStatus(info.getValue()),
     }),
 
     helper.accessor("id", {
@@ -174,7 +174,7 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARY_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
               props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
@@ -205,7 +205,7 @@ export const useTrainingNoticeDataTable = () => {
               ) : null}
               {props.row.original.preparationStatus === TrainingPreparationStatus.ON_GOING_NOMINATION ||
               props.row.original.preparationStatus === TrainingPreparationStatus.NOMINATION_DONE ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL ||
+              props.row.original.preparationStatus === TrainingPreparationStatus.PDC_SECRETARY_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.GM_APPROVAL ||
               props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
@@ -237,9 +237,10 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
-              {props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+              {props.row.original.status !== TrainingStatus.REQUIREMENTS_SUBMISSION &&
+              (props.row.original.preparationStatus === TrainingPreparationStatus.FOR_BATCHING ||
+                props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+                props.row.original.preparationStatus === TrainingPreparationStatus.DONE) ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                   onClick={(e) => {
@@ -291,8 +292,9 @@ export const useTrainingNoticeDataTable = () => {
               ) : null} */}
 
               {/* Rescheduling */}
-              {props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
-              props.row.original.preparationStatus === TrainingPreparationStatus.DONE ? (
+              {props.row.original.status !== TrainingStatus.REQUIREMENTS_SUBMISSION &&
+              (props.row.original.preparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
+                props.row.original.preparationStatus === TrainingPreparationStatus.DONE) ? (
                 <button
                   className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
                   onClick={(e) => {
@@ -305,16 +307,18 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
 
-              <button
-                className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
-                onClick={(e) => {
-                  setRemoveModalIsOpen(true);
-                  e.stopPropagation();
-                  setTrainingNoticeId(props.row.original.id);
-                }}
-              >
-                Delete
-              </button>
+              {props.row.original.status !== TrainingStatus.REQUIREMENTS_SUBMISSION && (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    setRemoveModalIsOpen(true);
+                    e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
+                  }}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </ActionDropdown>
         </div>
@@ -366,7 +370,7 @@ export const useTrainingNoticeDataTable = () => {
   };
 };
 
-export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
+export const GetTrainingPreparationStatus = (status: TrainingPreparationStatus) => {
   if (status === TrainingPreparationStatus.PENDING)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
@@ -385,22 +389,22 @@ export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
         Nomination Done
       </div>
     );
-  else if (status === TrainingPreparationStatus.PDC_SECRETARIAT_APPROVAL)
+  else if (status === TrainingPreparationStatus.PDC_SECRETARY_APPROVAL)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-blue-700 bg-blue-300 border-blue-200">
-        PDC Approval
+        For Secretary Approval
       </div>
     );
   else if (status === TrainingPreparationStatus.PDC_CHAIRMAN_APPROVAL)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-green-700 bg-green-300 border-green-200">
-        PDC Approval
+        For Chairman Approval
       </div>
     );
   else if (status === TrainingPreparationStatus.GM_APPROVAL)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-gray-700 bg-gray-300 border-gray-200">
-        PDC Approval
+        For GM Approval
       </div>
     );
   else if (status === TrainingPreparationStatus.FOR_BATCHING)
@@ -423,7 +427,7 @@ export const GetTrainingStatus = (status: TrainingPreparationStatus) => {
     );
 };
 
-export const GetStatus = (status: TrainingStatus | null) => {
+export const GetTrainingStatus = (status: TrainingStatus | null) => {
   if (status === TrainingStatus.UPCOMING)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-orange-700 bg-orange-100 border-orange-200">
