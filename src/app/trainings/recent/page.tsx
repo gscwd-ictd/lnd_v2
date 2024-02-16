@@ -8,7 +8,7 @@ export default async function OnGoingTrainings() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <ul className="flex items-center gap-1 text-sm">
-              <Link href="/trainings/on-going" className="text-gray-700">
+              <Link href="/trainings/notice" className="text-gray-700">
                 Trainings /
               </Link>
               <li className="text-gray-500">Recent</li>

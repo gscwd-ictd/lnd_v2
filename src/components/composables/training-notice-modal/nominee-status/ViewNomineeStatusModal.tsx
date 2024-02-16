@@ -91,8 +91,33 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/training-nominees/${id}`)) as any;
-        if (!isEmpty(data)) {
+        if (data.length > 0) {
+          let tempCountEmployees = 0;
+          let newAcceptedEmployees = [...acceptedEmployees];
+          let newDeclinedEmployees = [...declinedEmployees];
+          let newNominatedEmployees = [...nominatedEmployees];
+          data
+            .map((employee: EmployeeWithSupervisor) => {
+              tempCountEmployees += 1;
+              if (employee.status === TrainingNomineeStatus.ACCEPTED) {
+                newAcceptedEmployees.push(employee);
+              } else if (employee.status === TrainingNomineeStatus.DECLINED) {
+                newDeclinedEmployees.push(employee);
+              } else if (employee.status === TrainingNomineeStatus.PENDING) {
+                newNominatedEmployees.push(employee);
+              }
+
+              return employee;
+            })
+            .sort((a: EmployeeWithSupervisor, b: EmployeeWithSupervisor) =>
+              a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
+            );
           setEmployeesWithStatus(data);
+          setAcceptedEmployees(newAcceptedEmployees);
+          setDeclinedEmployees(newDeclinedEmployees);
+          setNominatedEmployees(newNominatedEmployees);
+          setCountEmployees(tempCountEmployees);
+          //  setCountIsDone(true);
         }
 
         return data;
@@ -102,36 +127,36 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     },
   });
 
-  useEffect(() => {
-    if (employeesWithStatus.length > 0 && countIsDone === false) {
-      let tempCountEmployees = 0;
-      let newAcceptedEmployees = [...acceptedEmployees];
-      let newDeclinedEmployees = [...declinedEmployees];
-      let newNominatedEmployees = [...nominatedEmployees];
-      employeesWithStatus
-        .map((employee) => {
-          tempCountEmployees += 1;
-          if (employee.status === TrainingNomineeStatus.ACCEPTED) {
-            newAcceptedEmployees.push(employee);
-          } else if (employee.status === TrainingNomineeStatus.DECLINED) {
-            newDeclinedEmployees.push(employee);
-          } else if (employee.status === TrainingNomineeStatus.PENDING) {
-            newNominatedEmployees.push(employee);
-          }
+  // useEffect(() => {
+  //   if (employeesWithStatus.length > 0 && countIsDone === false) {
+  //     let tempCountEmployees = 0;
+  //     let newAcceptedEmployees = [...acceptedEmployees];
+  //     let newDeclinedEmployees = [...declinedEmployees];
+  //     let newNominatedEmployees = [...nominatedEmployees];
+  //     employeesWithStatus
+  //       .map((employee) => {
+  //         tempCountEmployees += 1;
+  //         if (employee.status === TrainingNomineeStatus.ACCEPTED) {
+  //           newAcceptedEmployees.push(employee);
+  //         } else if (employee.status === TrainingNomineeStatus.DECLINED) {
+  //           newDeclinedEmployees.push(employee);
+  //         } else if (employee.status === TrainingNomineeStatus.PENDING) {
+  //           newNominatedEmployees.push(employee);
+  //         }
 
-          return employee;
-        })
-        .sort((a, b) =>
-          a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
-        );
+  //         return employee;
+  //       })
+  //       .sort((a, b) =>
+  //         a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
+  //       );
 
-      setAcceptedEmployees(newAcceptedEmployees);
-      setDeclinedEmployees(newDeclinedEmployees);
-      setNominatedEmployees(newNominatedEmployees);
-      setCountEmployees(tempCountEmployees);
-      setCountIsDone(true);
-    }
-  }, [employeesWithStatus, countIsDone]);
+  //     setAcceptedEmployees(newAcceptedEmployees);
+  //     setDeclinedEmployees(newDeclinedEmployees);
+  //     setNominatedEmployees(newNominatedEmployees);
+  //     setCountEmployees(tempCountEmployees);
+  //     setCountIsDone(true);
+  //   }
+  // }, [employeesWithStatus, countIsDone]);
 
   // set the training notice id only on one instance upon opening the modal
   useEffect(() => {

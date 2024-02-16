@@ -46,7 +46,9 @@ export const UsersDataTable: FunctionComponent = () => {
           setToastType,
         }}
       >
-        <AddNewUsersModal />
+        <div className="pb-3">
+          <AddNewUsersModal />
+        </div>
         <DataTable<User>
           title="Users"
           subtitle="List of users"

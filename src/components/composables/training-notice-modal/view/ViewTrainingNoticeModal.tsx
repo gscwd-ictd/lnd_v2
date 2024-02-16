@@ -36,7 +36,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
   const { id, viewTrainingNoticeModalIsOpen, setViewTrainingNoticeModalIsOpen } = useContext(TrainingNoticeContext);
 
   // per training notice query
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError } = useQuery({
     queryKey: ["training-details-sending", trainingNoticeId],
     enabled: !!trainingNoticeId && viewTrainingNoticeModalIsOpen !== false,
     staleTime: 2,
@@ -91,6 +91,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
         return error;
       }
     },
+    onError: () => {},
   });
 
   // set the training notice id only on one instance upon opening the modal
@@ -128,10 +129,12 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
               {/* <SendTrainingNoticeSummary /> */}
-              {isEmpty(data) || isLoading || isFetching ? (
+              {isLoading || isFetching ? (
                 <div className="flex justify-center w-full h-full overflow-hidden">
                   <Spinner size="large" color="blue" borderSize={4} />
                 </div>
+              ) : isError ? (
+                <>Error</>
               ) : (
                 <SendTrainingNoticeSummary />
               )}

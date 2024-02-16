@@ -6,7 +6,7 @@ import {
 } from "@lms/utilities/stores/training-notice-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useContext, useEffect } from "react";
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
@@ -16,9 +16,11 @@ import convertSize from "convert-size";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
 export const SendTrainingNoticeSummary: FunctionComponent = () => {
   const client = useAppwriteClient();
+  const { setNomineeStatusIsOpen } = useContext(TrainingNoticeContext);
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
   const { isComplete, setIsComplete } = useTrainingNoticeDataTable();
   const {
@@ -272,8 +274,36 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
             d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
           />
         </svg>
-        <div>
-          <div className="pb-1">Recommendations</div>
+        <div className="w-full">
+          <div className="flex items-start justify-start w-full gap-2">
+            <div className="pb-2">Recommendations</div>
+
+            <button
+              className="flex items-center gap-1 px-2 py-1 text-white bg-indigo-400 border rounded"
+              onClick={() => setNomineeStatusIsOpen(true)}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-white"
+              >
+                <path
+                  d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
+                  fill="currentColor"
+                />
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12 3C6.40848 3 1.71018 6.82432 0.378052 12C1.71018 17.1757 6.40848 21 12 21C17.5915 21 22.2898 17.1757 23.6219 12C22.2898 6.82432 17.5915 3 12 3ZM16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12Z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span className="text-xs ">Nominees</span>
+            </button>
+          </div>
           {slotDistribution &&
             slotDistribution.map((slot, idx) => {
               return (

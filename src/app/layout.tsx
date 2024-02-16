@@ -8,6 +8,8 @@ import { PageWrapper } from "@lms/components/osprey/page-content/view/PageWrappe
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { createFakeCookie } from "./functions/call";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,10 +21,17 @@ export const metadata = {
 };
 
 async function getUserFromHrmsDashboard() {
-  // get the user from hrms here
+  const res = await axios.get(`${url}/hrms/lnd`);
+  return res;
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  try {
+    const user = await getUserFromHrmsDashboard();
+  } catch (error) {
+    // redirect(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}`);
+  }
+
   return (
     <html lang="en">
       <body className={poppins.className}>

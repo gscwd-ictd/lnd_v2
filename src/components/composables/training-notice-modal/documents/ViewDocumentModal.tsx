@@ -8,7 +8,7 @@ import { Batch, useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utili
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
-import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
+import { PDFViewer, Document, Page } from "@react-pdf/renderer";
 import PdfHeader from "../../documents/PdfHeader";
 import TrainingDocumentPdf from "../../documents/training/TrainingDocumentPdf";
 import PdfFooter from "../../documents/PdfFooter";
@@ -72,7 +72,6 @@ export const ViewDocumentModal: FunctionComponent = () => {
             position: "Acting General Manager / PDC Chairperson",
           });
 
-       
           // setBatches([
           //   {
           //     batchNumber: 1,
@@ -832,6 +831,7 @@ export const ViewDocumentModal: FunctionComponent = () => {
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {/* <ApprovedTrainingPdf/> */}
+
               <PDFViewer width={"100%"} height={windowHeight}>
                 <Document title=" ">
                   <Page size="A4" style={{ paddingHorizontal: 72, paddingVertical: 24 }}>
