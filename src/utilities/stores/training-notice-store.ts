@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CourseContent, TrainingPreparationStatus, TrainingType } from "../types/training";
+import { CourseContent, TrainingStatus, TrainingType } from "../types/training";
 import { TrainingSource } from "@lms/lib/types/training-source.type";
 import { TrainingDesign } from "@lms/lib/types/training-design.type";
 import { LspSource } from "./lsp-details-store";
@@ -168,13 +168,10 @@ export type TrainingNoticeStore = {
   // added
   selectedFacilitators: TrainingFacilitatorWithType[];
   setSelectedFacilitators: (selectedFacilitators: TrainingFacilitatorWithType[] | undefined) => void;
-
   selectedTags: Tag[];
   setSelectedTags: (selectedTags: Tag[] | undefined) => void;
-
   facilitators: TrainingFacilitatorWithType[];
   setFacilitators: (facilitators: TrainingFacilitatorWithType[]) => void;
-
   selectedTag: Tag;
   setSelectedTag: (selectedTag: Tag) => void;
   id: string | null;
@@ -232,8 +229,8 @@ export type TrainingNoticeStore = {
   initialTrainingRequirements: TrainingRequirement[];
   setInitialTrainingRequirements: (initialTrainingRequirements: TrainingRequirement[]) => void;
 
-  preparationStatus: TrainingPreparationStatus | "";
-  setPreparationStatus: (preparationStatus: TrainingPreparationStatus | "") => void;
+  trainingStatus: TrainingStatus | "";
+  setTrainingStatus: (trainingStatus: TrainingStatus | "") => void;
 
   status: string;
   setStatus: (status: string) => void;
@@ -364,8 +361,8 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     status: "",
     setStatus: (status: string) => set({ status }),
 
-    preparationStatus: "",
-    setPreparationStatus: (preparationStatus: TrainingPreparationStatus | "") => set({ preparationStatus }),
+    trainingStatus: "",
+    setTrainingStatus: (trainingStatus) => set({ trainingStatus }),
 
     // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => set({ trainingDocuments }),
     reset: () =>
@@ -403,7 +400,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
         trainingRequirements: [],
         hasFetchedRecommendations: false,
         initialTrainingRequirements: [],
-        preparationStatus: "",
+        trainingStatus: "",
         previousSlotDistribution: [],
       }),
   }))

@@ -75,21 +75,21 @@ export const SubmitToPdcSecModal = () => {
                 <Button
                   size="small"
                   className="w-[5rem]"
-                  type="button"
-                  // onClick={() => setSendConfirmationModalIsOpen(true)}
-                  onClick={async () => await submitToPdcMutation.mutateAsync()}
-                >
-                  <span className="uppercase">Yes</span>
-                </Button>
-                <Button
-                  size="small"
-                  className="w-[5rem]"
                   variant="white"
                   onClick={() => {
                     setSubmitToPdcSecModalIsOpen(false);
                   }}
                 >
                   <span className="uppercase">No</span>
+                </Button>
+                <Button
+                  size="small"
+                  className="w-[5rem]"
+                  type="button"
+                  // onClick={() => setSendConfirmationModalIsOpen(true)}
+                  onClick={async () => await submitToPdcMutation.mutateAsync()}
+                >
+                  <span className="uppercase">Yes</span>
                 </Button>
               </div>
             </div>

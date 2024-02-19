@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { EmployeeWithSupervisor, TrainingNotice, TrainingPreparationStatus } from "@lms/utilities/types/training";
+import { EmployeeWithSupervisor, TrainingNotice, TrainingStatus } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
 import { Dispatch, FunctionComponent, SetStateAction, createContext } from "react";
 import { useTrainingNoticeDataTable } from "./hooks/use-training-notice-data-table";
@@ -17,6 +17,7 @@ import { BatchModal } from "../training-notice-modal/batch/BatchModal";
 import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { AddParticipants } from "../training-notice-modal/batch/AddParticipants";
 import { ViewDocumentModal } from "../training-notice-modal/documents/ViewDocumentModal";
+import { SetToUpcomingModal } from "../training-notice-modal/set-to-upcoming/SetToUpcomingModal";
 
 type TrainingNoticeState = {
   id: string;
@@ -52,8 +53,10 @@ type TrainingNoticeState = {
   setEmployeesWithStatus: Dispatch<SetStateAction<EmployeeWithSupervisor[]>>;
   batchingModalIsOpen: boolean;
   setBatchingModalIsOpen: Dispatch<SetStateAction<boolean>>;
-  trainingPreparationStatus: TrainingPreparationStatus | undefined;
-  setTrainingPreparationStatus: Dispatch<SetStateAction<TrainingPreparationStatus | undefined>>;
+  toUpcomingModalIsOpen: boolean;
+  setToUpcomingModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  trainingStatus: TrainingStatus | undefined;
+  setTrainingStatus: Dispatch<SetStateAction<TrainingStatus | undefined>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -78,8 +81,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     totalSelectedEmployees,
     employeesWithStatus,
     batchingModalIsOpen,
-    trainingPreparationStatus,
-    setTrainingPreparationStatus,
+    trainingStatus,
+    toUpcomingModalIsOpen,
+    setToUpcomingModalIsOpen,
+    setTrainingStatus,
     setBatchingModalIsOpen,
     setEmployeesWithStatus,
     setTotalSelectedEmployees,
@@ -127,8 +132,10 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           totalSelectedEmployees,
           employeesWithStatus,
           batchingModalIsOpen,
-          trainingPreparationStatus,
-          setTrainingPreparationStatus,
+          trainingStatus,
+          toUpcomingModalIsOpen,
+          setToUpcomingModalIsOpen,
+          setTrainingStatus,
           setBatchingModalIsOpen,
           setEmployeesWithStatus,
           setTotalSelectedEmployees,
@@ -158,6 +165,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <BatchModal />
         <AddParticipants />
         <ViewDocumentModal />
+        <SetToUpcomingModal />
       </TrainingNoticeContext.Provider>
     </>
   );

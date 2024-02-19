@@ -9,7 +9,7 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { BatchNumbering } from "./BatchNumbering";
-import { EmployeeWithSupervisor, TrainingPreparationStatus } from "@lms/utilities/types/training";
+import { EmployeeWithSupervisor, TrainingStatus } from "@lms/utilities/types/training";
 import dayjs from "dayjs";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
@@ -54,8 +54,8 @@ export const BatchModal: FunctionComponent = () => {
     id,
     employeePool,
     batches,
-    trainingPreparationStatus,
-    setTrainingPreparationStatus,
+    trainingStatus,
+    setTrainingStatus,
     setBatches,
     setEmployeePool,
     setTotalSelectedEmployees,
@@ -161,7 +161,7 @@ export const BatchModal: FunctionComponent = () => {
       !!trainingNoticeId &&
       hasFetchedDetails === true &&
       batchingModalIsOpen !== false &&
-      trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING,
+      trainingStatus === TrainingStatus.FOR_BATCHING,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -187,8 +187,7 @@ export const BatchModal: FunctionComponent = () => {
       !!trainingNoticeId &&
       hasFetchedDetails === true &&
       batchingModalIsOpen !== false &&
-      (trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
-        trainingPreparationStatus === TrainingPreparationStatus.DONE),
+      trainingStatus === TrainingStatus.DONE_BATCHING,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -284,7 +283,7 @@ export const BatchModal: FunctionComponent = () => {
           <ModalContent.Footer>
             <div className="px-5 pt-2 pb-5">
               <div className="flex items-center justify-end w-full gap-2">
-                {trainingPreparationStatus === TrainingPreparationStatus.FOR_BATCHING ? (
+                {trainingStatus === TrainingStatus.FOR_BATCHING ? (
                   <Button
                     variant="solid"
                     size="default"
@@ -305,8 +304,7 @@ export const BatchModal: FunctionComponent = () => {
                   >
                     Submit
                   </Button>
-                ) : trainingPreparationStatus === TrainingPreparationStatus.DONE_BATCHING ||
-                  trainingPreparationStatus === TrainingPreparationStatus.DONE ? (
+                ) : trainingStatus === TrainingStatus.DONE_BATCHING ? (
                   <Button
                     variant="solid"
                     size="default"

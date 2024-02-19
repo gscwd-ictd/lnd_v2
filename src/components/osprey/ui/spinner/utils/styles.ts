@@ -8,11 +8,11 @@ export const styles = {
     borderSize?: number
   ) =>
     cls(
-      `border-${borderSize} border-r-transparent animate-spin rounded-full`,
+      `border-${borderSize}  animate-spin rounded-full`,
       {
-        "border-blue-600": color === "blue",
-        "border-red-600": color === "red",
-        "border-green-600": color === "green",
+        "border-blue-600 border-r-blue-200": color === "blue",
+        "border-red-600 border-r-red-200": color === "red",
+        "border-green-600 border-r-green-200": color === "green",
         "w-10 h-10": size === "small",
         "w-15 h-15": size === "medium",
         "w-20 h-20": size === "large",

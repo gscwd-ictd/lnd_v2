@@ -40,7 +40,7 @@ export const OngoingAlertSubmission: FunctionComponent = () => {
           </label>
         </AlertDialogDescription>
         <div className="flex justify-end mt-4 space-x-2">
-          <Button variant="soft" onClick={() => setAlertSubmissionIsOpen(false)}>
+          <Button variant="white" onClick={() => setAlertSubmissionIsOpen(false)}>
             Cancel
           </Button>
           <Button
