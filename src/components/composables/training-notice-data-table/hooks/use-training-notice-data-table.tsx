@@ -221,6 +221,7 @@ export const useTrainingNoticeDataTable = () => {
                   onClick={(e) => {
                     // set modal to true
                     e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
                     setSubmitToPdcSecModalIsOpen(true);
                   }}
                 >
@@ -381,61 +382,61 @@ export const GetTrainingStatus = (status: TrainingStatus) => {
     );
   else if (status === TrainingStatus.PDC_SECRETARY_APPROVAL)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-400">
         For Secretary Approval
       </div>
     );
   else if (status === TrainingStatus.PDC_CHAIRMAN_APPROVAL)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-400">
         For Chairman Approval
       </div>
     );
   else if (status === TrainingStatus.GM_APPROVAL)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-400">
         For GM Approval
       </div>
     );
   else if (status === TrainingStatus.FOR_BATCHING)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-yellow-700 bg-yellow-300 border-yellow-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-yellow-700 bg-yellow-300 border-yellow-400">
         For Batching
       </div>
     );
   else if (status === TrainingStatus.DONE_BATCHING)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-yellow-700 bg-yellow-300 border-yellow-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-yellow-700 bg-yellow-300 border-yellow-400">
         Done Batching
       </div>
     );
   else if (status === TrainingStatus.UPCOMING)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-green-700 bg-green-100 border-green-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-green-700 bg-green-100 border-green-400">
         Upcoming
       </div>
     );
   else if (status === TrainingStatus.ON_GOING_TRAINING)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-green-700 bg-green-100 border-green-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-green-700 bg-green-100 border-green-400">
         Ongoing Training
       </div>
     );
   else if (status === TrainingStatus.REQUIREMENTS_SUBMISSION)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-emerald-700 bg-emerald-100 border-emerald-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-emerald-700 bg-emerald-100 border-emerald-400">
         Requirements Submission
       </div>
     );
   else if (status === TrainingStatus.COMPLETED)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-emerald-700 bg-emerald-100 border-emerald-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-emerald-700 bg-emerald-100 border-emerald-400">
         Completed
       </div>
     );
   else if (status === TrainingStatus.CANCELLED)
     return (
-      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-200">
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-400">
         Completed
       </div>
     );

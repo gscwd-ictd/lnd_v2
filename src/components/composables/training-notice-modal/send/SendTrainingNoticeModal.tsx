@@ -56,7 +56,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
     useContext(TrainingNoticeContext);
 
   // per training notice query
-  useQuery({
+  const { isLoading: trainingIsLoading, isFetching: trainingIsFetching } = useQuery({
     queryKey: ["training-details-sending", trainingNoticeId],
     enabled: !!trainingNoticeId && sendModalIsOpen !== false,
     staleTime: 2,
@@ -114,9 +114,9 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
   });
 
   // fetch uploaded files
-  const { data, isLoading, isFetching } = useQuery({
+  const { isLoading: externalDataIsLoading, isFetching: externalDataIsFetching } = useQuery({
     queryKey: ["uploaded-files", trainingNoticeId],
-    enabled: !!trainingNoticeId && sendModalIsOpen !== false,
+    enabled: !!trainingNoticeId && sendModalIsOpen !== false && selectedTrainingSource.name === "External",
     queryFn: async () => {
       try {
         const storage = new Storage(client!);
@@ -233,7 +233,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
-              {isEmpty(data) || isLoading || isFetching ? (
+              {trainingIsLoading || trainingIsFetching ? (
                 <div className="flex items-center justify-center w-full h-full">
                   <Spinner />
                 </div>

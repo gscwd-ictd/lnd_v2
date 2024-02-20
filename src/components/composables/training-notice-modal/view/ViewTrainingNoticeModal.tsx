@@ -129,7 +129,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
               {/* <SendTrainingNoticeSummary /> */}
-              {isLoading || isFetching ? (
+              {isLoading ? (
                 <div className="flex justify-center w-full h-full overflow-hidden">
                   <Spinner size="large" color="blue" borderSize={4} />
                 </div>

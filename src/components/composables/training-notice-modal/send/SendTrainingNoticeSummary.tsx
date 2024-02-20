@@ -10,12 +10,7 @@ import { FunctionComponent, useContext, useEffect } from "react";
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
-import { Storage } from "appwrite";
 import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
-import convertSize from "convert-size";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
 export const SendTrainingNoticeSummary: FunctionComponent = () => {
@@ -37,13 +32,14 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
     numberOfHours,
     location,
     slotDistribution,
-    deadline,
     trainingRequirements,
+    courseContent,
     setBucketFiles,
   } = useTrainingNoticeStore((state) => ({
     id: state.id,
     selectedTrainingDesign: state.selectedTrainingDesign,
     bucketFiles: state.bucketFiles,
+    courseContent: state.courseContent,
     selectedFacilitators: state.selectedFacilitators,
     selectedTags: state.selectedTags,
     courseTitle: state.courseTitle,
@@ -77,6 +73,43 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
           />
         </svg>
         {selectedTrainingSource.name === "Internal" ? selectedTrainingDesign.courseTitle : courseTitle}
+      </div>
+
+      <div className="flex flex-col items-start justify-center gap-1">
+        <div className="flex gap-2">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
+            <path d="M7 18H17V16H7V18Z" fill="currentColor" />
+            <path d="M17 14H7V12H17V14Z" fill="currentColor" />
+            <path d="M7 10H11V8H7V10Z" fill="currentColor" />
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 2C4.34315 2 3 3.34315 3 5V19C3 20.6569 4.34315 22 6 22H18C19.6569 22 21 20.6569 21 19V9C21 5.13401 17.866 2 14 2H6ZM6 4H13V9H19V19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4ZM15 4.10002C16.6113 4.4271 17.9413 5.52906 18.584 7H15V4.10002Z"
+              fill="currentColor"
+            />
+          </svg>
+          <span>Course Content</span>
+        </div>
+        <div className="flex flex-col">
+          {courseContent &&
+            courseContent.map((content, idx) => {
+              return (
+                <div key={idx} className="flex gap-2 pl-8">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  <span className="text-indigo-500">{content.title}</span>
+                </div>
+              );
+            })}
+        </div>
       </div>
 
       {selectedTrainingSource.name === "External" ? (
@@ -374,7 +407,7 @@ export const SendTrainingNoticeSummary: FunctionComponent = () => {
           {trainingRequirements &&
             trainingRequirements.map((req: TrainingRequirement, idx) => {
               return (
-                <div key={idx} className="flex w-full gap-2 pl-2 gap-0s">
+                <div key={idx} className="flex w-full gap-2 pl-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

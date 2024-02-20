@@ -266,7 +266,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                               <td className="p-2 text-sm font-light text-center border ">
                                 {employee.remarks ? (
                                   <Tooltip content={employee.remarks}>
-                                    <div className="text-left truncate hover:cursor-wait">{employee.remarks}</div>
+                                    <div className="text-left truncate hover:cursor-zoom-in">{employee.remarks}</div>
                                   </Tooltip>
                                 ) : (
                                   <span className="text-center">-</span>

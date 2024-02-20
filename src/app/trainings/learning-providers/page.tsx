@@ -10,7 +10,7 @@ export default function LearningProviders() {
 
         <BreadCrumbs // left-to-right
           crumbs={[
-            { layerText: "Trainings", path: "/trainings/on-going" },
+            { layerText: "Trainings", path: "/trainings/notice" },
             { layerText: "Providers", path: "" },
           ]}
         />

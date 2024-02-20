@@ -162,6 +162,13 @@ export const BatchModal: FunctionComponent = () => {
       hasFetchedDetails === true &&
       batchingModalIsOpen !== false &&
       trainingStatus === TrainingStatus.FOR_BATCHING,
+
+    onError: () => {
+      setToastOptions("danger", "Error", "Failed to fetch accepted nominees. Please try again later");
+    },
+    onSuccess: () => {
+      setToastOptions("success", "Success", "Fetched the accepted nominees.");
+    },
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -169,7 +176,6 @@ export const BatchModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
-
         setEmployeePool(acceptedNominees);
         setTotalSelectedEmployees([]);
 

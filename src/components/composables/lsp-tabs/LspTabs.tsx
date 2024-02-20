@@ -8,7 +8,7 @@ import { OrganizationDataTable } from "../lsp-data-table/OrganizationLspDataTabl
 export const LspTabs: FunctionComponent = () => {
   return (
     <>
-      <Tabs defaultValue="individual">
+      <Tabs defaultValue="individual" className="rounded">
         <TabsList>
           <TabsTrigger value="individual">Individual</TabsTrigger>
           <TabsTrigger value="organization">Organization</TabsTrigger>

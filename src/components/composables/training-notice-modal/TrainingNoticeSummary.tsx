@@ -1,13 +1,13 @@
+import { Disclosure } from "@headlessui/react";
 import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import {
   TrainingRequirement,
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
+import Link from "next/link";
 import { FunctionComponent } from "react";
 
 export const TrainingNoticeSummary: FunctionComponent = () => {
@@ -25,9 +25,8 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
     numberOfHours,
     location,
     slotDistribution,
-    deadline,
-    filesToUpload,
     trainingRequirements,
+    courseContent,
   } = useTrainingNoticeStore((state) => ({
     selectedTrainingDesign: state.selectedTrainingDesign,
     bucketFiles: state.bucketFiles,
@@ -37,6 +36,7 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
     numberOfParticipants: state.numberOfParticipants,
     selectedTrainingSource: state.selectedTrainingSource,
     from: state.trainingStart,
+    courseContent: state.courseContent,
     to: state.trainingEnd,
     numberOfHours: state.numberOfHours,
     filesToUpload: state.filesToUpload,
@@ -66,20 +66,84 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
         {selectedTrainingSource.name === "Internal" ? <>{selectedTrainingDesign.courseTitle}</> : courseTitle}
       </div>
 
+      <div className="flex flex-col items-start justify-center gap-1">
+        <div className="flex gap-2">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
+            <path d="M7 18H17V16H7V18Z" fill="currentColor" />
+            <path d="M17 14H7V12H17V14Z" fill="currentColor" />
+            <path d="M7 10H11V8H7V10Z" fill="currentColor" />
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 2C4.34315 2 3 3.34315 3 5V19C3 20.6569 4.34315 22 6 22H18C19.6569 22 21 20.6569 21 19V9C21 5.13401 17.866 2 14 2H6ZM6 4H13V9H19V19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4ZM15 4.10002C16.6113 4.4271 17.9413 5.52906 18.584 7H15V4.10002Z"
+              fill="currentColor"
+            />
+          </svg>
+          <span>Course Content</span>
+        </div>
+        <div className="flex flex-col">
+          {courseContent &&
+            courseContent.map((content, idx) => {
+              return (
+                <div key={idx} className="flex gap-2 pl-8">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  <span className="text-indigo-500">{content.title}</span>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+
       {selectedTrainingSource.name === "External" ? (
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-start justify-start gap-2">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M14 0C16.7614 0 19 2.23858 19 5V17C19 20.866 15.866 24 12 24C8.13401 24 5 20.866 5 17V9H7V17C7 19.7614 9.23858 22 12 22C14.7614 22 17 19.7614 17 17V5C17 3.34315 15.6569 2 14 2C12.3431 2 11 3.34315 11 5V17C11 17.5523 11.4477 18 12 18C12.5523 18 13 17.5523 13 17V6H15V17C15 18.6569 13.6569 20 12 20C10.3431 20 9 18.6569 9 17V5C9 2.23858 11.2386 0 14 0Z"
               fill="currentColor"
             />
           </svg>
-          {filesToUpload.length + bucketFiles.length}{" "}
-          {filesToUpload.length + bucketFiles.length > 1
-            ? "attached training design files"
-            : filesToUpload.length === 1
-            ? "attached training design file"
-            : null}
+
+          <Disclosure>
+            {({ open }) => (
+              <div>
+                <Disclosure.Button className="flex items-center justify-between w-full transition-all " tabIndex={-1}>
+                  <div className="text-indigo-500 ">
+                    {bucketFiles?.length}{" "}
+                    {bucketFiles?.length > 1
+                      ? "attached training design files"
+                      : bucketFiles?.length === 1
+                      ? "attached training design file"
+                      : null}
+                  </div>
+                </Disclosure.Button>
+
+                <Disclosure.Panel className="" as="ul">
+                  {bucketFiles &&
+                    bucketFiles.map((file, idx) => {
+                      return (
+                        <div key={idx} className="pb-1 pl-5">
+                          <span className="text-xs">{idx + 1}. </span>
+                          <Link href={file.href} target="_blank">
+                            <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
+                              {file.name}
+                            </span>
+                          </Link>
+                        </div>
+                      );
+                    })}
+                </Disclosure.Panel>
+              </div>
+            )}
+          </Disclosure>
         </div>
       ) : null}
       <div className="flex items-center justify-start gap-2">
