@@ -100,10 +100,10 @@ export const UploadTrainingDesign: FunctionComponent = () => {
       }
     },
     enabled: !!id && editModalIsOpen !== false && action === "update",
-    staleTime: 2,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    // staleTime: 2,
+    // refetchOnReconnect: false,
+    // refetchOnMount: false,
+    // refetchOnWindowFocus: false,
   });
 
   return (

@@ -170,9 +170,10 @@ export const AddNewLspModal: FunctionComponent = () => {
   const lspDataTableIndIntMutation = useMutation({
     onSuccess: async (data) => {
       setOpen(false);
-      queryClient.setQueryData(["lsp_individual"], (oldData: Array<any> | undefined) =>
-        oldData ? [...oldData, data] : undefined
-      );
+      setToastOptions("success", "Success", "You have successfully added an LSP");
+      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp-details/q?type=individual&page=1&limit=40`);
+
+      queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {

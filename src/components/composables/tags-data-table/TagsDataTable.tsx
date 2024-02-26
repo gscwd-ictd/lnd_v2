@@ -6,6 +6,7 @@ import { url } from "@lms/utilities/url/api-url";
 import { createColumnHelper } from "@tanstack/react-table";
 import { FunctionComponent, useEffect, useState } from "react";
 import { UpdateTagModal } from "../tags-modal/UpdateTagModal";
+import { DeleteTagModal } from "../tags-modal/DeleteTagModal";
 
 const helper = createColumnHelper<Tag>();
 
@@ -54,6 +55,7 @@ export const TagsDataTable: FunctionComponent = () => {
                   className="px-2 py-1 text-gray-700 border rounded shadow-sm"
                   onClick={() => {
                     // setOpen(true);
+                    setTagId(info.getValue());
                     setRemove(true);
                   }}
                 >
@@ -83,6 +85,7 @@ export const TagsDataTable: FunctionComponent = () => {
         subtitle="List of tags"
       />
       <UpdateTagModal id={tagId} update={update} setUpdate={setUpdate} />
+      <DeleteTagModal id={tagId} remove={remove} setRemove={setRemove} />
     </>
   );
 };

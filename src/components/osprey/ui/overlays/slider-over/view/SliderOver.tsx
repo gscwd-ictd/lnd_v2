@@ -14,6 +14,7 @@ type Props = {
 type SlideOverProps = Props & {
   open: boolean;
   setOpen: (state: boolean) => void;
+  onClose?: () => void;
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
 };
 
@@ -37,12 +38,20 @@ const SlideOverContext = createContext({} as SlideOverContextState);
 export const SlideOver: FunctionComponent<SlideOverProps> & SlideOverComposition = ({
   open = false,
   setOpen,
+  onClose,
   size = "sm",
   children,
 }) => {
   return (
     <Transition show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-40" onClose={setOpen}>
+      <Dialog
+        as="div"
+        className="relative z-40"
+        onClose={() => {
+          setOpen(!open);
+          onClose?.();
+        }}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-500"
@@ -52,12 +61,12 @@ export const SlideOver: FunctionComponent<SlideOverProps> & SlideOverComposition
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-30 blur-lg transition-opacity" />
+          <Dialog.Overlay className="fixed inset-0 transition-opacity bg-black bg-opacity-30 blur-lg" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+            <div className="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
               <Transition.Child
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-500"
@@ -69,7 +78,7 @@ export const SlideOver: FunctionComponent<SlideOverProps> & SlideOverComposition
               >
                 <Dialog.Panel className={styles.panel(size)}>
                   <SlideOverContext.Provider value={{ open, setOpen }}>
-                    <div className="flex h-full flex-col bg-white shadow-xl">{children}</div>
+                    <div className="flex flex-col h-full bg-white shadow-xl">{children}</div>
                   </SlideOverContext.Provider>
                 </Dialog.Panel>
               </Transition.Child>
@@ -93,7 +102,7 @@ const Title: FunctionComponent<Props> = ({ children }) => {
 };
 
 const Body: FunctionComponent<Props> = ({ children }) => {
-  return <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>;
+  return <main className="flex-1 overflow-x-hidden overflow-y-auto">{children}</main>;
 };
 
 const Footer: FunctionComponent<FooterProps> = ({ children, alignEnd }) => {

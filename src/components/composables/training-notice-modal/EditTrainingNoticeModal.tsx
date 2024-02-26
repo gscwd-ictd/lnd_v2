@@ -38,6 +38,8 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   const client = useAppwriteClient();
   const queryClient = useQueryClient();
 
+  const resetModal = useTrainingNoticeStore((state) => state.reset);
+
   const {
     courseTitle,
     facilitator,
@@ -380,6 +382,8 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       setSelectedTrainingType(undefined);
       setLspSource(undefined);
       setEditModalIsOpen(false);
+      reset();
+      resetModal();
     } else setPage(page - 1);
   };
 
@@ -443,6 +447,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setSelectedTrainingType(undefined);
     setAction(undefined);
     reset();
+    resetModal();
     // setTag({ id: "", tag: "" }), setSelectedTag({ id: "", tag: "" });
   };
 

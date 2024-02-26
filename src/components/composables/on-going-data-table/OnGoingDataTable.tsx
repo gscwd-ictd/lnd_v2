@@ -1,11 +1,9 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { EmployeeWithSupervisor, TrainingNotice } from "@lms/utilities/types/training";
+import { TrainingNotice } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
 import { Dispatch, FunctionComponent, SetStateAction, createContext, useEffect, useState } from "react";
-import { useOnGoingDataTable } from "./hooks/use-on-going-data-table";
-import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/SliderOver";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { isEmpty } from "lodash";
@@ -21,6 +19,7 @@ import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props"
 import { OngoingAlertSubmission } from "../ongoing/alert/OngoingAlert";
 import { OngoingToastComponent } from "../ongoing/toast/ToastComponent";
 import { OngoingSlideOver } from "../ongoing/slideover/OngoingSlideOver";
+import { useRecentDataTable } from "../recent-data-table/hooks/use-recent-data-table";
 
 type OnGoingState = {
   id: string;
@@ -51,7 +50,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useOnGoingDataTable();
+  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useRecentDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -184,8 +183,8 @@ export const OnGoingDataTable: FunctionComponent = () => {
           slideOverIsOpen,
           alertSubmissionIsOpen,
           toastIsOpen,
-          setToastIsOpen,
           toastType,
+          setToastIsOpen,
           setToastOptions,
           setToastType,
           setAlertSubmissionIsOpen,
@@ -197,7 +196,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
         }}
       >
         <DataTable<TrainingNotice>
-          datasource={`${url}/training-details/upcoming`}
+          datasource={`${url}/training-details/ongoing`}
           queryKey={["on-going-training"]}
           columns={columns}
           title="On-Going Trainings"

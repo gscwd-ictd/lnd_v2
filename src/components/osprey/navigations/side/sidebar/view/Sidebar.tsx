@@ -1,6 +1,6 @@
 "use client";
 
-import { FunctionComponent, useContext, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useContext, useEffect } from "react";
 import { SidebarContext } from "../utils/contexts";
 import { styles } from "../utils/styles";
 import { SidebarNavigation } from "../../sidebar-navigation/view/SidebarNavigation";

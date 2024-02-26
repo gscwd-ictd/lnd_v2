@@ -18,6 +18,7 @@ import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { AddParticipants } from "../training-notice-modal/batch/AddParticipants";
 import { ViewDocumentModal } from "../training-notice-modal/documents/ViewDocumentModal";
 import { SetToUpcomingModal } from "../training-notice-modal/set-to-upcoming/SetToUpcomingModal";
+import { ToOngoingAlertSubmission } from "../ongoing/alert/ToOngoingAlert";
 
 type TrainingNoticeState = {
   id: string;
@@ -57,6 +58,8 @@ type TrainingNoticeState = {
   setToUpcomingModalIsOpen: Dispatch<SetStateAction<boolean>>;
   trainingStatus: TrainingStatus | undefined;
   setTrainingStatus: Dispatch<SetStateAction<TrainingStatus | undefined>>;
+  toOngoingAlertIsOpen: boolean;
+  setToOngoingAlertIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
@@ -83,6 +86,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     batchingModalIsOpen,
     trainingStatus,
     toUpcomingModalIsOpen,
+    toOngoingAlertIsOpen,
+    setToOngoingAlertIsOpen,
     setToUpcomingModalIsOpen,
     setTrainingStatus,
     setBatchingModalIsOpen,
@@ -134,6 +139,8 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           batchingModalIsOpen,
           trainingStatus,
           toUpcomingModalIsOpen,
+          toOngoingAlertIsOpen,
+          setToOngoingAlertIsOpen,
           setToUpcomingModalIsOpen,
           setTrainingStatus,
           setBatchingModalIsOpen,
@@ -166,6 +173,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         <AddParticipants />
         <ViewDocumentModal />
         <SetToUpcomingModal />
+        <ToOngoingAlertSubmission />
       </TrainingNoticeContext.Provider>
     </>
   );

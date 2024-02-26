@@ -18,12 +18,13 @@ import {
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import dayjs from "dayjs";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
-import { OngoingAlertSubmission } from "../ongoing/alert/OngoingAlert";
-import { OngoingToastComponent } from "../ongoing/toast/ToastComponent";
-import { OngoingSlideOver } from "../ongoing/slideover/OngoingSlideOver";
+import { RecentSlideOver } from "../recent/slideover/RecentSlideOver";
+import { RecentAttendanceModal } from "../recent/modal/RecentAttendanceModal";
+import { RecentRequirementsModal } from "../recent/modal/RecentRequirementsModal";
 
 type RecentState = {
   id: string;
+  setId: Dispatch<SetStateAction<string>>;
   batches: Array<Batch>;
   setBatches: Dispatch<SetStateAction<Array<Batch>>>;
   selectedBatch: Batch;
@@ -41,10 +42,13 @@ type RecentState = {
   setToastIsOpen: Dispatch<SetStateAction<boolean>>;
   toastType: ToastType;
   setToastType: Dispatch<SetStateAction<ToastType>>;
+  requirementsModalIsOpen: boolean;
+  setRequirementsModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 export const RecentContext = createContext({} as RecentState);
 
 export const RecentDataTable: FunctionComponent = () => {
+  const [requirementsModalIsOpen, setRequirementsModalIsOpen] = useState<boolean>(false);
   const [slideOverIsOpen, setSlideOverIsOpen] = useState<boolean>(false);
   const [alertSubmissionIsOpen, setAlertSubmissionIsOpen] = useState<boolean>(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch>({} as Batch);
@@ -184,8 +188,11 @@ export const RecentDataTable: FunctionComponent = () => {
           slideOverIsOpen,
           alertSubmissionIsOpen,
           toastIsOpen,
-          setToastIsOpen,
           toastType,
+          requirementsModalIsOpen,
+          setRequirementsModalIsOpen,
+          setToastIsOpen,
+          setId,
           setToastOptions,
           setToastType,
           setAlertSubmissionIsOpen,
@@ -197,8 +204,8 @@ export const RecentDataTable: FunctionComponent = () => {
         }}
       >
         <DataTable<TrainingNotice>
-          // datasource={`${url}/training-details/recents`}
-          datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/recent`}
+          datasource={`${url}/training-details/recents`}
+          // datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/recent`}
           queryKey={["recent-trainings"]}
           columns={columns}
           title="Recent Trainings"
@@ -208,9 +215,11 @@ export const RecentDataTable: FunctionComponent = () => {
             setId(row.original.id);
           }}
         />
-        {/* <OngoingSlideOver />
-        <OngoingAlertSubmission />
-        <OngoingToastComponent /> */}
+        <RecentSlideOver />
+        <RecentAttendanceModal />
+        <RecentRequirementsModal />
+        {/* <OngoingAlertSubmission />
+        <OngoingToastComponent />  */}
       </RecentContext.Provider>
     </>
   );

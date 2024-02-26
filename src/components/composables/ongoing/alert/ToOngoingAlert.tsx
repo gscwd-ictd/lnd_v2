@@ -10,40 +10,39 @@ import { FunctionComponent, useContext } from "react";
 import { OnGoingContext } from "../../on-going-data-table/OnGoingDataTable";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
+import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
-export const OngoingAlertSubmission: FunctionComponent = () => {
+export const ToOngoingAlertSubmission: FunctionComponent = () => {
   const queryClient = useQueryClient();
-  const { alertSubmissionIsOpen, setAlertSubmissionIsOpen, setSlideOverIsOpen, setToastOptions, id } =
-    useContext(OnGoingContext);
+  const { toOngoingAlertIsOpen, setToOngoingAlertIsOpen, id } = useContext(TrainingNoticeContext);
 
   const confirmToSubmit = useMutation({
     onSuccess: async () => {
-      const getUpdatedOngoingTrainings = await axios.get(`${url}/training-details/ongoing`);
-      queryClient.setQueryData(["on-going-training"], getUpdatedOngoingTrainings.data.items);
-      setToastOptions("success", "Success", "You have moved the training to recents.");
-      setAlertSubmissionIsOpen(false);
-      setSlideOverIsOpen(false);
+      // setToastOptions("success", "Success", "You have moved the training to recents.");
+      setToOngoingAlertIsOpen(false);
+      // setSlideOverIsOpen(false);
+      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details`);
+      queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
     mutationFn: async () => {
-      const request = axios.put(`${url}/training-details/requirements-submission/${id}`);
+      const request = axios.put(`${url}/training-details/on-going/${id}`);
       return request;
     },
   });
 
   return (
-    <AlertDialog open={alertSubmissionIsOpen} onOpenChange={setAlertSubmissionIsOpen}>
+    <AlertDialog open={toOngoingAlertIsOpen} onOpenChange={setToOngoingAlertIsOpen}>
       <AlertDialogContent>
         <AlertDialogTitle>
-          <div className="text-lg font-semibold text-gray-600">Move to recents</div>
+          <div className="text-lg font-semibold text-gray-600">Move to on-going</div>
         </AlertDialogTitle>
         <AlertDialogDescription>
           <label className="text-sm font-medium text-gray-700">
-            Are you sure you want to move the training to recents and change the status to &ldquo;For requirements
-            submission&ldquo;?
+            Are you sure you want to move the training to on-going and change the status to &ldquo;On going&ldquo;?
           </label>
         </AlertDialogDescription>
         <div className="flex justify-end mt-4 space-x-2">
-          <Button variant="white" onClick={() => setAlertSubmissionIsOpen(false)}>
+          <Button variant="white" onClick={() => setToOngoingAlertIsOpen(false)}>
             Cancel
           </Button>
           <Button

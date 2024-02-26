@@ -34,6 +34,7 @@ export const useTrainingNoticeDataTable = () => {
     batchNumber: 1,
     trainingDate: { from: "", to: "" },
   });
+  const [toOngoingAlertIsOpen, setToOngoingAlertIsOpen] = useState<boolean>(false);
   const [selectedBatchModalIsOpen, setSelectedBatchModalIsOpen] = useState<boolean>(false);
   const [batches, setBatches] = useState<Batch[]>([
     { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
@@ -49,12 +50,16 @@ export const useTrainingNoticeDataTable = () => {
   const setLspSource = useLspSourceStore((state) => state.setLspSource);
   const setHasFetchedRecommendations = useTrainingNoticeStore((state) => state.setHasFetchedRecommendations);
   const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
-  // const setPreparationStatus = useTrainingNoticeStore((state) => state.setPreparationStatus);
+  const setTrainingSource = useTrainingNoticeStore((state) => state.setTrainingSource);
 
   const columns = [
     helper.accessor("courseTitle", {
       header: "Title",
-      cell: (info) => info.getValue(),
+      cell: (info) => (
+        <div className="max-w-[16rem]">
+          <h3>{info.getValue()}</h3>
+        </div>
+      ),
     }),
 
     helper.accessor("location", {
@@ -289,6 +294,7 @@ export const useTrainingNoticeDataTable = () => {
                       setRemoveModalIsOpen(true);
                       e.stopPropagation();
                       setTrainingNoticeId(props.row.original.id);
+                      setTrainingSource(props.row.original.source);
                     }}
                   >
                     Delete
@@ -306,6 +312,21 @@ export const useTrainingNoticeDataTable = () => {
                   }}
                 >
                   Set to Upcoming
+                </button>
+              )}
+
+              {props.row.original.status === TrainingStatus.UPCOMING && (
+                <button
+                  className="w-full p-2 text-gray-800 transition-colors hover:bg-gray-600 hover:text-white"
+                  onClick={(e) => {
+                    // setRemoveModalIsOpen(true);
+                    // setToOnGo(true);
+                    setToOngoingAlertIsOpen(true);
+                    e.stopPropagation();
+                    setTrainingNoticeId(props.row.original.id);
+                  }}
+                >
+                  Set to Ongoing
                 </button>
               )}
             </div>
@@ -338,6 +359,8 @@ export const useTrainingNoticeDataTable = () => {
     batchingModalIsOpen,
     trainingStatus,
     toUpcomingModalIsOpen,
+    toOngoingAlertIsOpen,
+    setToOngoingAlertIsOpen,
     setToUpcomingModalIsOpen,
     setTrainingStatus,
     setBatchingModalIsOpen,
@@ -438,6 +461,24 @@ export const GetTrainingStatus = (status: TrainingStatus) => {
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-400">
         Completed
+      </div>
+    );
+  else if (status === TrainingStatus.PDC_SECRETARY_DECLINED)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-400">
+        PDC Secretary Declined
+      </div>
+    );
+  else if (status === TrainingStatus.GM_DECLINED)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-400">
+        GM Declined
+      </div>
+    );
+  else if (status === TrainingStatus.PDC_CHAIRMAN_DECLINED)
+    return (
+      <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border  font-semibold rounded text-white bg-red-700 border-red-400">
+        PDC Chairman Declined
       </div>
     );
   else

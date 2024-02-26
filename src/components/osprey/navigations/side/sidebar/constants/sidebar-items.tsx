@@ -148,6 +148,7 @@ export const sidebarItems: SidebarItems = [
       },
       {
         path: "/trainings/on-going",
+        withIndentation: true,
         label: "On-going",
         icon: (
           <svg
@@ -169,6 +170,7 @@ export const sidebarItems: SidebarItems = [
 
       {
         path: "/trainings/recent",
+        withIndentation: true,
         label: "Recent",
         icon: (
           <svg
@@ -186,6 +188,7 @@ export const sidebarItems: SidebarItems = [
 
       {
         path: "/trainings/history",
+        withIndentation: true,
         label: "History",
         icon: (
           <svg
@@ -249,9 +252,9 @@ export const sidebarItems: SidebarItems = [
   },
 
   {
-    header: "Schedule",
-    subheader: "Plan and create schedule.",
-    tooltip: "Schedule",
+    header: "Orientations",
+    subheader: "Schedule of Orientations.",
+    tooltip: "Orientations",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -268,7 +271,159 @@ export const sidebarItems: SidebarItems = [
     ),
     panelItems: [
       {
-        path: "/schedules/training-plan",
+        path: "/orientations/schedules",
+        label: "Schedules",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-zinc-700"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+            />
+          </svg>
+        ),
+      },
+
+      {
+        path: "/orientations/on-going",
+        withIndentation: true,
+        label: "On-going",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-zinc-700"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
+            />
+          </svg>
+        ),
+      },
+
+      {
+        path: "/orientations/recent",
+        withIndentation: true,
+        label: "Recent",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-5 h-5 text-zinc-600"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ),
+      },
+
+      {
+        path: "/orientations/history",
+        withIndentation: true,
+        label: "History",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-zinc-700"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+            />
+          </svg>
+        ),
+      },
+
+      // {
+      //   path: "/orientations/training-events",
+      //   label: "Events",
+      //   icon: (
+      //     <svg
+      //       xmlns="http://www.w3.org/2000/svg"
+      //       fill="none"
+      //       viewBox="0 0 24 24"
+      //       strokeWidth={1.5}
+      //       stroke="currentColor"
+      //       className="w-5 h-5 text-zinc-700"
+      //     >
+      //       <path
+      //         strokeLinecap="round"
+      //         strokeLinejoin="round"
+      //         d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+      //       />
+      //     </svg>
+      //   ),
+      // },
+
+      // {
+      //   path: "/orientations/my-tasks",
+      //   label: "My Tasks",
+      //   icon: (
+      //     <svg
+      //       xmlns="http://www.w3.org/2000/svg"
+      //       fill="none"
+      //       viewBox="0 0 24 24"
+      //       strokeWidth={2}
+      //       stroke="currentColor"
+      //       className="w-5 h-5 text-zinc-700"
+      //     >
+      //       <path
+      //         strokeLinecap="round"
+      //         strokeLinejoin="round"
+      //         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      //       />
+      //     </svg>
+      //   ),
+      // },
+    ],
+  },
+
+  {
+    header: "Benchmarking",
+    subheader: "Benchmarking Schedules.",
+    tooltip: "Benchmarking",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M11 9V13.1707C9.83481 13.5825 9 14.6938 9 16C9 17.6569 10.3431 19 12 19C13.6569 19 15 17.6569 15 16C15 14.6938 14.1652 13.5825 13 13.1707V9H11ZM11 16C11 15.4477 11.4477 15 12 15C12.5523 15 13 15.4477 13 16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16Z"
+          fill="currentColor"
+        />
+        <path
+          d="M12 5C15.866 5 19 8.13401 19 12V13H17V12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12V13H5V12C5 8.13401 8.13401 5 12 5Z"
+          fill="currentColor"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23ZM12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
+          fill="currentColor"
+        />
+      </svg>
+    ),
+    panelItems: [
+      {
+        path: "/benchmarking/training-plan",
         label: "Training Plan",
         icon: (
           <svg
@@ -289,7 +444,7 @@ export const sidebarItems: SidebarItems = [
       },
 
       {
-        path: "/schedules/training-events",
+        path: "/benchmarking/training-events",
         label: "Events",
         icon: (
           <svg
@@ -310,7 +465,7 @@ export const sidebarItems: SidebarItems = [
       },
 
       {
-        path: "/schedules/my-tasks",
+        path: "/benchmarking/my-tasks",
         label: "My Tasks",
         icon: (
           <svg

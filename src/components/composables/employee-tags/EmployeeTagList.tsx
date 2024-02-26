@@ -190,7 +190,6 @@ export default function EmployeeTagList() {
             employeesFromTag.push(emp);
           });
         });
-
         setEmployees(employeesFromTag);
         // clear the input
         setEmployee([]);

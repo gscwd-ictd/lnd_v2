@@ -71,9 +71,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Expertise
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Expertise</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -97,13 +95,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                       allLsp?.expertise.map((exp: { subjectMatter: string }, index: number) => {
                         return (
                           <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                            + {exp.subjectMatter}
+                            ✓ {exp.subjectMatter}
                           </li>
                         );
                       })
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Expertise Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Expertise Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>
@@ -118,9 +116,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Trainings
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Trainings</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -144,13 +140,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                       allLsp?.trainings.map((training: { name: string }, index: number) => {
                         return (
                           <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                            + {training.name}
+                            ✓ {training.name}
                           </li>
                         );
                       })
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Trainings Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Trainings Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>
@@ -165,9 +161,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Projects
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Projects</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -191,13 +185,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                       allLsp?.projects.map((project: { name: string }, index: number) => {
                         return (
                           <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                            + {project.name}
+                            ✓ {project.name}
                           </li>
                         );
                       })
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Projects Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Projects Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>
@@ -212,9 +206,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Affiliations
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Affiliations</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -239,14 +231,14 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                         (affiliations: { position: string; institution: string }, index: number) => {
                           return (
                             <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                              + <span>{affiliations.position}</span> of <span>{affiliations.institution}</span>
+                              ✓ <span>{affiliations.position}</span> of <span>{affiliations.institution}</span>
                             </li>
                           );
                         }
                       )
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Affiliations Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Affiliations Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>
@@ -261,9 +253,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Certifications
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Certifications</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -287,13 +277,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                       allLsp?.certifications.map((certification: { name: string }, index: number) => {
                         return (
                           <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                            + {certification.name}
+                            ✓ {certification.name}
                           </li>
                         );
                       })
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Certifications Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Certifications Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>
@@ -308,9 +298,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                   <div className="flex items-center justify-between">
                     <Disclosure.Button className="flex items-center justify-between w-full py-2">
                       <div className="text-start">
-                        <span className="font-medium text-indigo-700 underline text-md underline-offset-2">
-                          Coaching
-                        </span>
+                        <span className="font-medium text-indigo-700 text-md ">Coaching</span>
                         {/* <p className="text-sm text-gray-500">{exp.subjectMatter}</p> */}
                       </div>
                       <svg
@@ -334,13 +322,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
                       allLsp?.coaching.map((coach: { name: string }, index: number) => {
                         return (
                           <li key={index} className="pl-2 space-y-3 text-sm text-gray-700">
-                            + {coach.name}
+                            ✓ {coach.name}
                           </li>
                         );
                       })
                     ) : (
                       <div className="flex w-full h-[2rem] ">
-                        <span className="pl-2 space-y-3 text-sm text-gray-400">- No Coaching Found</span>
+                        <span className="pl-2 space-y-3 text-sm text-gray-400">✗ No Coaching Found</span>
                       </div>
                     )}
                   </Disclosure.Panel>

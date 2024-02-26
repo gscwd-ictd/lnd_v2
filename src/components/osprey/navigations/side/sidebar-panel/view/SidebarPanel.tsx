@@ -17,7 +17,7 @@ export const SidebarPanel: FunctionComponent = () => {
           <ul className="space-y-1">
             {sidebarItems[activeNav].panelItems.map((item, index) => (
               <Fragment key={index}>
-                <SidebarPanelItem label={item.label as string} path={item.path}>
+                <SidebarPanelItem label={item.label as string} path={item.path} withIndentation={item.withIndentation}>
                   {item.icon}
                 </SidebarPanelItem>
               </Fragment>

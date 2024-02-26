@@ -19,18 +19,19 @@ type DeleteTagModalProps = {
 };
 
 export const DeleteTagModal: FunctionComponent<DeleteTagModalProps> = ({ id, remove, setRemove }) => {
-  // const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [isOpenToast, setIsOpenToast] = useState(false);
 
   const deleteTagsMutation = useMutation({
-    onSuccess: (data, variable) => {
+    onSuccess: async () => {
+      const getNewestTags = await axios.get(`${url}/tags`);
+      queryClient.setQueryData(["tags"], getNewestTags.data.items);
       setRemove(false);
-      queryClient.refetchQueries({ queryKey: ["tags"], type: "all", exact: true, stale: true });
     },
     onError: () => console.log("error"),
     mutationFn: async () => {
-      const response = await axios.delete(`${url}}/tags/${id}`);
+      console.log(id, "DELETING");
+      const response = await axios.delete(`${url}/tags/${id}`);
       return response.data;
     },
   });

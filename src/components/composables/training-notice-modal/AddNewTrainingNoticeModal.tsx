@@ -341,10 +341,8 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   useEffect(() => {
     const getTrainingSource = async () => {
       const { data } = await axios.get(`${url}/training-sources`);
-
       setSource(data.items);
     };
-
     getTrainingSource();
   }, []);
 

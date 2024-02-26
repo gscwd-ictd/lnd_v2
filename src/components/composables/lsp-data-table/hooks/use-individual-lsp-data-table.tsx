@@ -26,10 +26,13 @@ export const useIndividualLspDataTable = () => {
     helper.accessor("name", {
       header: "Name",
       cell: (info) => (
-        <>
+        <div className="flex items-center gap-1">
           {/* {info.row.original.firstName} {info.row.original.middleName} {info.row.original.lastName} */}
-          {info.row.original.name}
-        </>
+          <div className="flex items-center justify-center w-6 h-6 p-2 text-center text-white bg-gray-400 rounded-full">
+            {info.row.original.name[0].toUpperCase()}
+          </div>
+          <div> {info.row.original.name}</div>
+        </div>
       ),
     }),
 

@@ -9,6 +9,7 @@ export type NavigationItem = {
 export type PanelItem = {
   path: string;
   label?: string;
+  withIndentation?: boolean;
   icon?: JSX.Element;
 };
 

@@ -8,14 +8,17 @@ import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Dispatch, FunctionComponent, SetStateAction, useContext, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { url } from "@lms/utilities/url/api-url";
+import { trainingDesignUrl, url } from "@lms/utilities/url/api-url";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
+import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 
 export const DeleteTrainingNoticeModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
   const { id, removeModalIsOpen, setRemoveModalIsOpen } = useContext(TrainingNoticeContext);
+  const trainingSource = useTrainingNoticeStore((state) => state.trainingSource);
+  const reset = useTrainingNoticeStore((state) => state.reset);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const setToastOptions = (color: typeof toastType.color, title: string, content: string | undefined) => {
@@ -25,19 +28,29 @@ export const DeleteTrainingNoticeModal: FunctionComponent = () => {
 
   const deleteTrainingNoticeMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.delete(`${url}/training-details/${id}`);
+      try {
+        const response = await axios.delete(`${url}/training-details/${id}`);
+        if (trainingSource === "External") {
+          // call delete bucket by id
+          await axios.delete(`${trainingDesignUrl}/api/bucket/${id}`);
+        }
 
-      return response.data;
+        return response.data;
+      } catch (error) {
+        return error;
+      }
     },
     onError: (error: AxiosError<{ message: string }>) =>
       setToastOptions("danger", "Error", error.response?.data.message),
-    onSuccess(data, variables, context) {
+    onSuccess(data) {
       queryClient.refetchQueries({
         queryKey: ["training-notice"],
         type: "all",
         exact: true,
         stale: true,
       });
+
+      reset();
 
       setRemoveModalIsOpen(false);
       setToastOptions("success", "Success", `You have deleted a training notice with the id ${id}`);

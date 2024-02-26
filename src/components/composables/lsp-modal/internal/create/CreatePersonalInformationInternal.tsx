@@ -141,7 +141,6 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${portalBackendUrl}/${employeeId}`);
-
         setEmployeePds(data);
         return data;
       } catch (error) {
@@ -364,10 +363,12 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
             Sex
           </label>
           <div className="w-[8rem] mb-2">
-            {sex === "Male" ? (
+            {sex === Sex.MALE ? (
               <span className="w-full px-2 py-1 text-xs text-white bg-blue-500 rounded">Male</span>
-            ) : (
+            ) : sex === Sex.FEMALE ? (
               <span className="w-full px-2 py-1 text-xs text-white rounded bg-rose-500">Female</span>
+            ) : (
+              <span>-</span>
             )}
           </div>
         </div>

@@ -38,6 +38,7 @@ export default function EmployeeTagTabs() {
     if (query.length >= 3) {
       const getEmployee = async () => {
         const result = await axios.get(`${url}/hrms/employees/q?name=${query}`);
+        // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
         setEmployees(result.data);
       };
 
