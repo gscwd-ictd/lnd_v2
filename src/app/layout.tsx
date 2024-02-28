@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   } catch (error) {
     // redirect(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}`);
   }
-  //
+
   return (
     <html lang="en">
       <body className={poppins.className}>

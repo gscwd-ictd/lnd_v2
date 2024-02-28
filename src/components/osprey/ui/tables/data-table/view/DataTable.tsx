@@ -76,7 +76,7 @@ export const DataTable = <T extends unknown>({
   const { data, error, isLoading } = useQuery<T[]>({
     queryKey,
     queryFn: async () => {
-      const { data } = await axios.get(datasource);
+      const { data } = await axios.get(datasource, { withCredentials: true });
       return data.items as T[];
     },
   });

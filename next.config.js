@@ -25,6 +25,16 @@ const nextConfig = {
       },
     ],
   },
+  redirects: async () => {
+    return [
+      {
+        source: "/login",
+        destination: "http://172.20.110.45:3001/login",
+        basePath: false,
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
