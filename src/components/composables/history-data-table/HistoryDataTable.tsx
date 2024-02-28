@@ -195,7 +195,7 @@ export const HistoryDataTable: FunctionComponent = () => {
       >
         <DataTable<TrainingNotice>
           // datasource={`${url}/training-details/recents`}
-          datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/recent`}
+          datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/default-table`}
           queryKey={["history-trainings"]}
           columns={columns}
           title="Trainings History"

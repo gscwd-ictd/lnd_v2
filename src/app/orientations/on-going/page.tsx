@@ -1,3 +1,3 @@
 export default function OnGoing() {
-  return <div>My Tasks</div>;
+  return <div>Ongoing Orientations</div>;
 }

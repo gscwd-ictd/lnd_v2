@@ -1,11 +1,10 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { EmployeeWithSupervisor, TrainingNotice } from "@lms/utilities/types/training";
+import { TrainingNotice } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { Dispatch, FunctionComponent, SetStateAction, createContext, useEffect, useState } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, createContext, useState } from "react";
 import { useRecentDataTable } from "./hooks/use-recent-data-table";
-import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/SliderOver";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { isEmpty } from "lodash";
@@ -205,7 +204,6 @@ export const RecentDataTable: FunctionComponent = () => {
       >
         <DataTable<TrainingNotice>
           datasource={`${url}/training-details/recents`}
-          // datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/recent`}
           queryKey={["recent-trainings"]}
           columns={columns}
           title="Recent Trainings"
@@ -218,8 +216,6 @@ export const RecentDataTable: FunctionComponent = () => {
         <RecentSlideOver />
         <RecentAttendanceModal />
         <RecentRequirementsModal />
-        {/* <OngoingAlertSubmission />
-        <OngoingToastComponent />  */}
       </RecentContext.Provider>
     </>
   );
