@@ -37,6 +37,7 @@ export type DataTableProps<T extends unknown> = {
   subtitle?: string;
   children?: ReactNode;
   enableGlobalFilter?: boolean;
+  withCredentials?: boolean;
 };
 
 type DataTableContextState<T> = {
@@ -53,6 +54,7 @@ export const DataTable = <T extends unknown>({
   title,
   subtitle,
   enableGlobalFilter = true,
+  withCredentials = true,
   children,
 }: DataTableProps<T>): ReactElement => {
   // initialize state for table sorting
@@ -76,7 +78,7 @@ export const DataTable = <T extends unknown>({
   const { data, error, isLoading } = useQuery<T[]>({
     queryKey,
     queryFn: async () => {
-      const { data } = await axios.get(datasource, { withCredentials: true });
+      const { data } = await axios.get(datasource, { withCredentials });
       return data.items as T[];
     },
   });

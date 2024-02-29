@@ -1,10 +1,22 @@
+"use client";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
-import { FunctionComponent } from "react";
+import { useUserDetails } from "@lms/hooks/use-userdetails";
+import { FunctionComponent, useState } from "react";
+import DefaultImage from "../../../../../../../public/images/placeholders/employee-img-placeholder.jpg";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export const Topbar: FunctionComponent = () => {
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const session = useUserDetails();
+
   return (
-    <ul className="sticky z-10 flex items-center justify-end w-full gap-2 px-10 bg-white border-b sm:right-0 h-14">
-      <li
+    <ul className="sticky z-10 flex items-center justify-end w-full gap-0 px-10 bg-white border-b sm:right-0 h-14">
+      {/* <li
         role="button"
         className="flex items-center justify-center w-8 h-8 transition-colors rounded hover:bg-gray-100 group"
       >
@@ -23,14 +35,91 @@ export const Topbar: FunctionComponent = () => {
           />
           <path d="M12 6H4V20H18V12H16V18H6V8H12V6Z" fill="currentColor" />
         </svg>
+      </li> */}
+
+      <li role="button">
+        <Avatar size="sm" source={session.photoUrl || DefaultImage.src} alt="avtar" />
       </li>
 
       <li role="button">
-        <Avatar
-          size="sm"
-          source="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
-          alt="avtar"
-        />
+        {/* {session.isSuperUser === true ? "Superuser Admin" : session.email} */}
+        <DropdownMenu.Root open={openMenu} onOpenChange={setOpenMenu}>
+          <DropdownMenu.Trigger asChild>
+            <div className="flex items-center gap-2 px-3 py-2 text-xs  text-slate-600">
+              {session.isSuperUser === true ? session.username : session.email}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.34317 7.75732L4.92896 9.17154L12 16.2426L19.0711 9.17157L17.6569 7.75735L12 13.4142L6.34317 7.75732Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </DropdownMenu.Trigger>
+          <AnimatePresence>
+            {openMenu && (
+              <DropdownMenu.Portal forceMount>
+                <DropdownMenu.Content align="center" side="bottom" sideOffset={4} asChild className="z-[999]">
+                  <motion.div
+                    initial={{ x: -10, opacity: 0 }}
+                    animate={{ x: 1, opacity: 1 }}
+                    exit={{ y: 10, opacity: 0 }}
+                    className="flex flex-col bg-white rounded shadow-lg overflow-clip"
+                  >
+                    <DropdownMenu.Item asChild>
+                      <button
+                        // onClick={() => console.log(session)}
+                        onClick={() => router.push(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}/module-dashboard`)}
+                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:border-gray-400 hover:bg-gray-200 focus:bg-gray-100"
+                      >
+                        <div className="flex gap-3 text-xs">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            className="w-4 h-4 stroke-green-700"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+                            />
+                          </svg>
+
+                          <span>Go back to HRMS modules</span>
+                        </div>
+                      </button>
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Item asChild>
+                      <button
+                        onClick={() => console.log(session)}
+                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:border-gray-400 hover:bg-gray-200 focus:bg-gray-100"
+                      >
+                        <div className="flex gap-3 text-xs">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            className="w-4 h-4 stroke-rose-500"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                            />
+                          </svg>
+                          <span>Logout</span>
+                        </div>
+                      </button>
+                    </DropdownMenu.Item>
+                  </motion.div>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            )}
+          </AnimatePresence>
+        </DropdownMenu.Root>
       </li>
     </ul>
   );
