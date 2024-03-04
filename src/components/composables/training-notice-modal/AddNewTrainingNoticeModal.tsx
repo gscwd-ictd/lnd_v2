@@ -93,7 +93,9 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       resetTrainingTypes();
       setToastOptions("success", "Success", "You have successfully added a training notice!");
 
-      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+        withCredentials: true,
+      });
 
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
@@ -152,36 +154,39 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       let tempIds: Array<string> = [];
       const storage = new Storage(client!);
 
-      const trainingCreationResponse = await axios.post(`${url}/training-details/external`, {
-        source: { id: selectedTrainingSource.id },
-        // source: { id: "23c758bc-2172-40a8-9cb1-d176e3360f1e" },
-        type: selectedTrainingType,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        courseTitle,
-        location,
-        slotDistribution: slotDistribution.map((slot) => {
-          const employees = slot.employees.map((emp) => {
-            return { employeeId: emp.employeeId };
-          });
+      const trainingCreationResponse = await axios.post(
+        `${url}/training-details/external`,
+        {
+          source: { id: selectedTrainingSource.id },
+          type: selectedTrainingType,
+          trainingLspDetails: selectedFacilitators.map((faci) => {
+            return { id: faci.id };
+          }),
+          courseTitle,
+          location,
+          slotDistribution: slotDistribution.map((slot) => {
+            const employees = slot.employees.map((emp) => {
+              return { employeeId: emp.employeeId };
+            });
 
-          return {
-            supervisor: { supervisorId: slot.supervisor.supervisorId },
-            numberOfSlots: slot.numberOfSlots,
-            employees,
-          };
-        }),
-        trainingStart: new Date(training.trainingStart).toISOString(),
-        trainingEnd: new Date(training.trainingEnd).toISOString(),
-        numberOfHours,
-        courseContent,
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { id: tag.id };
-        }),
-        trainingRequirements,
-      });
+            return {
+              supervisor: { supervisorId: slot.supervisor.supervisorId },
+              numberOfSlots: slot.numberOfSlots,
+              employees,
+            };
+          }),
+          trainingStart: new Date(training.trainingStart).toISOString(),
+          trainingEnd: new Date(training.trainingEnd).toISOString(),
+          numberOfHours,
+          courseContent,
+          numberOfParticipants,
+          trainingTags: selectedTags.map((tag) => {
+            return { id: tag.id };
+          }),
+          trainingRequirements,
+        },
+        { withCredentials: true }
+      );
 
       // create the bucket according to the training creation response id and name
       const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket`, {

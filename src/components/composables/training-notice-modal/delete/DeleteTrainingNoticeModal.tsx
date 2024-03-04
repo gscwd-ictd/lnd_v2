@@ -29,7 +29,7 @@ export const DeleteTrainingNoticeModal: FunctionComponent = () => {
   const deleteTrainingNoticeMutation = useMutation({
     mutationFn: async () => {
       try {
-        const response = await axios.delete(`${url}/training-details/${id}`);
+        const response = await axios.delete(`${url}/training-details/${id}`, { withCredentials: true });
         if (trainingSource === "External") {
           // call delete bucket by id
           await axios.delete(`${trainingDesignUrl}/api/bucket/${id}`);

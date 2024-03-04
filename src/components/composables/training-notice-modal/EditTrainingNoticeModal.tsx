@@ -294,7 +294,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     queryKey: ["training-details", trainingNoticeId],
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
         // INTERNAL
         if (!isEmpty(data)) {
           setCourseContent(data.courseContent);

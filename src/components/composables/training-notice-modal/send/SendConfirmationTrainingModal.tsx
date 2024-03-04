@@ -70,38 +70,42 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       setToastOptions("danger", "Error", `There is a problem with the request: ${error}`);
     },
     mutationFn: async () => {
-      const response = await axios.patch(`${url}/training-notices/internal`, {
-        id,
-        source: { id: selectedTrainingSource.id }, // updated
-        trainingDesign: { id: selectedTrainingDesign.id },
-        type: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        location,
-        slotDistribution: slotDistribution.map((slot) => {
-          const employees = slot.employees.map((emp) => {
-            return { employeeId: emp.employeeId };
-          });
+      const response = await axios.patch(
+        `${url}/training-notices/internal`,
+        {
+          id,
+          source: { id: selectedTrainingSource.id }, // updated
+          trainingDesign: { id: selectedTrainingDesign.id },
+          type: selectedTrainingType,
+          courseContent,
+          trainingLspDetails: selectedFacilitators.map((faci) => {
+            return { id: faci.id };
+          }),
+          location,
+          slotDistribution: slotDistribution.map((slot) => {
+            const employees = slot.employees.map((emp) => {
+              return { employeeId: emp.employeeId };
+            });
 
-          return {
-            supervisor: { supervisorId: slot.supervisor.supervisorId },
-            numberOfSlots: slot.numberOfSlots,
-            employees,
-          };
-        }),
-        trainingStart: from,
-        trainingEnd: to,
-        numberOfHours,
-        // deadlineForSubmission: dayjs().add(3, "day"),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { id: tag.id };
-        }),
+            return {
+              supervisor: { supervisorId: slot.supervisor.supervisorId },
+              numberOfSlots: slot.numberOfSlots,
+              employees,
+            };
+          }),
+          trainingStart: from,
+          trainingEnd: to,
+          numberOfHours,
+          // deadlineForSubmission: dayjs().add(3, "day"),
+          numberOfParticipants,
+          trainingTags: selectedTags.map((tag) => {
+            return { id: tag.id };
+          }),
 
-        trainingRequirements,
-      });
+          trainingRequirements,
+        },
+        { withCredentials: true }
+      );
 
       return response.data;
     },
