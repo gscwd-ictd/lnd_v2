@@ -39,6 +39,7 @@
     "@tiptap/extension-placeholder": "^2.1.11",
     "@tiptap/extension-text": "^2.1.11",
     "@tiptap/extension-text-align": "^2.1.11",
+    "@tiptap/extension-text-style": "^2.2.4",
     "@tiptap/extension-underline": "^2.1.11",
     "@tiptap/extension-youtube": "^2.1.11",
     "@tiptap/pm": "^2.1.11",

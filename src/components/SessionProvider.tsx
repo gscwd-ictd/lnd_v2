@@ -30,17 +30,20 @@ type UserDetails = {
 export const SessionContext = createContext<SessionContextState>({ user: undefined });
 
 export const SessionProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
-  const { data: user, isLoading } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["user-session"],
     queryFn: async () => {
       const { data } = await axios.get(`${process.env.NEXT_PUBLIC_HRMS_DOMAIN_BE}/users/details`, {
         withCredentials: true,
       });
-
       return data;
     },
     retry: false,
-  }) as any;
+  });
 
   if (!isLoading && user === undefined) {
     redirect("/login");

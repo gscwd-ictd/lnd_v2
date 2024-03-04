@@ -38,15 +38,15 @@ export const Topbar: FunctionComponent = () => {
       </li> */}
 
       <li role="button">
-        <Avatar size="sm" source={session.photoUrl || DefaultImage.src} alt="avtar" />
+        <Avatar size="sm" source={session?.photoUrl || DefaultImage.src} alt="avtar" />
       </li>
 
       <li role="button">
-        {/* {session.isSuperUser === true ? "Superuser Admin" : session.email} */}
+        {/* {session?.isSuperUser === true ? "Superuser Admin" : session?.email} */}
         <DropdownMenu.Root open={openMenu} onOpenChange={setOpenMenu}>
           <DropdownMenu.Trigger asChild>
             <div className="flex items-center gap-2 px-3 py-2 text-xs  text-slate-600">
-              {session.isSuperUser === true ? session.username : session.email}
+              {session?.isSuperUser === true ? session?.username : session?.email}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M6.34317 7.75732L4.92896 9.17154L12 16.2426L19.0711 9.17157L17.6569 7.75735L12 13.4142L6.34317 7.75732Z"
@@ -63,30 +63,29 @@ export const Topbar: FunctionComponent = () => {
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 1, opacity: 1 }}
                     exit={{ y: 10, opacity: 0 }}
-                    className="flex flex-col bg-white rounded shadow-lg overflow-clip"
+                    className="flex flex-col bg-transparent rounded shadow-lg overflow-clip"
                   >
                     <DropdownMenu.Item asChild>
                       <button
-                        // onClick={() => console.log(session)}
                         onClick={() => router.push(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}/module-dashboard`)}
-                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:border-gray-400 hover:bg-gray-200 focus:bg-gray-100"
+                        className="p-4 transition-colors min-w-[12rem] bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-600 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            className="w-4 h-4 stroke-green-700"
+                            strokeWidth={2}
+                            className="w-4 h-4 stroke-green-600"
                           >
                             <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
                             />
                           </svg>
 
-                          <span>Go back to HRMS modules</span>
+                          <span>HRMS modules</span>
                         </div>
                       </button>
                     </DropdownMenu.Item>
@@ -94,14 +93,14 @@ export const Topbar: FunctionComponent = () => {
                     <DropdownMenu.Item asChild>
                       <button
                         onClick={() => console.log(session)}
-                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:border-gray-400 hover:bg-gray-200 focus:bg-gray-100"
+                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-600 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
-                            strokeWidth={1.5}
+                            strokeWidth={2}
                             className="w-4 h-4 stroke-rose-500"
                           >
                             <path
