@@ -23,6 +23,7 @@ import { Storage } from "appwrite";
 import convertSize from "convert-size";
 import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
 import { v4 as uuidv4 } from "uuid";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 type ToastType = {
   color: "success" | "warning" | "info" | "default" | "danger";
@@ -43,7 +44,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   const {
     courseTitle,
     facilitator,
-    selectedTag,
     id: trainingNoticeId,
     selectedFacilitators,
     selectedTrainingSource,
@@ -51,14 +51,10 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     courseContent,
     numberOfParticipants,
     consumedSlots,
-    bucket,
     bucketFiles,
     filesToUpload,
     selectedTags,
-    initialTrainingRequirements,
-    trainingRequirements,
     filesToDelete,
-    setBucketFiles,
     reset,
     setTrainingStatus,
     initialCourseTitle,
@@ -106,31 +102,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     setToastIsOpen(true);
   };
 
-  // const getBucketFiles = async (bucketId: string) => {
-  //   const storage = new Storage(client!);
-  //   const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${bucketId}`);
-
-  //   if (getBucketListFiles.data.files.length > 0) {
-  //     const newBucketFiles = Promise.all(
-  //       getBucketListFiles.data.files.map(async (file: any) => {
-  //         const fileDetails = await storage.getFile(bucketId, file.$id);
-  //         const filePreview = storage.getFilePreview(bucketId, file.$id);
-  //         const fileView = storage.getFileView(bucketId, file.$id);
-
-  //         return {
-  //           id: file.$id,
-  //           name: fileDetails.name,
-  //           href: fileView.href,
-  //           fileLink: fileView.href,
-  //           sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
-  //           mimeType: fileDetails.mimeType,
-  //         };
-  //       })
-  //     );
-  //     setBucketFiles(await newBucketFiles);
-  //   } else setBucketFiles([]);
-  // };
-
   const internalTrainingMutation = useMutation({
     onSuccess: async (data) => {
       setEditModalIsOpen(false);
@@ -139,7 +110,9 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       reset();
       // resetModal();
 
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+        withCredentials: true,
+      });
 
       queryClient.setQueryData(["training-notice"], getUpdatedTrainingNotice.data.items);
     },
@@ -155,37 +128,41 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         selectedTrainingDesign,
       } = training;
 
-      const response = await axios.put(`${url}/training-details/internal`, {
-        id: trainingNoticeId,
-        source: { id: selectedTrainingSource.id },
-        trainingDesign: { id: selectedTrainingDesign.id },
-        type: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
-        }),
-        location,
-        slotDistribution: slotDistribution.map((slot) => {
-          const employees = slot.employees.map((emp) => {
-            return { employeeId: emp.employeeId };
-          });
+      const response = await axios.put(
+        `${url}/training-details/internal`,
+        {
+          id: trainingNoticeId,
+          source: { id: selectedTrainingSource.id },
+          trainingDesign: { id: selectedTrainingDesign.id },
+          type: selectedTrainingType,
+          courseContent,
+          trainingLspDetails: selectedFacilitators.map((faci) => {
+            return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
+          }),
+          location,
+          slotDistribution: slotDistribution.map((slot) => {
+            const employees = slot.employees.map((emp) => {
+              return { employeeId: emp.employeeId };
+            });
 
-          return {
-            supervisor: { supervisorId: slot.supervisor.supervisorId },
-            numberOfSlots: slot.numberOfSlots,
-            employees,
-          };
-        }),
-        trainingStart: new Date(training.trainingStart).toISOString(),
-        trainingEnd: new Date(training.trainingEnd).toISOString(),
-        numberOfHours,
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { id: tag.id };
-        }),
+            return {
+              supervisor: { supervisorId: slot.supervisor.supervisorId },
+              numberOfSlots: slot.numberOfSlots,
+              employees,
+            };
+          }),
+          trainingStart: new Date(training.trainingStart).toISOString(),
+          trainingEnd: new Date(training.trainingEnd).toISOString(),
+          numberOfHours,
+          numberOfParticipants,
+          trainingTags: selectedTags.map((tag) => {
+            return { id: tag.id };
+          }),
 
-        trainingRequirements,
-      });
+          trainingRequirements,
+        },
+        { withCredentials: true }
+      );
 
       return response.data;
     },
@@ -199,7 +176,9 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       reset();
       // resetModal();
 
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+        withCredentials: true,
+      });
 
       queryClient.setQueryData(["training-notice"], getUpdatedTrainingNotice.data.items);
     },
@@ -501,9 +480,19 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
                     size="small"
                     type="button"
                     onClick={onNext}
-                    disabled={page === 5 && consumedSlots !== numberOfParticipants ? true : false}
+                    disabled={
+                      page === 5 && consumedSlots !== numberOfParticipants
+                        ? true
+                        : internalTrainingMutation.isLoading
+                        ? true
+                        : externalTrainingMutation.isLoading
+                        ? true
+                        : false
+                    }
                     className={`disabled:bg-indigo-300 disabled:cursor-not-allowed`}
                   >
+                    {internalTrainingMutation.isLoading && <Spinner color="light" size="xs" />}{" "}
+                    {externalTrainingMutation.isLoading && <Spinner color="light" size="xs" />}{" "}
                     {page === 7 ? "Submit" : "Proceed"}
                   </Button>
                 )}

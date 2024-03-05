@@ -39,6 +39,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
 import { v4 as uuidv4 } from "uuid";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
@@ -487,9 +488,19 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
                     size="small"
                     type="button"
                     onClick={onNext}
-                    disabled={page === 5 && consumedSlots !== numberOfParticipants ? true : false}
+                    disabled={
+                      page === 5 && consumedSlots !== numberOfParticipants
+                        ? true
+                        : internalTrainingMutation.isLoading
+                        ? true
+                        : externalTrainingMutation.isLoading
+                        ? true
+                        : false
+                    }
                     className={`disabled:bg-indigo-300 disabled:cursor-not-allowed`}
                   >
+                    {internalTrainingMutation.isLoading && <Spinner color="light" size="xs" />}{" "}
+                    {externalTrainingMutation.isLoading && <Spinner color="light" size="xs" />}{" "}
                     {page === 7 ? "Submit" : "Proceed"}
                   </Button>
                 )}
