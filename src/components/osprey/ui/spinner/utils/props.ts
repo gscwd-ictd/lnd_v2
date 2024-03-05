@@ -1,6 +1,6 @@
 export type SpinnerProps = {
-  size?: "small" | "medium" | "large";
+  size?: "xs" | "small" | "medium" | "large";
   borderSize?: number;
-  color?: "blue" | "red" | "green";
+  color?: "blue" | "red" | "green" | "indigo" | "light";
   className?: string;
 };

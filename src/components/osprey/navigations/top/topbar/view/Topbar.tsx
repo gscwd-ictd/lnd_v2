@@ -68,7 +68,7 @@ export const Topbar: FunctionComponent = () => {
                     <DropdownMenu.Item asChild>
                       <button
                         onClick={() => router.push(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}/module-dashboard`)}
-                        className="p-4 transition-colors min-w-[12rem] bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-600 hover:text-white"
+                        className="p-4 transition-colors min-w-[12rem] bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-500 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
@@ -93,7 +93,7 @@ export const Topbar: FunctionComponent = () => {
                     <DropdownMenu.Item asChild>
                       <button
                         onClick={() => console.log(session)}
-                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-600 hover:text-white"
+                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-indigo-500 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
