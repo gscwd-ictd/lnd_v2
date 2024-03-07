@@ -10,6 +10,7 @@ import { JSONContent } from "@tiptap/react";
 import { isEmpty } from "lodash";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const UpdateTrainingDesignComponent: FunctionComponent = () => {
   const { push } = useRouter();
@@ -168,8 +169,10 @@ export const UpdateTrainingDesignComponent: FunctionComponent = () => {
             <button
               type="button"
               onClick={onNext}
+              disabled={tdDataTableMutation.isLoading ? true : false}
               className="px-2 py-1 text-sm font-medium sm:min-w-[3rem] md:min-w-[6rem] lg:min-w-[6rem] h-[2.5rem] rounded text-white hover:bg-indigo-400 bg-indigo-500"
             >
+              {tdDataTableMutation.isLoading && <Spinner color="light" size="xs" />}{" "}
               {page === 1 ? "Preview" : page === 2 ? "Submit" : ""}
             </button>
           </div>

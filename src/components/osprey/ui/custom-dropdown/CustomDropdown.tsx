@@ -12,27 +12,25 @@ export const ActionDropdown: FunctionComponent<ActionDropdownProps> = ({ childre
   const router = useRouter();
 
   return (
-    <>
-      <Popover.Root>
-        <Popover.Trigger
-          className="h-full select-none border border-gray-200 whitespace-nowrap rounded bg-slate-500 px-3 py-[0.2rem] transition-colors ease-in-out hover:bg-slate-400 active:bg-slate-600"
-          asChild
-          tabIndex={-1}
-        >
-          <span className="text-white">...</span>
-        </Popover.Trigger>
+    <Popover.Root>
+      <Popover.Trigger
+        className="h-full select-none border border-gray-200 whitespace-nowrap rounded bg-slate-500 px-3 py-[0.2rem] transition-colors ease-in-out hover:bg-slate-400 active:bg-slate-600"
+        asChild
+        tabIndex={-1}
+      >
+        <span className="text-white">...</span>
+      </Popover.Trigger>
 
-        <Popover.Content
-          className="transition-all shadow-lg PopoverContent"
-          sideOffset={5}
-          collisionPadding={20}
-          avoidCollisions
-          // style={{ width: 'var(--radix-popover-trigger-width)' }}
-        >
-          {children}
-        </Popover.Content>
-        {/* menu items here */}
-      </Popover.Root>
-    </>
+      <Popover.Content
+        className="transition-all shadow-lg PopoverContent"
+        sideOffset={5}
+        collisionPadding={20}
+        avoidCollisions
+        // style={{ width: 'var(--radix-popover-trigger-width)' }}
+      >
+        {children}
+      </Popover.Content>
+      {/* menu items here */}
+    </Popover.Root>
   );
 };

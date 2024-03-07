@@ -176,9 +176,9 @@ export const sidebarItems: SidebarItems = [
   },
 
   {
-    header: "Orientations",
-    subheader: "Discover orientations.",
-    tooltip: "Orientations",
+    header: "Others",
+    subheader: "Discover Other Activities.",
+    tooltip: "Other Activities",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -195,7 +195,7 @@ export const sidebarItems: SidebarItems = [
     ),
     panelItems: [
       {
-        path: "/orientations/activities",
+        path: "/others/activities",
         label: "Activities",
         icon: (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -232,7 +232,7 @@ export const sidebarItems: SidebarItems = [
       },
 
       {
-        path: "/orientations/on-going",
+        path: "/others/on-going",
         withIndentation: true,
         label: "On-going",
         icon: (
@@ -254,7 +254,7 @@ export const sidebarItems: SidebarItems = [
       },
 
       {
-        path: "/orientations/recent",
+        path: "/others/recent",
         withIndentation: true,
         label: "Recent",
         icon: (
@@ -272,7 +272,7 @@ export const sidebarItems: SidebarItems = [
       },
 
       {
-        path: "/orientations/history",
+        path: "/others/history",
         withIndentation: true,
         label: "History",
         icon: (
