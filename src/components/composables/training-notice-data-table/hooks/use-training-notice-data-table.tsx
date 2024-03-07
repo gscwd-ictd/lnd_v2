@@ -155,12 +155,15 @@ export const useTrainingNoticeDataTable = () => {
                       setLspSource(LspSource.EXTERNAL);
                     }
                     setInitialTrainingRequirements([
-                      { document: "Pre-test", isSelected: false },
-                      { document: "Course Materials", isSelected: false },
-                      { document: "Post Training Report", isSelected: false },
+                      { document: "Certificate of Appearance", isSelected: false },
+                      { document: "Certificate of Training", isSelected: false },
                       { document: "Course Evaluation Report", isSelected: false },
+                      { document: "Course Materials", isSelected: false },
                       { document: "Learning Application Plan", isSelected: false },
+                      { document: "Post Training Report", isSelected: false },
                       { document: "Post-test", isSelected: false },
+                      { document: "Pre-test", isSelected: false },
+                      { document: "Program", isSelected: false },
                     ]);
                   }}
                 >

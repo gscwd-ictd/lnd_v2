@@ -277,14 +277,14 @@ export const EditExternalCourseOutline: FunctionComponent = () => {
             <p className="text-xs text-gray-500">The ones responsible for leading and guiding the training process.</p>
           </div>
 
-          <div className={`grid grid-cols-3 gap-1 mb-2`}>
+          <div className={`grid grid-cols-2 gap-1 mb-2`}>
             {selectedFacilitators.map((faci) => {
               return (
                 <div
                   key={faci.id}
-                  className="flex items-center  justify-between gap-2  pl-2.5 space-x-2 text-xs text-gray-800 rounded select-none bg-stone-200 "
+                  className="flex items-center  justify-between gap-2 text-xs text-gray-800 rounded select-none bg-stone-200 "
                 >
-                  <span className="w-[80%] break-words py-2">{faci.name}</span>
+                  <span className="w-[80%] pl-2.5 break-words py-3">{faci.name}</span>
                   <button
                     onClick={() => {
                       const newSelectedFacilitators = selectedFacilitators.filter((newFaci) => newFaci.id !== faci.id);
@@ -351,7 +351,7 @@ export const EditExternalCourseOutline: FunctionComponent = () => {
                       e.preventDefault();
                     }
                   }}
-                  placeholder="Search for employee"
+                  placeholder="Search for facilitator"
                   className="placeholder:text-xs"
                 />
               </Combobox.Input>

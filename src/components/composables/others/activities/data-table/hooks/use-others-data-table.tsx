@@ -1,15 +1,8 @@
-import { Orientation } from "@lms/utilities/types/orientation";
+import { Others } from "@lms/utilities/types/others";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Dispatch, SetStateAction } from "react";
-
-type OrientationNoticeState = {
-  id: string;
-  editModalIsOpen: boolean;
-  setEditModalIsOpen: Dispatch<SetStateAction<boolean>>;
-};
 
 export const useOrientationDataTable = () => {
-  const helper = createColumnHelper<Orientation>();
+  const helper = createColumnHelper<Others>();
 
   const columns = [
     helper.accessor("title", {
@@ -21,12 +14,12 @@ export const useOrientationDataTable = () => {
       cell: (info) => info.getValue(),
     }),
 
-    helper.accessor("dateStart", {
+    helper.accessor("dateFrom", {
       header: "Start Date",
       cell: (info) => info.getValue(),
     }),
 
-    helper.accessor("dateEnd", {
+    helper.accessor("dateTo", {
       header: "End Date",
       cell: (info) => info.getValue(),
     }),

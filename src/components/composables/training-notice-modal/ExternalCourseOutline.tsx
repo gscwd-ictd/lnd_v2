@@ -231,7 +231,7 @@ export const ExternalCourseOutline: FunctionComponent<CourseOutlineProps> = ({ s
                     setFacilitator({ ...facilitator, name: e.target.value });
                     setSearchFaci(e.target.value);
                   }}
-                  placeholder="Search for employee"
+                  placeholder="Search for facilitator"
                   className="placeholder:text-xs"
                 />
               </Combobox.Input>

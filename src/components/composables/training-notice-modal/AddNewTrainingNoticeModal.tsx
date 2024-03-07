@@ -92,6 +92,14 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       reset();
       resetModal();
       resetTrainingTypes();
+
+      setAction(undefined);
+      setSelectedTrainingType(undefined);
+      setLspSource(undefined);
+      setSelectedFacilitator({ id: "", name: "", type: "" });
+      resetModal();
+      reset();
+
       setToastOptions("success", "Success", "You have successfully added a training notice!");
 
       const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details?page=1&limit=1000`, {
@@ -217,6 +225,14 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       reset();
       resetTrainingTypes();
       resetModal();
+
+      setAction(undefined);
+      setSelectedTrainingType(undefined);
+      setLspSource(undefined);
+      setSelectedFacilitator({ id: "", name: "", type: "" });
+
+      resetModal();
+      reset();
 
       const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
 
@@ -408,12 +424,15 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
                               setTrainingSource(trainingSource.id!);
                               setSelectedTrainingSource(trainingSource);
                               setInitialTrainingRequirements([
-                                { document: "Pre-test", isSelected: false },
-                                { document: "Course Materials", isSelected: false },
-                                { document: "Post Training Report", isSelected: false },
+                                { document: "Certificate of Appearance", isSelected: false },
+                                { document: "Certificate of Training", isSelected: false },
                                 { document: "Course Evaluation Report", isSelected: false },
+                                { document: "Course Materials", isSelected: false },
                                 { document: "Learning Application Plan", isSelected: false },
+                                { document: "Post Training Report", isSelected: false },
                                 { document: "Post-test", isSelected: false },
+                                { document: "Pre-test", isSelected: false },
+                                { document: "Program", isSelected: false },
                               ]);
                               setPage(1);
                               setAction("create");

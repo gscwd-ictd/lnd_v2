@@ -17,9 +17,6 @@ export const SubmitToPdcSecModal = () => {
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
 
-  // handle sending, change status to for PDC Review
-  const handleSend = () => {};
-
   // toast options
   const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
     setToastType({ color, title, content });
@@ -28,15 +25,18 @@ export const SubmitToPdcSecModal = () => {
 
   const submitToPdcMutation = useMutation({
     onSuccess: async () => {
-      const getTrainingNotice = await axios.get(`${url}/training-details`);
+      const getTrainingNotice = await axios.get(`${url}/training-details`, { withCredentials: true });
 
       queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
       setToastOptions("success", "Success", "You have sent the training to the PDC Secretary.");
       setSubmitToPdcSecModalIsOpen(false);
     },
     mutationFn: async () => {
-      console.log(id);
-      const response = await axios.post(`${url}/training-approvals`, { trainingDetails: id });
+      const response = await axios.post(
+        `${url}/training-approvals`,
+        { trainingDetails: id },
+        { withCredentials: true }
+      );
       return response;
     },
     onError: () => {

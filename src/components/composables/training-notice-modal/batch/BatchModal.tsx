@@ -79,14 +79,14 @@ export const BatchModal: FunctionComponent = () => {
         batches: newBatches,
       };
 
-      const data = await axios.post(`${url}/training-nominees/batch`, trainingWithBatches);
+      const data = await axios.post(`${url}/training-nominees/batch`, trainingWithBatches, { withCredentials: true });
       return data;
     },
 
     onSuccess: async () => {
       setBatchingModalIsOpen(false);
 
-      const getTrainingNotice = await axios.get(`${url}/training-details`);
+      const getTrainingNotice = await axios.get(`${url}/training-details`, { withCredentials: true });
 
       queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
 
@@ -113,7 +113,7 @@ export const BatchModal: FunctionComponent = () => {
         batches: newBatches,
       };
 
-      const data = await axios.patch(`${url}/training-nominees/batch`, trainingWithBatches);
+      const data = await axios.patch(`${url}/training-nominees/batch`, trainingWithBatches, { withCredentials: true });
       return data;
     },
 
@@ -138,7 +138,7 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = await axios.get(`${url}/training-details/${id}` as any);
+        const { data } = await axios.get(`${url}/training-details/${id}`, { withCredentials: true });
         setHasFetchedDetails(true);
         if (!isEmpty(data)) {
           setNumberOfParticipants(data.numberOfParticipants);
@@ -175,7 +175,9 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`)) as any;
+        const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`, {
+          withCredentials: true,
+        })) as any;
         setEmployeePool(acceptedNominees);
         setTotalSelectedEmployees([]);
 
@@ -199,34 +201,30 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
-        let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
-        const fetchedBatches = data.map((batch: Batch) => {
-          if (batch.employees) {
-            updatedSelectedEmployees.push(...batch.employees);
-          }
-          return {
-            batchNumber: batch.batchNumber,
-            trainingDate: {
-              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
-              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
-            },
-            isOneDayTraining:
-              dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
-            employees: batch.employees,
-          };
-        });
+      const { data } = await axios.get(`${url}/training-nominees/${id}/batch`);
+      let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
+      const fetchedBatches = data.map((batch: Batch) => {
+        if (batch.employees) {
+          updatedSelectedEmployees.push(...batch.employees);
+        }
+        return {
+          batchNumber: batch.batchNumber,
+          trainingDate: {
+            from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+            to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+          },
+          isOneDayTraining:
+            dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
+          employees: batch.employees,
+        };
+      });
 
-        setBatches(fetchedBatches);
+      setBatches(fetchedBatches);
 
-        setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
-        setEmployeePool([]);
+      setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+      setEmployeePool([]);
 
-        return batches;
-      } catch (error) {
-        return error;
-      }
+      return batches;
     },
   });
 
@@ -256,6 +254,7 @@ export const BatchModal: FunctionComponent = () => {
               <div className="flex items-start gap-2">
                 <h3 className="text-2xl font-medium text-gray-700">{courseTitle}</h3>
               </div>
+
               {isEmpty(trainingStart) ? null : (
                 <div className="flex text-sm text-center">
                   <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>

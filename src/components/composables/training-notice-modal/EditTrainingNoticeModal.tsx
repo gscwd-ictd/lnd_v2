@@ -103,12 +103,12 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   };
 
   const internalTrainingMutation = useMutation({
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       setEditModalIsOpen(false);
       // toast options here
       setToastOptions("success", "Success", "You have successfully updated a training notice!");
       reset();
-      // resetModal();
+      resetModal();
 
       const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
         withCredentials: true,
@@ -269,7 +269,11 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   });
 
   // per training notice
-  const { data: trainingNotice, isLoading: isLoadingTrainingNotice } = useQuery({
+  const {
+    data: trainingNotice,
+    isLoading: isLoadingTrainingNotice,
+    refetch,
+  } = useQuery({
     queryKey: ["training-details", trainingNoticeId],
     queryFn: async () => {
       try {
@@ -302,12 +306,15 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
             // setCourseTitle(data.)
             setInitialTrainingRequirements([
-              { document: "Pre-test", isSelected: false },
-              { document: "Course Materials", isSelected: false },
-              { document: "Post Training Report", isSelected: false },
+              { document: "Certificate of Appearance", isSelected: false },
+              { document: "Certificate of Training", isSelected: false },
               { document: "Course Evaluation Report", isSelected: false },
+              { document: "Course Materials", isSelected: false },
               { document: "Learning Application Plan", isSelected: false },
+              { document: "Post Training Report", isSelected: false },
               { document: "Post-test", isSelected: false },
+              { document: "Pre-test", isSelected: false },
+              { document: "Program", isSelected: false },
             ]);
           }
 
@@ -332,12 +339,15 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
 
             setInitialTrainingRequirements([
-              { document: "Pre-test", isSelected: false },
-              { document: "Course Materials", isSelected: false },
-              { document: "Post Training Report", isSelected: false },
+              { document: "Certificate of Appearance", isSelected: false },
+              { document: "Certificate of Training", isSelected: false },
               { document: "Course Evaluation Report", isSelected: false },
+              { document: "Course Materials", isSelected: false },
               { document: "Learning Application Plan", isSelected: false },
+              { document: "Post Training Report", isSelected: false },
               { document: "Post-test", isSelected: false },
+              { document: "Pre-test", isSelected: false },
+              { document: "Program", isSelected: false },
             ]);
           }
         }

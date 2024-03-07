@@ -270,14 +270,14 @@ export const EditInternalCourseOutline: FunctionComponent = () => {
             </label>
             <p className="text-xs text-gray-500">The ones responsible for leading and guiding the training process.</p>
           </div>
-          <div className={`grid grid-cols-3 gap-1 mb-2`}>
+          <div className={`grid grid-cols-2 gap-1 mb-2`}>
             {selectedFacilitators.map((faci) => {
               return (
                 <div
                   key={faci.id}
-                  className="flex items-center  justify-between gap-2  pl-2.5 space-x-2 text-xs text-gray-800 rounded select-none bg-stone-200 "
+                  className="flex items-center  justify-between gap-2  space-x-2 text-xs text-gray-800 rounded select-none bg-stone-200 "
                 >
-                  <span className="w-[80%] break-words py-2">{faci.name}</span>
+                  <span className="w-[80%] break-words py-3 pl-2.5">{faci.name}</span>
                   <button
                     onClick={() => {
                       const newSelectedFacilitators = selectedFacilitators.filter((newFaci) => newFaci.id !== faci.id);
@@ -290,8 +290,6 @@ export const EditInternalCourseOutline: FunctionComponent = () => {
                     type="button"
                     className="h-full w-[20%] flex items-center"
                   >
-                    {/* <span className="flex items-center justify-center w-full">x</span> */}
-
                     <span className="flex items-center justify-center w-full h-full font-semibold rounded hover:bg-red-300">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -343,7 +341,7 @@ export const EditInternalCourseOutline: FunctionComponent = () => {
                   size="small"
                   color={!isEmpty(errors.facilitators) ? "error" : "primary"}
                   helperText={errors.facilitators ? errors?.facilitators?.message : undefined}
-                  placeholder="Search for employee"
+                  placeholder="Search for facilitator"
                   className="placeholder:text-xs"
                 />
               </Combobox.Input>

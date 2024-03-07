@@ -19,18 +19,13 @@ export type PostTrainingDocument = {
 
 export const TrainingRequirementDocuments: FunctionComponent = () => {
   // const setTrainingDocuments = useTrainingNoticeStore((state) => state.setTrainingDocuments);
-  const deadline = useTrainingNoticeStore((state) => state.deadlineForSubmission);
-  const setDeadline = useTrainingNoticeStore((state) => state.setDeadlineForSubmission);
   const initialTrainingRequirements = useTrainingNoticeStore((state) => state.initialTrainingRequirements);
   const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
-  // const trainingDocuments = useTrainingNoticeStore((state) => state.trainingDocuments);
-  const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
   const trainingRequirements = useTrainingNoticeStore((state) => state.trainingRequirements);
   const setTrainingRequirements = useTrainingNoticeStore((state) => state.setTrainingRequirements);
   const hasSetTrainingRequirements = useTrainingNoticeStore((state) => state.hasSetTrainingRequirements);
   const setHasSetTrainingRequirements = useTrainingNoticeStore((state) => state.setHasSetTrainingRequirements);
-  const selectedTrainingSource = useTrainingNoticeStore((state) => state.selectedTrainingSource);
 
   const schema = yup.object({
     trainingRequirements: yup

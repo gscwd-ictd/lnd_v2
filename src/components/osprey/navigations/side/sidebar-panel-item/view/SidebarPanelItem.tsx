@@ -25,7 +25,11 @@ export const SidebarPanelItem: FunctionComponent<SidebarPanelItemProps> = ({
 
   return (
     <Link href={path} className={styles.panelItem(selected, withIndentation)}>
-      {withIndentation ? ">" : null}
+      {withIndentation && selected ? (
+        <div className="rotate-90 transition-all">&gt;</div>
+      ) : withIndentation && !selected ? (
+        " >"
+      ) : null}
       <span>{children}</span>
       <p className="text-sm font-medium">{label}</p>
     </Link>
