@@ -7,6 +7,8 @@ export type Others = {
   location: string;
   dateFrom: string;
   dateTo: string;
+  category: OthersCategory;
+  orientationId: string;
 };
 
 export enum OthersCategory {

@@ -5,7 +5,7 @@ import {
   AlertDialogTitle,
 } from "@lms/components/osprey/ui/overlays/alert-dialog/view/AlertDialog";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
-import { Dispatch, FunctionComponent, SetStateAction, useContext, useState } from "react";
+import { FunctionComponent, useContext, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { trainingDesignUrl, url } from "@lms/utilities/url/api-url";
@@ -32,7 +32,7 @@ export const DeleteTrainingNoticeModal: FunctionComponent = () => {
         const response = await axios.delete(`${url}/training-details/${id}`, { withCredentials: true });
         if (trainingSource === "External") {
           // call delete bucket by id
-          await axios.delete(`${trainingDesignUrl}/api/bucket/${id}`);
+          await axios.delete(`${trainingDesignUrl}/api/bucket/lnd/${id}`);
         }
 
         return response.data;

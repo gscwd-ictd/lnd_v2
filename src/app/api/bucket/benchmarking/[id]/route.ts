@@ -4,24 +4,22 @@ import sdk from "node-appwrite";
 
 type Param = {
   params: {
-    bucketId: string;
-    fileId: string;
+    id: string;
   };
 };
 
-// delete a file by bucket_id and file_id
+// delete a bucket by id
 export async function DELETE(request: NextRequest, { params }: Param) {
-  console.log(params);
   try {
     const client = new sdk.Client();
     const storage = new sdk.Storage(client);
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_SECRET_KEY!);
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_BENCHMARKING!)
+      .setKey(process.env.NEXT_PUBLIC_APPWRITE_BENCHMARKING_SECRET_KEY!);
 
-    const data = await storage.deleteFile(params.bucketId, params.fileId);
+    const data = await storage.deleteBucket(params.id);
 
     return NextResponse.json(data);
   } catch (error) {

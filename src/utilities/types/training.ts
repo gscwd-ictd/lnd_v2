@@ -1,3 +1,4 @@
+import { Employee } from "../stores/employee-tags-store";
 import { Recommendation } from "../stores/training-notice-store";
 
 export type TrainingSource = {
@@ -63,6 +64,8 @@ export type EmployeeWithStatus = {
   status?: TrainingNomineeStatus;
   remarks?: string | null;
 };
+
+export type EmployeeFlatWithSupervisor = Employee & Pick<Recommendation, "supervisor">;
 
 export type EmployeeWithSupervisor = EmployeeWithStatus &
   Pick<Recommendation, "supervisor"> & { isOneDayTraining?: boolean };

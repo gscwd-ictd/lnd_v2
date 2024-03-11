@@ -4,7 +4,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { useOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
-import { Others } from "@lms/utilities/types/others";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent, useEffect, useState } from "react";
@@ -184,10 +183,10 @@ export const ActivityDetails: FunctionComponent = () => {
               id="location"
               style={{ resize: "none" }}
               rows={2}
-              placeholder="Please indicate the training's venue"
+              placeholder="Please indicate the activity's venue"
               // className="block w-full px-4 py-3 text-sm border-gray-200 rounded-md placeholder:text-gray-300 placeholder:text-xs focus:border-indigo-500 focus:ring-indigo-500"
 
-              className={`block w-full px-4 py-3 placeholder:text-gray-300 rounded-md  ${
+              className={`block w-full px-4 py-3 placeholder:text-gray-300 placeholder:text-xs rounded-md  ${
                 errors.location
                   ? "outline-none border focus:ring-2 text-sm transition-colors border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "outline-none border focus:ring-2 text-sm transition-colors border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"

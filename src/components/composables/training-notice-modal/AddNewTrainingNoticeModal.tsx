@@ -36,17 +36,15 @@ import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/Appwrite
 import { Storage } from "appwrite";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { nanoid } from "nanoid";
 import { useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
 import { v4 as uuidv4 } from "uuid";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { useLnd } from "@lms/hooks/use-lnd";
 
 export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
-  const client = useAppwriteClient();
-  const bucketStrings = useTrainingNoticeStore((state) => state.bucketStrings);
+  const client = useLnd();
   const filesToUpload = useTrainingNoticeStore((state) => state.filesToUpload);
-  const bucket = useTrainingNoticeStore((state) => state.bucket);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [source, setSource] = useState<TrainingSource[]>([]);
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
@@ -59,7 +57,6 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const setModalIsOpen = useTrainingNoticeModalStore((state) => state.setModalIsOpen);
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
   const courseContent = useTrainingNoticeStore((state) => state.courseContent);
-  const selectedTag = useTrainingNoticeStore((state) => state.selectedTag);
   const selectedTags = useTrainingNoticeStore((state) => state.selectedTags);
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
   const lspSource = useLspSourceStore((state) => state.lspSource);
@@ -77,9 +74,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
   const setSelectedFacilitator = useTrainingNoticeStore((state) => state.setSelectedFacilitator);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
-  const setBucketStrings = useTrainingNoticeStore((state) => state.setBucketStrings);
   const resetTrainingTypes = useTrainingTypesStore((state) => state.reset);
-  // const [stepSuccess, setStepSuccess] = useState<number>(0);
 
   const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
     setToastType({ color, title, content });
@@ -198,7 +193,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       );
 
       // create the bucket according to the training creation response id and name
-      const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket`, {
+      const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd`, {
         id: trainingCreationResponse.data.id,
         name: trainingCreationResponse.data.courseTitle,
       });
