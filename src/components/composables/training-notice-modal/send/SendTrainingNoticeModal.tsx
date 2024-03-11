@@ -13,12 +13,12 @@ import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingT
 import { useTrainingNoticeDataTable } from "../../training-notice-data-table/hooks/use-training-notice-data-table";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { Storage } from "appwrite";
-import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
 import convertSize from "convert-size";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { useLnd } from "@lms/hooks/use-lnd";
 
 export const SendTrainingNoticeModal: FunctionComponent = () => {
-  const client = useAppwriteClient();
+  const client = useLnd();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);

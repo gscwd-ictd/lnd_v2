@@ -3,8 +3,9 @@ export type Benchmarking = {
   updatedAt: Date;
   deletedAt: Date | null;
   id: string;
-  purpose: string;
+  title: string;
   location: string;
-  dateStart: string;
-  dateEnd: string;
+  dateFrom: string;
+  dateTo: string;
+  partner: string;
 };

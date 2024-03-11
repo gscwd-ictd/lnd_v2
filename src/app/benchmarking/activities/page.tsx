@@ -1,5 +1,5 @@
-import { BenchmarkingDataTable } from "@lms/components/composables/benchmarking/schedules/data-table/BenchmarkingDataTable";
-import { AddNewBenchmarkingModal } from "@lms/components/composables/benchmarking/schedules/modal/AddNewBenchmarkingModal";
+import { BenchmarkingDataTable } from "@lms/components/composables/benchmarking/activities/data-table/BenchmarkingDataTable";
+import { AddNewBenchmarkingModal } from "@lms/components/composables/benchmarking/activities/modal/AddNewBenchmarkingModal";
 
 export default function Benchmarking() {
   return (

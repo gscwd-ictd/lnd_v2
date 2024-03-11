@@ -173,22 +173,9 @@ export const BatchNumbering: FunctionComponent = () => {
                   <div className="text-2xl font-medium">Batch {batch.batchNumber}</div>
                   {batch.trainingDate?.from && (
                     <div className="flex gap-1 rounded-xl text-md">
-                      {/* <div>
-                        {batch.trainingDate?.from
-                          ? ` ${dayjs(batch.trainingDate.from).format("MMMM DD, YYYY hh:mm A")} `
-                          : null}{" "}
-                      </div>
-                      <div>
-                        {batch.trainingDate.to && batch.trainingDate.from === batch.trainingDate.to
-                          ? null
-                          : batch.trainingDate.to && batch.trainingDate.to !== batch.trainingDate.from
-                          ? `- ${dayjs(batch.trainingDate.to).format("MMMM DD, YYYY hh:mm A")}`
-                          : null}
-                      </div> */}
                       {dayjs(batch.trainingDate?.from).isSame(dayjs(batch.trainingDate?.to), "day") === true ? (
                         <div className="flex w-full">
                           <div className="flex w-full gap-1">
-                            {/* <span className="w-[4.5rem]">Starts on</span> */}
                             {/* Date From */}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"

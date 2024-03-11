@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     client
       .setEndpoint(appwriteUrl!)
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_SECRET_KEY!);
+      .setKey(process.env.NEXT_PUBLIC_APPWRITE_ORIENTATION_SECRET_KEY!);
     console.log("files: ", filesToUpload);
     console.log("bucketId: ", bucketId);
     // map all files to upload as we call the storage.createFile function to save it in appwrite

@@ -1,5 +1,4 @@
 import { FileThumbnail } from "@lms/components/features/Thumbnail";
-import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
@@ -13,19 +12,11 @@ import convertSize from "convert-size";
 import Link from "next/link";
 import { Storage } from "appwrite";
 
-import {
-  FunctionComponent,
-  MutableRefObject,
-  Suspense,
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FunctionComponent, MutableRefObject, createContext, useContext, useEffect, useRef, useState } from "react";
 import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
 import axios from "axios";
 import { isEmpty } from "lodash";
+import { useLnd } from "@lms/hooks/use-lnd";
 
 type FileToUploadCardProps = {
   file: File;
@@ -64,7 +55,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
   const id = useTrainingNoticeStore((state) => state.id);
   const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
   const { editModalIsOpen, setEditModalIsOpen } = useContext(TrainingNoticeContext);
-  const client = useAppwriteClient();
+  const client = useLnd();
   const action = useTrainingNoticeModalStore((state) => state.action);
 
   // fetch uploaded files
@@ -73,7 +64,7 @@ export const UploadTrainingDesign: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const storage = new Storage(client!);
-        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${id}`);
+        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd?id=${id}`);
 
         if (getBucketListFiles.data.files.length > 0) {
           const newBucketFiles = Promise.all(

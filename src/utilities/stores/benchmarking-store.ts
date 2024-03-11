@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Employee } from "./employee-tags-store";
 
 export type BenchmarkingModalStore = {
   page: number;
@@ -8,6 +9,24 @@ export type BenchmarkingModalStore = {
   modalIsOpen: boolean;
   setModalIsOpen: (modalIsOpen: boolean) => void;
   resetModal: () => void;
+};
+
+export type BenchmarkingState = {
+  id: string;
+  setId: (id: string) => void;
+  title: string;
+  setTitle: (title: string) => void;
+  partner: string;
+  setPartner: (partner: string) => void;
+  participants: Array<Employee>;
+  setParticipants: (participants: Array<Employee>) => void;
+  location: string;
+  setLocation: (location: string) => void;
+  dateFrom: string;
+  setDateFrom: (dateFrom: string) => void;
+  dateTo: string;
+  setDateTo: (dateTo: string) => void;
+  reset: () => void;
 };
 
 export const useBenchmarkingModalStore = create<BenchmarkingModalStore>((set) => ({
@@ -22,6 +41,34 @@ export const useBenchmarkingModalStore = create<BenchmarkingModalStore>((set) =>
       modalIsOpen: false,
       action: undefined,
       page: 1,
+    });
+  },
+}));
+
+export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
+  id: "",
+  setId: (id) => set({ id }),
+  title: "",
+  setTitle: (title) => set({ title }),
+  partner: "",
+  setPartner: (partner) => set({ partner }),
+  participants: [],
+  setParticipants: (participants) => set({ participants }),
+  location: "",
+  setLocation: (location) => set({ location }),
+  dateFrom: "",
+  setDateFrom: (dateFrom) => set({ dateFrom }),
+  dateTo: "",
+  setDateTo: (dateTo) => set({ dateTo }),
+  reset: () => {
+    set({
+      id: "",
+      location: "",
+      title: "",
+      participants: [],
+      partner: "",
+      dateFrom: "",
+      dateTo: "",
     });
   },
 }));

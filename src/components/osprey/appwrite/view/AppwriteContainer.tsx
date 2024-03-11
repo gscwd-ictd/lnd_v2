@@ -13,16 +13,18 @@ type AppwriteContainerProps = {
   children: ReactNode | ReactNode[];
 };
 
-export const useAppwriteClient = () => {
+export const useAppwriteClient = (projectId: string) => {
   const { client } = useContext(AppwriteClientContext);
 
+  client?.setProject(projectId);
   return client;
 };
 
 export const AppwriteClientContainer = ({ children }: AppwriteContainerProps) => {
-  const [client] = useState(() =>
-    new Client().setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-  );
+  // const [client] = useState(() =>
+  //   new Client().setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!)
+  // );
+  const [client] = useState(new Client().setEndpoint(appwriteUrl!));
 
   return <AppwriteClientContext.Provider value={{ client }}>{children}</AppwriteClientContext.Provider>;
 };

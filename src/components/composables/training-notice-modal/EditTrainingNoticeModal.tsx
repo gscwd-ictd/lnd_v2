@@ -7,23 +7,19 @@ import {
 import { url } from "@lms/utilities/url/api-url";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { initial, isEmpty } from "lodash";
-import { Dispatch, FunctionComponent, SetStateAction, useContext, useEffect, useState } from "react";
+import { isEmpty } from "lodash";
+import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { TrainingNoticeModalBody } from "./TrainingNoticeModalBody";
 import dayjs from "dayjs";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { LspSource, useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
-import {
-  getCapitalizedTrainingType,
-  getTrainingTypeFromString,
-} from "@lms/utilities/functions/getTrainingTypeFromString";
-import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/AppwriteContainer";
+import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { Storage } from "appwrite";
-import convertSize from "convert-size";
 import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
 import { v4 as uuidv4 } from "uuid";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { useLnd } from "@lms/hooks/use-lnd";
 
 type ToastType = {
   color: "success" | "warning" | "info" | "default" | "danger";
@@ -36,7 +32,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const training = useTrainingNoticeStore();
-  const client = useAppwriteClient();
+  const client = useLnd();
   const queryClient = useQueryClient();
 
   const resetModal = useTrainingNoticeStore((state) => state.reset);

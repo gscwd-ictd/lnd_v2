@@ -14,7 +14,6 @@ import { useAppwriteClient } from "@lms/components/osprey/appwrite/view/Appwrite
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 
 export const SendTrainingNoticeSummary: FunctionComponent = () => {
-  const client = useAppwriteClient();
   const { setNomineeStatusIsOpen } = useContext(TrainingNoticeContext);
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
   const { isComplete, setIsComplete } = useTrainingNoticeDataTable();

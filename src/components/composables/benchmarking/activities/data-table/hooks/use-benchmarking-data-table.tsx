@@ -12,8 +12,12 @@ export const useBenchmarkingDataTable = () => {
   const helper = createColumnHelper<Benchmarking>();
 
   const columns = [
-    helper.accessor("purpose", {
-      header: "Purpose",
+    helper.accessor("title", {
+      header: "Partner",
+      cell: (info) => info.getValue(),
+    }),
+    helper.accessor("partner", {
+      header: "Partner",
       cell: (info) => info.getValue(),
     }),
     helper.accessor("location", {
@@ -21,12 +25,12 @@ export const useBenchmarkingDataTable = () => {
       cell: (info) => info.getValue(),
     }),
 
-    helper.accessor("dateStart", {
+    helper.accessor("dateFrom", {
       header: "Start Date",
       cell: (info) => info.getValue(),
     }),
 
-    helper.accessor("dateEnd", {
+    helper.accessor("dateTo", {
       header: "End Date",
       cell: (info) => info.getValue(),
     }),

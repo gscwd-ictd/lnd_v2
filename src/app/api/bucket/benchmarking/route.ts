@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_SECRET_KEY!);
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_BENCHMARKING!)
+      .setKey(process.env.NEXT_PUBLIC_APPWRITE_BENCHMARKING_SECRET_KEY!);
 
     const data = await storage.createBucket(
       id,
@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_SECRET_KEY!);
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_BENCHMARKING!)
+      .setKey(process.env.NEXT_PUBLIC_APPWRITE_BENCHMARKING_SECRET_KEY!);
 
     const data = await storage.listFiles(id);
 

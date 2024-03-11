@@ -7,7 +7,7 @@ async function createFile(files: File[]) {
   try {
     const client = new Client();
     const storage = new Storage(client);
-    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!);
 
     let tempIds: Array<string> = [];
 
@@ -30,7 +30,7 @@ async function createBucketFile(id: string, name: string) {
     const client = new sdk.Client();
     const storage = new sdk.Storage(client);
 
-    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+    client.setEndpoint(appwriteUrl!).setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!);
 
     const data = await storage.createBucket(id, name);
 

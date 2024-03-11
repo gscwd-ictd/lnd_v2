@@ -28,8 +28,9 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
     trainingRequirements,
     courseContent,
   } = useTrainingNoticeStore((state) => ({
+    bucketFiles: state.filesToUpload,
     selectedTrainingDesign: state.selectedTrainingDesign,
-    bucketFiles: state.bucketFiles,
+    // bucketFiles: state.bucketFiles,
     selectedFacilitators: state.selectedFacilitators,
     selectedTags: state.selectedTags,
     courseTitle: state.courseTitle,
@@ -132,11 +133,14 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
                       return (
                         <div key={idx} className="pb-1 pl-5">
                           <span className="text-xs">{idx + 1}. </span>
-                          <Link href={file.href} target="_blank">
+                          <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
+                            {file.name}
+                          </span>
+                          {/* <Link href={file.href} target="_blank">
                             <span className="text-xs text-zinc-500 hover:text-indigo-700 active:text-indigo-800 ">
                               {file.name}
                             </span>
-                          </Link>
+                          </Link> */}
                         </div>
                       );
                     })}
