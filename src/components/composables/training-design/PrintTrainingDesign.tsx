@@ -12,9 +12,12 @@ import Image from "next/image";
 import gscwd_logo from "../../../../public/images/document/gscwd_logo.png";
 import iso_logo from "../../../../public/images/document/iso_logo.jpg";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { useUserDetails } from "@lms/hooks/use-userdetails";
 
 export const PrintTrainingDesign = () => {
   const trainingDesignToPrintRef = useRef(null);
+  const user = useUserDetails();
+
   const params = useParams();
   const handlePrint = useReactToPrint({
     content: () => trainingDesignToPrintRef.current,
@@ -105,7 +108,6 @@ export const PrintTrainingDesign = () => {
                   </div>
                 </header>
                 <hr className="my-4" />
-
                 <div className="flex justify-center w-full font-semibold uppercase">Training Design</div>
                 <div className="flex items-center font-semibold">Course Title: {courseTitle}</div>
                 <div className="mt-4 font-semibold">I.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rationale</div>

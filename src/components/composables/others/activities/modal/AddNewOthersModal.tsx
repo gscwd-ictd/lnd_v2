@@ -3,27 +3,77 @@
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { useOthersCategoryStore, useOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { OtherCategorySelection } from "../pages/CategorySelection";
 import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
 import { isEmpty } from "lodash";
 import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
+import axios from "axios";
+import { useOrientation } from "@lms/hooks/use-orientation";
+import { Storage } from "appwrite";
+import { url } from "@lms/utilities/url/api-url";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddNewOthersModal = () => {
   const queryClient = useQueryClient();
   const [dropDownOpen, setDropDownOpen] = useState<boolean>(false);
+  const client = useOrientation();
 
   const page = useOthersModalStore((state) => state.page);
   const modalIsOpen = useOthersModalStore((state) => state.modalIsOpen);
   const category = useOthersCategoryStore((state) => state.category);
+  const orientation = useOthersStore();
 
   const setModalIsOpen = useOthersModalStore((state) => state.setModalIsOpen);
   const setPage = useOthersModalStore((state) => state.setPage);
   const reset = useOthersStore((state) => state.reset);
   const resetModal = useOthersModalStore((state) => state.resetModal);
   const setCategory = useOthersCategoryStore((state) => state.setCategory);
+
+  const addOrientationMutation = useMutation({
+    mutationFn: async () => {
+      const { filesToUpload, dateTo, dateFrom, location, title } = orientation;
+
+      // const storage = new Storage(client!);
+
+      // const orientationCreationResponse = await axios.post(
+      //   `${url}/orientation`,
+      //   {
+      //     title,
+      //     dateFrom,
+      //     dateTo,
+      //     location,
+      //     filesToUpload,
+      //     category,
+      //   },
+      //   { withCredentials: true }
+      // );
+
+      // // create the bucket according to the orientation response id and name
+      // const orientationBucketCreationResponse = await axios.post(
+      //   `${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/orientation`,
+      //   {
+      //     id: orientationCreationResponse.data.id,
+      //     name: orientationCreationResponse.data.title,
+      //   }
+      // );
+
+      // // map the files to create it in appwrite bucket
+      // try {
+      //   const files = await Promise.all(
+      //     filesToUpload.map(async (file) => {
+      //       const result = await storage.createFile(orientationBucketCreationResponse.data.$id, uuidv4(), file);
+      //     })
+      //   );
+      // } catch (error: any) {
+      //   return (error.response.data.error = 3);
+      // }
+
+      console.log({ title, dateFrom, dateTo, location, filesToUpload, category });
+    },
+  });
 
   const onNext = () => {
     if (page === 1 && !isEmpty(category)) setPage(2);
@@ -120,7 +170,11 @@ export const AddNewOthersModal = () => {
                   </Button>
                 )}
 
-                {page === 3 && <Button className="w-[6rem]">Submit</Button>}
+                {page === 3 && (
+                  <Button className="w-[6rem]" onClick={() => addOrientationMutation.mutateAsync()}>
+                    Submit
+                  </Button>
+                )}
               </div>
             </div>
           </ModalContent.Footer>

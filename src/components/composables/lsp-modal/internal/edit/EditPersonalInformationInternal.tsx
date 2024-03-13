@@ -7,6 +7,7 @@ import {
   LspAward,
   LspCertification,
   LspEducation,
+  Sex,
   useAddLspModalStore,
   useEditLspModalStore,
   useEmployeeSearchStore,
@@ -54,22 +55,16 @@ export const EditPersonalInformationInternal: FunctionComponent = () => {
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
   const tin = useLspDetailsStore((state) => state.tin);
-
   const employeeId = useLspDetailsStore((state) => state.employeeId);
-
   const name = useLspDetailsStore((state) => state.name);
-
   const experience = useLspDetailsStore((state) => state.experience);
-
-  const setExperience = useLspDetailsStore((state) => state.setExperience);
-
+  const sex = useLspDetailsStore((state) => state.sex);
   const intro = useLspDetailsStore((state) => state.introduction);
-
+  const setExperience = useLspDetailsStore((state) => state.setExperience);
   const setIntro = useLspDetailsStore((state) => state.setIntroduction);
-
   const setPage = useEditLspModalStore((state) => state.setPage);
-
   const setName = useLspDetailsStore((state) => state.setName);
+  const setSex = useLspDetailsStore((state) => state.setSex);
 
   // on submit
   const onSubmit = () => {
@@ -121,6 +116,25 @@ export const EditPersonalInformationInternal: FunctionComponent = () => {
             />
           )}
         </div>
+
+        {sex !== undefined && (
+          <div>
+            <label htmlFor="sex" className="text-xs font-medium text-gray-600">
+              Sex
+            </label>
+            <div className="w-[8rem] mb-2">
+              {sex === Sex.MALE ? (
+                <span className="w-full px-2 py-1 text-xs text-white bg-indigo-500 rounded">Male</span>
+              ) : sex === Sex.FEMALE ? (
+                <span className="w-full px-2 py-1 text-xs border border-indigo-700 text-indigo-700 rounded bg-indigo-200">
+                  Female
+                </span>
+              ) : (
+                <span>-</span>
+              )}
+            </div>
+          </div>
+        )}
 
         <div>
           <label htmlFor="exp" className="text-xs font-medium text-gray-600">

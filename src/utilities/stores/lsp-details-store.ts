@@ -93,9 +93,25 @@ type EmployeePds = {
   };
 };
 
+type EmployeeData = {
+  employeeId: string;
+  sex: Sex | undefined;
+  fullName: string;
+  email: string;
+  photoUrl: string;
+  contactNumber: string;
+  postalAddress: string;
+  tin: string;
+  awards: Array<LspAward>;
+  certifications: Array<LspCertification>;
+  education: Array<LspEducation>;
+};
+
 export type EmployeeSearchStore = {
   employeePds: EmployeePds | undefined;
   setEmployeePds: (employeePds: EmployeePds | undefined) => void;
+  employeeData: EmployeeData | undefined;
+  setEmployeeData: (employeeData: EmployeeData) => void;
   employeeId: string | undefined;
   setEmployeeId: (employeeId: string | undefined) => void;
   searchInput: string;
@@ -343,11 +359,20 @@ export const useEditLspModalStore = create<LspModalStore>((set) => ({
 export const useEmployeeSearchStore = create<EmployeeSearchStore>((set) => ({
   employeeId: undefined,
   setEmployeeId: (employeeId) => set({ employeeId }),
+  employeeData: undefined,
+  setEmployeeData: (employeeData) => set({ employeeData }),
   employeePds: undefined,
   setEmployeePds: (employeePds) => set({ employeePds }),
   searchInput: "",
   setSearchInput: (searchInput) => set({ searchInput }),
   selectedEmployee: { employeeId: "", fullName: "", positionTitle: "" } as EmployeeSearch,
   setSelectedEmployee: (selectedEmployee: EmployeeSearch) => set({ selectedEmployee }),
-  reset: () => set({ employeeId: undefined, employeePds: undefined, searchInput: "", selectedEmployee: undefined }),
+  reset: () =>
+    set({
+      employeeId: undefined,
+      employeePds: undefined,
+      searchInput: "",
+      selectedEmployee: undefined,
+      employeeData: undefined,
+    }),
 }));

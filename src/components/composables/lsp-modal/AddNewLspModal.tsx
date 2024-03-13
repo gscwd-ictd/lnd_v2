@@ -171,13 +171,13 @@ export const AddNewLspModal: FunctionComponent = () => {
     onSuccess: async (data) => {
       setOpen(false);
       setToastOptions("success", "Success", "You have successfully added an LSP");
-      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp-details/q?type=individual&page=1&limit=40`);
+      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp/q?type=individual&page=1&limit=40`);
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.post(`${url}/lsp-details/individual/internal`, {
+      const response = await axios.post(`${url}/lsp/individual/internal`, {
         employeeId,
         expertise,
         experience: experience ?? [],
@@ -203,13 +203,13 @@ export const AddNewLspModal: FunctionComponent = () => {
       resetLspDetailsStore();
       resetEmployeeStore();
 
-      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp-details/q?type=individual&page=1&limit=40`);
+      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp/q?type=individual&page=1&limit=40`);
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.post(`${url}/lsp-details/individual/external`, {
+      const response = await axios.post(`${url}/lsp/individual/external`, {
         firstName,
         middleName,
         lastName,
@@ -245,12 +245,12 @@ export const AddNewLspModal: FunctionComponent = () => {
       resetEmployeeStore();
       resetLspDetailsStore();
 
-      const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp-details/q?type=organization&page=1&limit=40`);
+      const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp/q?type=organization&page=1&limit=40`);
       queryClient.setQueryData(["lsp-organization"], getUpdatedOrganizationLsp.data.items);
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.post(`${url}/lsp-details/organization/external`, {
+      const response = await axios.post(`${url}/lsp/organization/external`, {
         organizationName,
         contactNumber,
         email,

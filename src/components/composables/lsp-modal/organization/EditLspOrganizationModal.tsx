@@ -152,7 +152,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     queryKey: ["lsp-details", lspId],
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/lsp-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/lsp/${id}`)) as any;
         if (!isEmpty(data)) {
           // setLspDetails(data);
           setLspSource(LspSource.EXTERNAL);
@@ -205,7 +205,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
       setToastOptions("danger", "Error", "Please try again in a few seconds");
     },
     mutationFn: async () => {
-      const response = await axios.put(`${url}/lsp-details/organization/external`, {
+      const response = await axios.put(`${url}/lsp/organization/external`, {
         //data
         id: lspId,
         organizationName,

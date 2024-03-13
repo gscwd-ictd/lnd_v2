@@ -126,16 +126,12 @@ export const AddExternalCourseOutline: FunctionComponent = () => {
     enabled: hasSelectedFacilitators === false,
     queryFn: async () => {
       // const individualInternal = await axios.get(`${url}/lsp-details/individual/internal?page=1&limit=200`);
-      const individualInternal = await axios.get(
-        `${url}/lsp-details/q?type=individual&source=internal&page=1&limit=200`
-      );
+      const individualInternal = await axios.get(`${url}/lsp/q?type=individual&source=internal&page=1&limit=200`);
       // const individualExternal = await axios.get(`${url}/lsp-details/individual/external?page=1&limit=200`);
-      const individualExternal = await axios.get(
-        `${url}/lsp-details/q?type=individual&source=external&page=1&limit=200`
-      );
+      const individualExternal = await axios.get(`${url}/lsp/q?type=individual&source=external&page=1&limit=200`);
 
       // const organization = await axios.get(`${url}/lsp-details/organization?page=1&limit=200`);
-      const organization = await axios.get(`${url}/lsp-details/q?type=organization&page=1&limit=200`);
+      const organization = await axios.get(`${url}/lsp/q?type=organization&page=1&limit=200`);
 
       let newFacilitators: {
         id: string;

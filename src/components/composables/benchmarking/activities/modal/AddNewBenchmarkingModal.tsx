@@ -5,20 +5,53 @@ import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/vi
 import { useBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { AddParticipants } from "../pages/AddParticipants";
+import { useMutation } from "@tanstack/react-query";
+import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { useState } from "react";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export const AddNewBenchmarkingModal = () => {
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const page = useBenchmarkingModalStore((state) => state.page);
   const modalIsOpen = useBenchmarkingModalStore((state) => state.modalIsOpen);
+  const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
+  const participants = useBenchmarkingStore((state) => state.participants);
   const reset = useBenchmarkingStore((state) => state.reset);
   const setPage = useBenchmarkingModalStore((state) => state.setPage);
   const resetModal = useBenchmarkingModalStore((state) => state.resetModal);
   const setModalIsOpen = useBenchmarkingModalStore((state) => state.setModalIsOpen);
+  const benchmarking = useBenchmarkingStore();
 
   const onClose = () => {
     setModalIsOpen(false);
     resetModal();
     reset();
   };
+
+  const onNext = async () => {
+    if (page === 1 && filesToUpload.length === 0) {
+      setToastOptions("danger", "Error", "You have not uploaded anything.");
+    } else if (page === 3 && participants.length < 1) {
+      setToastOptions("danger", "Error", "You have not added any participant.");
+    } else if (page === 3 && participants.length > 0) await addBenchmarkingMutation.mutateAsync();
+    else setPage(page + 1);
+  };
+
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
+
+  const addBenchmarkingMutation = useMutation({
+    mutationFn: async () => {
+      const { title, dateFrom, dateTo, location, participants, partner } = benchmarking;
+
+      console.log({ title, dateFrom, dateTo, location, participants, partner });
+    },
+  });
 
   return (
     <>
@@ -28,7 +61,7 @@ export const AddNewBenchmarkingModal = () => {
         animate={false}
         isStatic
         size="md"
-        fixedHeight
+        // fixedHeight
         onClose={onClose}
       >
         <Button
@@ -58,8 +91,9 @@ export const AddNewBenchmarkingModal = () => {
           </ModalContent.Title>
           <ModalContent.Body>
             <main className="px-2 space-y-4">
-              {page === 1 && <ActivityDetails />}
-              {page === 2 && <AddParticipants />}
+              {page === 1 && <UploadActivityAttachment />}
+              {page === 2 && <ActivityDetails />}
+              {page === 3 && <AddParticipants />}
             </main>
           </ModalContent.Body>
           <ModalContent.Footer>
@@ -75,9 +109,28 @@ export const AddNewBenchmarkingModal = () => {
                     Previous
                   </Button>
                 )}
+                {page === 3 && (
+                  <Button variant="white" className="w-[5rem]" onClick={() => setPage(2)}>
+                    Previous
+                  </Button>
+                )}
                 {page === 1 && (
+                  <Button className="w-[5rem]" onClick={onNext}>
+                    Next
+                  </Button>
+                )}
+                {page === 2 && (
                   <Button className="w-[5rem]" type="submit" form="benchmarkDetailsForm">
                     Next
+                  </Button>
+                )}
+                {page === 3 && (
+                  <Button
+                    className="w-[5rem] disabled:bg-indigo-300 disabled:cursor-not-allowed"
+                    onClick={onNext}
+                    disabled={addBenchmarkingMutation.isLoading ? true : false}
+                  >
+                    {addBenchmarkingMutation.isLoading ? <Spinner size="xs" /> : null} Submit
                   </Button>
                 )}
               </div>
@@ -85,6 +138,15 @@ export const AddNewBenchmarkingModal = () => {
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
+
+      <Toast
+        duration={toastType.color === "danger" ? 2000 : 1500}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
     </>
   );
 };

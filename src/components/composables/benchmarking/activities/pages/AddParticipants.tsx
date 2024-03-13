@@ -1,5 +1,6 @@
 import { Combobox } from "@headlessui/react";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
+import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
 import React from "react";
 import { FunctionComponent, useState } from "react";
@@ -63,8 +64,10 @@ export const employeesWithSupervisor: EmployeeFlatWithSupervisor[] = [
 
 export const AddParticipants: FunctionComponent = () => {
   const [participantsPool, setParticipantsPool] = useState<Array<EmployeeFlatWithSupervisor>>(employeesWithSupervisor);
-  const [selectedParticipants, setSelectedParticipants] = useState<Array<EmployeeFlatWithSupervisor>>([]);
+  // const [selectedParticipants, setSelectedParticipants] = useState<Array<EmployeeFlatWithSupervisor>>([]);
   const [searchParticipant, setSearchParticipant] = useState<string>("");
+  const participants = useBenchmarkingStore((state) => state.participants);
+  const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
 
   // filtered facilitators
   const filteredParticipants =
@@ -86,37 +89,17 @@ export const AddParticipants: FunctionComponent = () => {
             <p className="text-xs text-gray-500">The list of people who will participate in the training.</p>
             {/* {errors.employees?.message ? <div className="text-xs text-red-700">List should not be empty!</div> : null} */}
           </div>
-          {/* <div>
-            <button
-              type="button"
-              onClick={addAllParticipants}
-              disabled={tempEmployeePool.length === 0 ? true : false}
-              className={`"w-auto rounded ${
-                tempEmployeePool.length === 0 ? "bg-gray-700 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-400"
-              } text-xs text-white px-3 py-2`}
-            >
-              {tempEmployeePool.length === 0
-                ? "No participants left"
-                : tempEmployeePool.length > 1 && selectedEmployees.length === 0
-                ? "Add All Participants"
-                : `Add ${tempEmployeePool.length} Remaining Participants`}
-            </button>
-          </div> */}
         </div>
 
         <div className="relative mt-2">
           <Combobox
-            value={selectedParticipants}
+            value={participants}
             multiple
             nullable={true}
             onChange={(value) => {
               const newValues = participantsPool.filter((x) => !value.includes(x));
-
-              setSelectedParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
-
-              //   setValue("employees", value);
-
-              // setEmployeePool(newValues);
+              // setSelectedParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
+              setParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
               setParticipantsPool(newValues);
             }}
           >
@@ -172,7 +155,7 @@ export const AddParticipants: FunctionComponent = () => {
 
         <div className="relative overflow-x-auto rounded-lg shadow-md">
           <table className="w-full text-left ">
-            <thead className="text-white rounded-t bg-sky-700">
+            <thead className="text-white rounded-t bg-slate-900">
               <tr>
                 <th className="p-2 font-medium text-center border">#</th>
                 <th className="p-2 font-medium border">Participant Name</th>
@@ -181,8 +164,8 @@ export const AddParticipants: FunctionComponent = () => {
               </tr>
             </thead>
             <tbody>
-              {selectedParticipants.length > 0 ? (
-                selectedParticipants.map((participant, idx) => {
+              {participants.length > 0 ? (
+                participants.map((participant, idx) => {
                   return (
                     <tr className="even:bg-inherit odd:bg-zinc-50" key={participant.employeeId}>
                       <td className="p-2 text-sm font-light text-center border ">{idx + 1}</td>
@@ -194,10 +177,9 @@ export const AddParticipants: FunctionComponent = () => {
                             className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
                             type="button"
                             onClick={() => {
-                              const newSelectedParticipants = [...selectedParticipants];
+                              const newSelectedParticipants = [...participants];
                               newSelectedParticipants.splice(idx, 1);
-                              setSelectedParticipants(newSelectedParticipants);
-                              // setValue("employees", newSelectedParticipants);
+                              setParticipants(newSelectedParticipants);
                               const newParticipants = [...participantsPool];
                               newParticipants.push(participant);
 
@@ -233,16 +215,12 @@ export const AddParticipants: FunctionComponent = () => {
                   );
                 })
               ) : (
-                <td colSpan={4} rowSpan={4}>
-                  <div className="w-full h-[6rem] flex justify-center items-center">
-                    <span className="text-gray-500 font-medium text-lg">NO SELECTED PARTICIPANTS</span>
-                  </div>
-                </td>
+                <></>
               )}
             </tbody>
           </table>
         </div>
-        <div className="pb-10"></div>
+        <div className="pb-24"></div>
       </div>
     </>
   );

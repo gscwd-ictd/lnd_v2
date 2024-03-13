@@ -25,7 +25,7 @@ export const ToOngoingAlertSubmission: FunctionComponent = () => {
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
     mutationFn: async () => {
-      const request = axios.put(`${url}/training-details/on-going/${id}`);
+      const request = axios.put(`${url}/training-details/on-going/${id}`, {}, { withCredentials: true });
       return request;
     },
   });
