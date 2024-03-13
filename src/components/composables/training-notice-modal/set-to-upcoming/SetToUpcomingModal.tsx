@@ -25,7 +25,7 @@ export const SetToUpcomingModal: FunctionComponent = () => {
 
   const setToUpcomingTrainingNoticeMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.put(`${url}/training-details/done/${id}`);
+      const response = await axios.put(`${url}/training-details/done/${id}`, {}, { withCredentials: true });
 
       return response.data;
     },

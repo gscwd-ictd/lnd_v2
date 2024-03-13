@@ -4,7 +4,7 @@ import { TrainingNoticeContext } from "../../training-notice-data-table/Training
 import dayjs from "dayjs";
 import { EmployeeWithSupervisor } from "@lms/utilities/types/training";
 
-export const BatchNumbering: FunctionComponent = () => {
+export const BatchNumberingBack: FunctionComponent = () => {
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
   const {
     batches,
@@ -29,7 +29,7 @@ export const BatchNumbering: FunctionComponent = () => {
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
             totalSelectedEmployees.length === numberOfParticipants ? "bg-sky-400 hover:bg-sky-600" : "bg-zinc-500"
           } rounded-md`}
-          // role="button"
+          role="button"
           onClick={(e) => {
             // console.log(totalSelectedEmployees)
             e.stopPropagation();
@@ -41,13 +41,10 @@ export const BatchNumbering: FunctionComponent = () => {
 
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
-            employeePool.length === 0 ? "bg-sky-400" : "bg-zinc-500"
+            employeePool.length === 0 ? "bg-sky-400 hover:bg-sky-600" : "bg-zinc-500"
           } rounded-md`}
-          // role="button"
-          onClick={(e) => {
-            console.log(employeePool);
-            e.stopPropagation();
-          }}
+          role="button"
+          onClick={() => console.log(employeePool)}
         >
           <div className="text-3xl text-white">{employeePool.length}</div>
           <div className="text-sm font-medium text-gray-100">Available</div>

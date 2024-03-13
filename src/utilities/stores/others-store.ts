@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { OthersCategory } from "../types/others";
+import { BucketFile } from "./training-notice-store";
 
 export type OthersModalStore = {
   page: number;
@@ -19,6 +20,8 @@ export type OthersCategoryState = {
 export type OrientationState = {
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
+  bucketFiles: Array<BucketFile>;
+  setBucketFIles: (bucketFiles: Array<BucketFile>) => void;
   title: string;
   setTitle: (title: string) => void;
   dateFrom: string;
@@ -62,5 +65,7 @@ export const useOthersStore = create<OrientationState>((set) => ({
   setDateTo: (dateTo) => set({ dateTo }),
   location: "",
   setLocation: (location) => set({ location }),
-  reset: () => set({ filesToUpload: [], title: "", dateFrom: "", dateTo: "", location: "" }),
+  bucketFiles: [],
+  setBucketFIles: (bucketFiles) => set({ bucketFiles }),
+  reset: () => set({ filesToUpload: [], title: "", dateFrom: "", dateTo: "", location: "", bucketFiles: [] }),
 }));

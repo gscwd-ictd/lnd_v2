@@ -34,7 +34,7 @@ const schema = yup.object({
       },
     })
     .notRequired(),
-
+  partner: yup.string().label("Partner").required(),
   location: yup.string().label("Location").required("Please input location"),
 });
 
@@ -50,6 +50,8 @@ export const ActivityDetails: FunctionComponent = () => {
   const dateTo = useBenchmarkingStore((state) => state.dateTo);
   const location = useBenchmarkingStore((state) => state.location);
   const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
+  const partner = useBenchmarkingStore((state) => state.partner);
+  const setPartner = useBenchmarkingStore((state) => state.setPartner);
   const setPage = useBenchmarkingModalStore((state) => state.setPage);
   const setTitle = useBenchmarkingStore((state) => state.setTitle);
   const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
@@ -57,7 +59,7 @@ export const ActivityDetails: FunctionComponent = () => {
   const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
 
   const onSubmit = () => {
-    setPage(2);
+    setPage(3);
   };
 
   return (
@@ -80,6 +82,24 @@ export const ActivityDetails: FunctionComponent = () => {
             autoComplete="off"
             color={!isEmpty(errors.title) ? "error" : "primary"}
             helperText={!isEmpty(errors.title) ? errors.title?.message : undefined}
+          />
+        </div>
+
+        <div className="mt-1 mb-4">
+          <div className="mb-2">
+            <label htmlFor="course-title" className="block text-xs font-medium text-gray-700">
+              Partner<span className="text-red-600 text-md">*</span>
+            </label>
+            <p className="text-xs text-gray-500">Benchmarking partner of the said activity</p>
+          </div>
+          <Input
+            {...register("partner", { value: partner, onChange: (e) => setPartner(e.target.value) })}
+            placeholder="Please indicate the selected partner during the benchmarking activity"
+            size="small"
+            className="placeholder:text-xs"
+            autoComplete="off"
+            color={!isEmpty(errors.partner) ? "error" : "primary"}
+            helperText={!isEmpty(errors.partner) ? errors.partner?.message : undefined}
           />
         </div>
 

@@ -202,6 +202,7 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training-nominees/${id}/batch`);
+
       let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
       const fetchedBatches = data.map((batch: Batch) => {
         if (batch.employees) {
@@ -250,7 +251,7 @@ export const BatchModal: FunctionComponent = () => {
       >
         <ModalContent>
           <ModalContent.Title>
-            <header className="px-5 mt-3">
+            <header className="p-8">
               <div className="flex items-start gap-2">
                 <h3 className="text-2xl font-medium text-gray-700">{courseTitle}</h3>
               </div>

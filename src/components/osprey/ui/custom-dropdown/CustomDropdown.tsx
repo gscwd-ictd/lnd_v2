@@ -17,6 +17,9 @@ export const ActionDropdown: FunctionComponent<ActionDropdownProps> = ({ childre
         className="h-full select-none border border-gray-200 whitespace-nowrap rounded bg-slate-500 px-3 py-[0.2rem] transition-colors ease-in-out hover:bg-slate-400 active:bg-slate-600"
         asChild
         tabIndex={-1}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
         <span className="text-white">...</span>
       </Popover.Trigger>

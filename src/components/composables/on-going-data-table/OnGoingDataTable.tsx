@@ -82,7 +82,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
         if (!isEmpty(data)) {
           if (data.source.name === "Internal") {
             setId(data.id);
@@ -139,7 +139,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
+        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`, { withCredentials: true })) as any;
         let updatedSelectedEmployees: BatchEmployee[] = [];
         const fetchedBatches = data.map((batch: Batch) => {
           if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);

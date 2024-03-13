@@ -21,8 +21,8 @@ export const OrganizationDataTable: FunctionComponent = () => {
         subtitle="Select any of the learning service providers below to view details."
         columns={columns}
         // datasource={`${url}/lsp-details/organization?page=1&limit=40`}
-        datasource={`${url}/lsp-details/q?type=organization&page=1&limit=40`}
-        queryKey={["lsp_organization"]}
+        datasource={`${url}/lsp/q?type=organization&page=1&limit=40`}
+        queryKey={["lsp-organization"]}
       />
       <DeleteLspOrganizationAlertDialog id={lspId} remove={remove} setRemove={setRemove} />
       <EditLspOrganizationModal edit={edit} id={lspId} setEdit={setEdit} />

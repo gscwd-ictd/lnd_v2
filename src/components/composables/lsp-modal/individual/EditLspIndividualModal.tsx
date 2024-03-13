@@ -190,7 +190,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     queryKey: ["lsp-details", lspId],
     queryFn: async () => {
       try {
-        const { data } = await axios.get(`${url}/lsp-details/${id}`);
+        const { data } = await axios.get(`${url}/lsp/${id}`);
 
         if (!isEmpty(data)) {
           if (lspSource === "internal") {
@@ -293,7 +293,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     },
     mutationFn: async () => {
       try {
-        const response = await axios.put(`${url}/lsp-details/individual/external`, {
+        const response = await axios.put(`${url}/lsp/individual/external`, {
           //data
           id: lspId,
           firstName,
@@ -342,7 +342,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     },
     mutationFn: async () => {
       try {
-        const response = await axios.put(`${url}/lsp-details/individual/internal`, {
+        const response = await axios.put(`${url}/lsp/individual/internal`, {
           //data
           id: lspId,
           employeeId: employeeId,

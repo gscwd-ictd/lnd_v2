@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { Employee } from "./employee-tags-store";
+import { EmployeeFlatWithSupervisor } from "../types/training";
+import { BucketFile } from "./training-notice-store";
 
 export type BenchmarkingModalStore = {
   page: number;
@@ -18,14 +20,18 @@ export type BenchmarkingState = {
   setTitle: (title: string) => void;
   partner: string;
   setPartner: (partner: string) => void;
-  participants: Array<Employee>;
-  setParticipants: (participants: Array<Employee>) => void;
+  participants: Array<EmployeeFlatWithSupervisor>;
+  setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
   location: string;
   setLocation: (location: string) => void;
   dateFrom: string;
   setDateFrom: (dateFrom: string) => void;
   dateTo: string;
   setDateTo: (dateTo: string) => void;
+  filesToUpload: Array<File>;
+  setFilesToUpload: (filesToUpload: Array<File>) => void;
+  bucketFiles: Array<BucketFile>;
+  setBucketFIles: (bucketFiles: Array<BucketFile>) => void;
   reset: () => void;
 };
 
@@ -60,6 +66,10 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   setDateFrom: (dateFrom) => set({ dateFrom }),
   dateTo: "",
   setDateTo: (dateTo) => set({ dateTo }),
+  filesToUpload: [],
+  setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
+  bucketFiles: [],
+  setBucketFIles: (bucketFiles) => set({ bucketFiles }),
   reset: () => {
     set({
       id: "",
@@ -69,6 +79,7 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
       partner: "",
       dateFrom: "",
       dateTo: "",
+      filesToUpload: [],
     });
   },
 }));

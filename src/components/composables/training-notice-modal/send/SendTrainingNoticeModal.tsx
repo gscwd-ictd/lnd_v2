@@ -114,13 +114,13 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
   });
 
   // fetch uploaded files
-  const { isLoading: externalDataIsLoading, isFetching: externalDataIsFetching } = useQuery({
+  useQuery({
     queryKey: ["uploaded-files", trainingNoticeId],
     enabled: !!trainingNoticeId && sendModalIsOpen !== false && selectedTrainingSource.name === "External",
     queryFn: async () => {
       try {
         const storage = new Storage(client!);
-        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket?id=${id}`);
+        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd?id=${id}`);
 
         if (getBucketListFiles.data.files.length > 0) {
           const newBucketFiles = Promise.all(

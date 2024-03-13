@@ -99,10 +99,12 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
     employeeId,
     employeePds,
     selectedEmployee,
+    employeeData,
     setEmployeeId,
     setEmployeePds,
     setSearchInput,
     setSelectedEmployee,
+    setEmployeeData,
   } = useEmployeeSearchStore();
 
   const [search, setSearch] = useState("");
@@ -140,8 +142,11 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
     queryKey: ["employee-pds", employeeId],
     queryFn: async () => {
       try {
-        const { data } = await axios.get(`${portalBackendUrl}/${employeeId}`);
-        setEmployeePds(data);
+        // const { data } = await axios.get(`${portalBackendUrl}/${employeeId}`);
+        const { data } = await axios.get(`${url}/portal/employees/details/${employeeId}`);
+        // setEmployeePds(data);
+        setEmployeeData(data);
+        console.log(data);
         return data;
       } catch (error) {
         setEmployeePds(undefined);
@@ -151,54 +156,54 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (!isEmpty(selectedEmployee) && !isEmpty(employeePds)) {
+    if (!isEmpty(selectedEmployee) && !isEmpty(employeeData)) {
       clearErrors("employeeId");
       clearErrors("tin");
       // setLspEmployeeId(employeePds?.personalInfo._id as string);
-      setSex(employeePds?.personalInfo.sex);
-      setLspEmployeeId(employeeId!);
-      setFname(employeePds?.personalInfo.firstName as string);
-      setMname(employeePds?.personalInfo.middleName as string);
-      setLname(employeePds?.personalInfo.lastName as string);
-      setContactNumber(employeePds?.personalInfo.mobileNumber as string);
-      setEmail(employeePds?.personalInfo.email as string);
-      setPostalAddress(
-        `${employeePds?.permanentAddress.subdivision}, ${employeePds?.permanentAddress.barangay}, ${employeePds?.permanentAddress.city}`
-      );
-      setTin(employeePds?.governmentIssuedIds.tinNumber ?? "");
-      setValue("tin", employeePds?.governmentIssuedIds.tinNumber ?? "");
-
+      setSex(employeeData?.sex);
+      setLspEmployeeId(employeeData.employeeId!);
+      // setFname(employeeData?.personalInfo?.firstName as string);
+      // setMname(employeeData?.personalInfo?.middleName as string);
+      // setLname(employeeData?.personalInfo?.lastName as string);
+      setContactNumber(employeeData?.contactNumber);
+      setEmail(employeeData?.email);
+      setPostalAddress(employeeData.postalAddress);
+      setTin(employeeData.tin ?? "");
+      setValue("tin", employeeData?.tin ?? "");
       setFullName(selectedEmployee.fullName);
 
-      const college = employeePds?.college.map((education) => ({
-        degree: education.degree,
-        institution: education.schoolName,
-      })) as unknown as Array<LspEducation>;
+      // const college = employeePds?.college.map((education) => ({
+      //   degree: education.degree,
+      //   institution: education.schoolName,
+      // })) as unknown as Array<LspEducation>;
 
-      const graduate = employeePds?.graduate.map((education) => ({
-        degree: education.degree,
-        institution: education.schoolName,
-      })) as unknown as Array<LspEducation>;
+      // const graduate = employeePds?.graduate.map((education) => ({
+      //   degree: education.degree,
+      //   institution: education.schoolName,
+      // })) as unknown as Array<LspEducation>;
 
-      setEducation(college?.concat(graduate));
+      // setEducation(college?.concat(graduate));
 
-      const awards = employeePds?.recognitions.map(({ recognition }) => ({
-        name: recognition,
-      }));
+      // const awards = employeePds?.recognitions.map(({ recognition }) => ({
+      //   name: recognition,
+      // }));
 
-      setAwards(awards as unknown as Array<LspAward>);
+      // setAwards(awards as unknown as Array<LspAward>);
 
-      const certs = employeePds?.eligibility.map((cert) => ({ name: cert.name }));
+      // const certs = employeePds?.eligibility.map((cert) => ({ name: cert.name }));
 
-      setCertifications(certs as unknown as Array<LspCertification>);
-    } else if (!isEmpty(selectedEmployee?.employeeId) && employeePds === undefined) {
+      // setCertifications(certs as unknown as Array<LspCertification>);
+      setEducation(employeeData.education ?? []);
+      setAwards(employeeData.awards ?? []);
+      setCertifications(employeeData.certifications ?? []);
+    } else if (!isEmpty(selectedEmployee?.employeeId) && employeeData === undefined) {
       setError("employeeId", { message: "Employee details not found" });
       setTin("");
       setValue("tin", "");
       setError("tin", { message: "Unable to find a TIN Number" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId, employeePds, selectedEmployee]);
+  }, [employeeId, employeeData, selectedEmployee]);
 
   useEffect(() => {
     if (!isEmpty(employeeId)) {
@@ -281,97 +286,24 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
           </Combobox>
         </div>
 
-        {/* <div>
-          <RadioGroup name="sex">
-            <div className="mt-5 mb-3">
-              <RadioGroup.Label as="div">
-                <p className="text-xs font-medium text-gray-600">Sex</p>
-              </RadioGroup.Label>
+        {sex !== undefined && (
+          <div>
+            <label htmlFor="sex" className="text-xs font-medium text-gray-600">
+              Sex
+            </label>
+            <div className="w-[8rem] mb-2">
+              {sex === Sex.MALE ? (
+                <span className="w-full px-2 py-1 text-xs text-white bg-indigo-500 rounded">Male</span>
+              ) : sex === Sex.FEMALE ? (
+                <span className="w-full px-2 py-1 text-xs border border-indigo-700 text-indigo-700 rounded bg-indigo-200">
+                  Female
+                </span>
+              ) : (
+                <span>-</span>
+              )}
             </div>
-
-            <div className={`p-1 border rounded ${errors.sex ? "border-red-400" : "border-inherit"}`}>
-              <RadioGroup.Option value={Sex} as={Fragment}>
-                {({ checked }) => {
-                  checked = sex === Sex.MALE;
-                  return (
-                    <div
-                      className={`${
-                        checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
-                      } cursor-pointer px-4 py-1 mb-1 border rounded flex items-center justify-between hover:scale-95 transition-transform`}
-                      onClick={() => {
-                        setSex(Sex.MALE);
-                        setValue("sex", "male");
-                      }}
-                    >
-                      <p className="text-sm">Male</p>
-                      {checked && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                }}
-              </RadioGroup.Option>
-              <RadioGroup.Option value={Sex} as={Fragment}>
-                {({ checked }) => {
-                  checked = sex === Sex.FEMALE;
-                  return (
-                    <div
-                      className={`${
-                        checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
-                      } cursor-pointer px-4 py-1 border rounded flex items-center justify-between hover:scale-95 transition-transform`}
-                      onClick={() => {
-                        setSex(Sex.FEMALE);
-                        setValue("sex", "female");
-                      }}
-                    >
-                      <p className="text-sm">Female</p>
-                      {checked && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                }}
-              </RadioGroup.Option>
-            </div>
-          </RadioGroup>
-        </div> */}
-
-        <div>
-          <label htmlFor="sex" className="text-xs font-medium text-gray-600">
-            Sex
-          </label>
-          <div className="w-[8rem] mb-2">
-            {sex === Sex.MALE ? (
-              <span className="w-full px-2 py-1 text-xs text-white bg-blue-500 rounded">Male</span>
-            ) : sex === Sex.FEMALE ? (
-              <span className="w-full px-2 py-1 text-xs text-white rounded bg-rose-500">Female</span>
-            ) : (
-              <span>-</span>
-            )}
           </div>
-        </div>
+        )}
         <span className="text-xs text-red-500">{errors.sex ? errors.sex.message : null}</span>
 
         <div>

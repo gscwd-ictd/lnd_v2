@@ -23,7 +23,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
   const { data: allLsp, error: errorAllLsp } = useQuery({
     queryKey: ["lsp-details", rowId],
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/lsp-details/${rowId}`);
+      const { data } = await axios.get(`${url}/lsp/${rowId}`);
 
       return data;
     },
@@ -340,7 +340,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
       </SlideOver>
       <DataTable<LearningServiceProvider>
         // datasource={`${url}/lsp-details/individual?page=1&limit=40`}
-        datasource={`${url}/lsp-details/q?type=individual&page=1&limit=40`}
+        datasource={`${url}/lsp/q?type=individual&page=1&limit=40`}
         queryKey={["lsp-individual"]}
         columns={columns}
         title="Learning Service Providers"

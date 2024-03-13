@@ -33,7 +33,7 @@ export const DeleteLspOrganizationAlertDialog: FunctionComponent<DeleteLspOrgani
 
   const deleteLspMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.delete(`${url}/lsp-details/${id}`);
+      const response = await axios.delete(`${url}/lsp/${id}`);
 
       return response.data;
     },

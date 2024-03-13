@@ -58,7 +58,7 @@ export const Topbar: FunctionComponent = () => {
           <AnimatePresence>
             {openMenu && (
               <DropdownMenu.Portal forceMount>
-                <DropdownMenu.Content align="center" side="bottom" sideOffset={4} asChild className="z-[999]">
+                <DropdownMenu.Content align="center" side="bottom" sideOffset={12} asChild className="z-[999]">
                   <motion.div
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 1, opacity: 1 }}
@@ -68,7 +68,7 @@ export const Topbar: FunctionComponent = () => {
                     <DropdownMenu.Item asChild>
                       <button
                         onClick={() => router.push(`${process.env.NEXT_PUBLIC_HRMS_DASHBOARD_URL}/module-dashboard`)}
-                        className="p-4 transition-colors min-w-[12rem] bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-slate-500 hover:text-white"
+                        className="p-4 transition-colors min-w-[12rem] bg-white border-b outline-none hover:cursor-pointer hover:bg-slate-500 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
@@ -93,7 +93,7 @@ export const Topbar: FunctionComponent = () => {
                     <DropdownMenu.Item asChild>
                       <button
                         onClick={() => console.log(session)}
-                        className="p-4 transition-colors bg-gray-100 border-b outline-none hover:cursor-pointer hover:bg-slate-500 hover:text-white"
+                        className="p-4 transition-colors bg-white border-b outline-none hover:cursor-pointer hover:bg-slate-500 hover:text-white"
                       >
                         <div className="flex gap-3 text-xs">
                           <svg
@@ -104,11 +104,12 @@ export const Topbar: FunctionComponent = () => {
                             className="w-4 h-4 stroke-rose-500"
                           >
                             <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
                             />
                           </svg>
+
                           <span>Logout</span>
                         </div>
                       </button>

@@ -62,7 +62,9 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       setConfirmCompleteModalIsOpen(false);
       setSendConfirmationModalIsOpen(false);
       setSendModalIsOpen(false);
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+        withCredentials: true,
+      });
 
       queryClient.setQueryData(["training-notice"], getUpdatedTrainingNotice.data.items);
     },
