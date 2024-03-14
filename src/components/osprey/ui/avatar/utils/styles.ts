@@ -5,7 +5,7 @@ export const styles = {
     size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl",
     roundedness?: "sm" | "md" | "lg" | "xl" | "full"
   ) =>
-    cls("inline-block border-2 border-white", {
+    cls("inline-block border-2 border-white static", {
       "h-8 w-8 ": size === "sm",
       "h-[2.375rem] w-[2.375rem]": size === "md",
       "h-[2.875rem] w-[2.875rem]": size === "lg",

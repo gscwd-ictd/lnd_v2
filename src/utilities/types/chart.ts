@@ -1,5 +1,5 @@
 export type Dataset = {
-  label: string;
+  label?: string;
   data: number[];
   borderColor?: string;
   backgroundColor: string | Array<string>;

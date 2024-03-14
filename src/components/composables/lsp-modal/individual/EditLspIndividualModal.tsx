@@ -4,8 +4,9 @@
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, Suspense, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import placeholder from "../../../../../public/images/placeholders/user-placeholder-gray.png";
 import axios from "axios";
 import {
   LspSource,
@@ -22,6 +23,8 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspIndividualModalBody } from "./LspIndividualModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { AvatarWIthAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWIthAppwriteUpload";
 
 type EditLspIndividualModalProps = {
   edit: boolean;
@@ -69,6 +72,8 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     trainings,
     introduction,
     sex,
+    uploadedPhoto,
+
     reset,
     setEmail,
     setIntroduction,
@@ -191,7 +196,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp/${id}`);
-
+        console.log(data);
         if (!isEmpty(data)) {
           if (lspSource === "internal") {
             setTin(data.tin);
@@ -381,10 +386,17 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
         <ModalContent>
           <ModalContent.Title>
             <div className="px-2">
-              <Avatar
-                source="https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1224.jpg"
-                size="xl"
-              />
+              <Suspense fallback={<Spinner />}>
+                <AvatarWIthAppwriteUpload
+                  source={
+                    photoUrl
+                      ? photoUrl
+                      : // : "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1224.jpg"
+                        placeholder.src
+                  }
+                  size="xl"
+                />
+              </Suspense>
             </div>
             <header className="px-2 mt-1">
               <p className="text-xs font-medium text-indigo-500">{page} of 11</p>
@@ -522,6 +534,12 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
                     Proceed
                   </Button>
                 )}
+                {/* 
+                {lspSource === LspSource.EXTERNAL && lspType === LspType.INDIVIDUAL && page === 1 && (
+                  <Button size="small" type="submit" form="editPersonalInfoExternalForm">
+                    Proceed
+                  </Button>
+                )} */}
 
                 {lspSource === LspSource.EXTERNAL && lspType === LspType.INDIVIDUAL && page === 2 && (
                   <Button size="small" type="submit" form="editContactInfoExternalForm">

@@ -251,13 +251,13 @@ export const BatchModal: FunctionComponent = () => {
       >
         <ModalContent>
           <ModalContent.Title>
-            <header className="p-8">
+            <header className="px-8">
               <div className="flex items-start gap-2">
-                <h3 className="text-2xl font-medium text-gray-700">{courseTitle}</h3>
+                <h3 className="text-2xl font-sans font-bold text-gray-700 ">{courseTitle}</h3>
               </div>
 
               {isEmpty(trainingStart) ? null : (
-                <div className="flex text-sm text-center">
+                <div className="flex text-sm text-center font-sans">
                   <div className="text-gray-600 ">{dayjs(trainingStart).format("MMMM DD, YYYY")}</div>
                   <div>
                     &nbsp;

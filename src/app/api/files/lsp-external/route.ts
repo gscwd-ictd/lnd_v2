@@ -1,7 +1,7 @@
 import { appwriteUrl } from "@lms/utilities/url/api-url";
 import { AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
-import sdk, { InputFile } from "node-appwrite";
+import sdk from "node-appwrite";
 import { v4 as uuidv4 } from "uuid";
 
 type MyError = Omit<AxiosResponse, "data"> & {
@@ -18,10 +18,9 @@ export async function POST(request: NextRequest) {
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_LND_SECRET_KEY!);
-    console.log("files: ", filesToUpload);
-    console.log("bucketId: ", bucketId);
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LSP_EXTERNAL!)
+      .setKey(process.env.NEXT_PUBLIC_APPWRITE_LSP_EXTERNAL_SECRET_KEY!);
+
     // map all files to upload as we call the storage.createFile function to save it in appwrite
     const files = await Promise.all(
       filesToUpload.map(async (file: File) => {

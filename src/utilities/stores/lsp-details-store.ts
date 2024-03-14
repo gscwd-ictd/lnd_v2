@@ -203,6 +203,8 @@ export type LspDetailsStore = {
   setAffiliations: (affiliations: LspAffiliation[]) => void;
   setAwards: (awards: LspAward[]) => void;
   setCertifications: (certifications: LspCertification[]) => void;
+  uploadedPhoto: File | null;
+  setUploadedPhoto: (uploadedPhoto: File | null) => void;
   reset: () => void;
 };
 
@@ -235,6 +237,8 @@ export const useLspDetailsStore = create<LspDetailsStore>()(
     prefixName: "",
     suffixName: "",
     sex: undefined,
+    uploadedPhoto: null,
+    setUploadedPhoto: (uploadedPhoto) => set({ uploadedPhoto }),
     setSex: (sex) => set({ sex }),
     setTin: (tin: string) => set({ tin }),
     setPrefixName: (prefixName: string) => set({ prefixName }),

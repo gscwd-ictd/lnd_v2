@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ORIENTATION!)
       .setKey(process.env.NEXT_PUBLIC_APPWRITE_ORIENTATION_SECRET_KEY!);
     console.log("files: ", filesToUpload);
     console.log("bucketId: ", bucketId);
