@@ -3,12 +3,12 @@
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent, ModalTrigger } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, Suspense, useState } from "react";
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import {
   LspSource,
   LspType,
@@ -44,6 +44,13 @@ import { CreateOrganizationDetails } from "./organization/create/CreateOrganizat
 import { CreateCertificationsExternal } from "./external/CreateCertificationsExternal";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWithAppwriteUpload";
+import defaultPhoto from "../../../../public/images/placeholders/user-placeholder-gray.png";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { AddUploadPhotoAlert } from "./individual/AddUploadPhotoAlert";
+import { useLspExternal } from "@lms/hooks/use-lsp-external";
+import { Storage } from "appwrite";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddNewLspModal: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -54,8 +61,9 @@ export const AddNewLspModal: FunctionComponent = () => {
     setToastIsOpen(true);
   };
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const client = useLspExternal();
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { page, setPage } = useAddLspModalStore();
 
   const resetLspDetailsStore = useLspDetailsStore((state) => state.reset);
@@ -72,8 +80,6 @@ export const AddNewLspModal: FunctionComponent = () => {
   const setLspType = useLspTypeStore((state) => state.setLspType);
 
   const queryClient = useQueryClient();
-
-  const personalInfoChecker = () => {};
 
   // on next or proceed button
   const onNext = () => {
@@ -150,6 +156,9 @@ export const AddNewLspModal: FunctionComponent = () => {
     extensionName,
     tin,
     sex,
+    photoToUploadUrl,
+    photoId,
+    photoToUpload,
     setEmployeeId,
     setId,
     setFirstName,
@@ -207,8 +216,36 @@ export const AddNewLspModal: FunctionComponent = () => {
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
-    onError: (error) => console.log(error),
+    onError: (data) => {
+      setToastOptions("danger", "Error", "Something went wrong, please try again later.");
+    },
     mutationFn: async () => {
+      //! create a route where it creates the file in the appwrite, then it returns the url and id,
+      //! and post it in lsp creation
+
+      // create the file in appwrite
+
+      // initially assign this object to null
+      // let uploadedFileData: { id: string | null; photoUrl: string | null } = { id: null, photoUrl: null };
+      // if (photoToUpload !== null) {
+      //   const storage = new Storage(client!);
+
+      //   const uploadedFile = await storage.createFile(
+      //     // process.env.NEXT_PUBLIC_APPWRITE_BUCKET_LSP_EXTERNAL!,
+      //     "123123",
+      //     uuidv4(),
+      //     photoToUpload!
+      //   );
+
+      //   // find by $id
+      //   const filePreview = await storage.getFileView(
+      //     process.env.NEXT_PUBLIC_APPWRITE_BUCKET_LSP_EXTERNAL!,
+      //     uploadedFile.$id
+      //   );
+
+      //   uploadedFileData = { id: uploadedFile.$id, photoUrl: filePreview.href };
+      // }
+
       const response = await axios.post(`${url}/lsp/individual/external`, {
         firstName,
         middleName,
@@ -221,7 +258,8 @@ export const AddNewLspModal: FunctionComponent = () => {
         email,
         postalAddress,
         experience: experience ?? [],
-        photoUrl,
+        // photoUrl: photoToUpload !== null ? uploadedFileData?.photoUrl : null, //! new changes
+        // photoId: photoToUpload !== null ? uploadedFileData?.id : null, //! new changes
         tin,
         sex,
         introduction,
@@ -233,8 +271,6 @@ export const AddNewLspModal: FunctionComponent = () => {
         projects: projects ?? [],
         trainings: trainings ?? [],
       });
-
-      return response.data;
     },
   });
 
@@ -248,8 +284,40 @@ export const AddNewLspModal: FunctionComponent = () => {
       const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp/q?type=organization&page=1&limit=40`);
       queryClient.setQueryData(["lsp-organization"], getUpdatedOrganizationLsp.data.items);
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {
+      console.log(error);
+      setToastOptions("danger", "Error", "Something went wrong. Please try again later.");
+    },
     mutationFn: async () => {
+      //! create a route where it creates the file in the appwrite, then it returns the url and id,
+      //! and post it in lsp creation
+
+      // initially assign this object to null
+      // let uploadedFileData: { id: string | null; photoUrl: string | null } = { id: null, photoUrl: null };
+      // if (photoToUpload !== null) {
+      //   const storage = new Storage(client!);
+
+      //   try {
+      //     const uploadedFile = await storage.createFile(
+      //       process.env.NEXT_PUBLIC_APPWRITE_BUCKET_LSP_EXTERNAL!,
+      //       uuidv4(),
+      //       photoToUpload!
+      //     );
+
+      //     // find by $id
+      //     const filePreview = await storage.getFileView(
+      //       process.env.NEXT_PUBLIC_APPWRITE_BUCKET_LSP_EXTERNAL!,
+      //       uploadedFile.$id
+      //     );
+
+      //     uploadedFileData = { id: uploadedFile.$id, photoUrl: filePreview.href };
+      //     return uploadedFileData;
+      //   } catch (error) {
+      //     // return { id: null, photoUrl: null };
+      //     return error;
+      //   }
+      // }
+
       const response = await axios.post(`${url}/lsp/organization/external`, {
         organizationName,
         contactNumber,
@@ -258,7 +326,8 @@ export const AddNewLspModal: FunctionComponent = () => {
         experience,
         tin,
         introduction,
-        photoUrl,
+        // photoUrl: photoToUpload !== null ? uploadedFileData?.photoUrl : null, //! new changes
+        // photoId: photoToUpload !== null ? uploadedFileData?.id : null, //! new changes
         expertise,
         affiliations,
         awards,
@@ -266,9 +335,6 @@ export const AddNewLspModal: FunctionComponent = () => {
         coaching,
         trainings,
       });
-
-      resetLspDetailsStore();
-      resetEmployeeStore();
 
       return response.data;
     },
@@ -354,20 +420,24 @@ export const AddNewLspModal: FunctionComponent = () => {
         </DropdownMenu.Root>
         <ModalContent>
           <ModalContent.Title>
-            <div className="px-2">
-              <Avatar
-                source="https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1224.jpg"
-                size="xl"
-              />
+            <div className="px-2 flex gap-2">
+              <Suspense fallback={<Spinner />}>
+                {/* {lspSource === LspSource.INTERNAL ? (
+                  <Avatar source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
+                ) : (
+                  <AvatarWithAppwriteUpload source={photoToUploadUrl ? photoToUploadUrl : defaultPhoto.src} size="xl" />
+                )} */}
+                <Avatar source={defaultPhoto.src} size="xl" />
+              </Suspense>
             </div>
             <header className="px-2 mt-1">
-              <p className="text-xs font-medium text-indigo-500">
+              <div className="text-xs font-medium text-indigo-500">
                 {page} of {lspType === LspType.ORGANIZATION ? "9" : "12"}
-              </p>
+              </div>
               <div className="flex items-start gap-2">
                 <h3 className="text-lg font-semibold text-gray-600">Learning Provider Profile</h3>
                 <div className="flex items-center gap-1">
-                  <p
+                  <div
                     className={`${
                       lspType === LspType.INDIVIDUAL
                         ? "text-green-600 bg-green-50 border-green-100"
@@ -377,9 +447,9 @@ export const AddNewLspModal: FunctionComponent = () => {
                     } text-xs px-[0.25rem] py-[0.1rem] font-semibold rounded border`}
                   >
                     {lspType === LspType.INDIVIDUAL ? "Individual" : "Organization"}
-                  </p>
+                  </div>
                   {lspSource && (
-                    <p
+                    <div
                       className={`${
                         lspSource === LspSource.INTERNAL
                           ? "text-purple-600 bg-purple-50 border-purple-100"
@@ -389,11 +459,11 @@ export const AddNewLspModal: FunctionComponent = () => {
                       } text-xs px-[0.25rem] py-[0.1rem] font-semibold rounded border`}
                     >
                       {lspSource === LspSource.INTERNAL ? "Internal" : "External"}
-                    </p>
+                    </div>
                   )}
                 </div>
               </div>
-              <p className="text-sm text-gray-400">
+              <div className="text-sm text-gray-400">
                 {page === 2 && lspType === LspType.INDIVIDUAL
                   ? "Personal information"
                   : page === 3 && lspType === LspType.INDIVIDUAL
@@ -415,7 +485,7 @@ export const AddNewLspModal: FunctionComponent = () => {
                   : page === 11 && lspType === LspType.INDIVIDUAL
                   ? "Learning Service Provider's certifications"
                   : ""}
-              </p>
+              </div>
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
@@ -646,7 +716,23 @@ export const AddNewLspModal: FunctionComponent = () => {
                 )}
 
                 {lspType === LspType.ORGANIZATION && page === 9 && (
-                  <Button size="small" type="button" onClick={onNext}>
+                  <Button
+                    size="small"
+                    type="button"
+                    disabled={
+                      lspDataTableOrganizationMutation.isLoading ||
+                      lspDataTableIndExtMutation.isLoading ||
+                      lspDataTableIndIntMutation.isLoading
+                        ? true
+                        : false
+                    }
+                    onClick={onNext}
+                  >
+                    {lspDataTableOrganizationMutation.isLoading ||
+                    lspDataTableIndExtMutation.isLoading ||
+                    lspDataTableIndIntMutation.isLoading ? (
+                      <Spinner color="light" size="xs" />
+                    ) : null}{" "}
                     Submit
                   </Button>
                 )}
@@ -657,6 +743,7 @@ export const AddNewLspModal: FunctionComponent = () => {
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
+      <AddUploadPhotoAlert />
       <Toast
         duration={2000}
         open={toastIsOpen}

@@ -97,14 +97,13 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
       setToastOptions("success", "Success", "You have successfully added a training notice!");
 
-      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training?page=1&limit=1000`, {
         withCredentials: true,
       });
 
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
     onError: async (error: any) => {
-      console.log(error);
       if (error.response.data.error.step === 1) {
         // this step creates the training notice in the backend
         // if this step fails, it should just show an error in toast
@@ -116,7 +115,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
         // call delete training here
         const id = error.response.data.error.id;
-        await axios.delete(`${url}/training-details/${id}`);
+        await axios.delete(`${url}/training/${id}`);
 
         setToastOptions(
           "danger",
@@ -131,10 +130,10 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
         // call delete bucket here
 
-        await axios.delete(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/${error.response.data.error.id}`);
+        await axios.delete(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd/${error.response.data.error.id}`);
 
         // call delete training notice here
-        await axios.delete(`${url}/training-details/${error.response.data.error.id}`);
+        await axios.delete(`${url}/training/${error.response.data.error.id}`);
 
         setToastOptions(
           "danger",
@@ -158,8 +157,9 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       let tempIds: Array<string> = [];
       const storage = new Storage(client!);
 
+      // step 1
       const trainingCreationResponse = await axios.post(
-        `${url}/training-details/external`,
+        `${url}/training/external`,
         {
           source: { id: selectedTrainingSource.id },
           type: selectedTrainingType,
@@ -192,12 +192,14 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         { withCredentials: true }
       );
 
+      // step 2
       // create the bucket according to the training creation response id and name
       const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd`, {
         id: trainingCreationResponse.data.id,
         name: trainingCreationResponse.data.courseTitle,
       });
 
+      // step 3
       // map the files to create it in appwrite bucket
       try {
         const files = await Promise.all(
@@ -229,7 +231,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
       resetModal();
       reset();
 
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training?page=1&limit=1000`);
 
       queryClient.setQueryData(["training-notice"], getUpdatedTrainingNotice.data.items);
     },
@@ -245,7 +247,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         trainingRequirements,
       } = training;
 
-      const response = await axios.post(`${url}/training-details/internal`, {
+      const response = await axios.post(`${url}/training/internal`, {
         source: { id: selectedTrainingSource.id },
         trainingDesign: { id: selectedTrainingDesign.id },
         type: selectedTrainingType,
@@ -357,7 +359,7 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
 
   useEffect(() => {
     const getTrainingSource = async () => {
-      const { data } = await axios.get(`${url}/training-sources`);
+      const { data } = await axios.get(`${url}/training/sources`);
       setSource(data.items);
     };
     getTrainingSource();

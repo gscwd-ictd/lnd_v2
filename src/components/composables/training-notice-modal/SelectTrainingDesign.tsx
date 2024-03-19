@@ -25,7 +25,7 @@ export const SelectTrainingDesign: FunctionComponent = () => {
 
   useEffect(() => {
     const getTrainingDesigns = async () => {
-      const result = await axios.get(`${url}/training-designs?limit=500`);
+      const result = await axios.get(`${url}/training/designs?limit=500`);
       setTrainingDesigns(result.data.items);
     };
 

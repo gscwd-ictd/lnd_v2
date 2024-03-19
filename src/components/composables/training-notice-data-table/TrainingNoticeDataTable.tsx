@@ -111,12 +111,12 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
   return (
     <>
       <DataTable<TrainingNotice>
-        datasource={`${url}/training-details?page=1&limit=1000`}
+        datasource={`${url}/training?page=1&limit=1000`}
         queryKey={["training-notice"]}
         columns={columns}
         title="Notice of Training"
         subtitle="Training outline and other details for the upcoming training programs."
-        // onRowClick={(row) => console.log(row.original.id)}
+        onRowClick={(row) => console.log(row.original.id)}
       />
 
       <TrainingNoticeContext.Provider

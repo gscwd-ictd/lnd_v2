@@ -16,6 +16,7 @@ export const OrganizationDataTable: FunctionComponent = () => {
         <SlideOver.Title>Title</SlideOver.Title>
         <SlideOver.Body>{allLsp && JSON.stringify(allLsp)}</SlideOver.Body>
       </SlideOver> */}
+
       <DataTable
         title="Learning Service Providers"
         subtitle="Select any of the learning service providers below to view details."

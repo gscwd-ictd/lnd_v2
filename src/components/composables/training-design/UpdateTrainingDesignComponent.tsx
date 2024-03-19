@@ -99,7 +99,7 @@ export const UpdateTrainingDesignComponent: FunctionComponent = () => {
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.patch(`${url}/training-designs/${params.id}`, {
+      const response = await axios.patch(`${url}/training/designs/${params.id}`, {
         courseTitle,
         rationale,
         courseDescription,
@@ -114,11 +114,11 @@ export const UpdateTrainingDesignComponent: FunctionComponent = () => {
     },
   });
 
-  // all lsp query
+  // all training design query
   useQuery({
     queryKey: ["training-design", params.id],
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/training-designs/${params.id}`);
+      const { data } = await axios.get(`${url}/training/designs/${params.id}`);
 
       setId(data.id);
       setCourseTitle(data.courseTitle);

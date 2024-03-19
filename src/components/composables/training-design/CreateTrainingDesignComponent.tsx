@@ -81,7 +81,7 @@ export const CreateTrainingDesignComponent: FunctionComponent = () => {
   const tdDataTableMutation = useMutation({
     onSuccess: (data) => {
       push(`/trainings/design`);
-      queryClient.setQueryData(["training_design"], (oldData: any) => {
+      queryClient.setQueryData(["training-design"], (oldData: any) => {
         const newData = [...oldData];
         newData.push(data);
         return newData;
@@ -89,7 +89,7 @@ export const CreateTrainingDesignComponent: FunctionComponent = () => {
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.post(`${url}/training-designs`, {
+      const response = await axios.post(`${url}/training/designs`, {
         courseTitle,
         rationale,
         courseDescription,

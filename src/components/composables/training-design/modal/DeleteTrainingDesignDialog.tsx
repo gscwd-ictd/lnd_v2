@@ -28,7 +28,7 @@ export const DeleteTrainingDesignDialog: FunctionComponent<DeleteLspIndividualAl
   const deleteLspMutation = useMutation({
     onSuccess: (data) => {
       queryClient.refetchQueries({
-        queryKey: ["training_designs"],
+        queryKey: ["training-designs"],
         type: "all",
         exact: true,
         stale: true,
@@ -39,7 +39,7 @@ export const DeleteTrainingDesignDialog: FunctionComponent<DeleteLspIndividualAl
     },
     onError: (error) => console.log(error),
     mutationFn: async () => {
-      const response = await axios.delete(`${url}/training-designs/${id}`);
+      const response = await axios.delete(`${url}/training/designs/${id}`);
 
       return response.data;
     },

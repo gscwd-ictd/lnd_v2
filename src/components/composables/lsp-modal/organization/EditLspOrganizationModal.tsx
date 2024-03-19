@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
+import defaultPhoto from "../../../../../public/images/placeholders/user-placeholder-gray.png";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
@@ -20,6 +20,8 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspOrganizationModalBody } from "./LspOrganizationModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
+import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWithAppwriteUpload";
+import { EditUploadPhotoAlert } from "../individual/EditUploadPhotoAlert";
 
 type EditLspOrganizationModalProps = {
   edit: boolean;
@@ -75,6 +77,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     setEducation,
     setExperience,
     setId,
+    setPhotoId,
     setProjects,
     setCoaching,
     setAffiliations,
@@ -153,29 +156,27 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/lsp/${id}`)) as any;
-        if (!isEmpty(data)) {
-          // setLspDetails(data);
-          setLspSource(LspSource.EXTERNAL);
-          setContactNumber(data.contactNumber);
-          setExperience(data.experience);
-          setEducation(!isEmpty(data.education) ? data.education : []);
-          setExpertise(!isEmpty(data.expertise) ? data.expertise : []);
-          setTrainings(data.trainings);
-          setCertifications(data.certifications);
-          setCoaching(data.coaching);
-          setAffiliations(data.affiliations);
-          setAwards(data.awards);
-          setFirstName(data.firstName);
-          setMiddleName(data.middleName);
-          setLastName(data.lastName);
-          setExtensionName(data.extensionName);
-          setName(data.name);
-          setEmail(data.email);
-          setIntroduction(data.introduction);
-          setPhotoUrl(data.photoUrl);
-          setPostalAddress(data.postalAddress);
-          setTin(data.tin);
-        }
+        setLspSource(LspSource.EXTERNAL);
+        setContactNumber(data.contactNumber);
+        setExperience(data.experience);
+        setEducation(!isEmpty(data.education) ? data.education : []);
+        setExpertise(!isEmpty(data.expertise) ? data.expertise : []);
+        setTrainings(data.trainings);
+        setCertifications(data.certifications);
+        setCoaching(data.coaching);
+        setAffiliations(data.affiliations);
+        setAwards(data.awards);
+        setFirstName(data.firstName);
+        setMiddleName(data.middleName);
+        setLastName(data.lastName);
+        setExtensionName(data.extensionName);
+        setName(data.name);
+        setEmail(data.email);
+        setIntroduction(data.introduction);
+        setPhotoId(data.photoId);
+        setPhotoUrl(data.photoUrl);
+        setPostalAddress(data.postalAddress);
+        setTin(data.tin);
 
         return data;
       } catch (error) {
@@ -190,7 +191,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
   });
 
   const lspDataTableMutation = useMutation({
-    onSuccess: (data, variable) => {
+    onSuccess: () => {
       setEdit(false);
       setToastOptions("success", "Success", "Successfully Updated");
 
@@ -247,10 +248,11 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         <ModalContent>
           <ModalContent.Title>
             <div className="px-2">
-              <Avatar
+              {/* <Avatar
                 source="https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1224.jpg"
                 size="xl"
-              />
+              /> */}
+              <AvatarWithAppwriteUpload source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
             </div>
             <header className="px-2 mt-1">
               <p className="text-xs font-medium text-indigo-500">{page} of 9</p>
@@ -315,7 +317,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
             <div className="px-2 py-3">
               <div className="flex items-center justify-end w-full gap-2">
                 <Button size="small" variant="white" onClick={onPrevious}>
-                  {page === 1 ? "Cancel" : "Previous"}
+                  {page === 1 ? "Close" : "Previous"}
                 </Button>
 
                 {page === 1 && (
@@ -364,6 +366,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
+      <EditUploadPhotoAlert />
       <Toast
         duration={2000}
         open={toastIsOpen}

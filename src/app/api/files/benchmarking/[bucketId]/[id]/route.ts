@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest, { params }: Param) {
 
     client
       .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_BENCHMARKING!)
       .setKey(process.env.NEXT_PUBLIC_APPWRITE_BENCHMARKING_SECRET_KEY!);
 
     const data = await storage.deleteFile(params.bucketId, params.fileId);

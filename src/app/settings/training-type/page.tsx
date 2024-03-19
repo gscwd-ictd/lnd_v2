@@ -2,6 +2,7 @@ import { TrainingTypeDataTable } from "@lms/components/composables/training-type
 import { AddTrainingTypeModal } from "../../../components/composables/training-type-modal/AddTrainingTypeModal";
 import { TrainingType } from "../../../utilities/types/training-type.type";
 import Link from "next/link";
+import { BreadCrumbs } from "@lms/components/osprey/ui/breadcrumbs/view/BreadCrumbs";
 
 // export const getData = async () => {
 //   const { data } = await axios.get(`${process.env.NEXT_PUBLIC_DOMAIN_SERVER}/training-types`);
@@ -14,17 +15,16 @@ export default function TrainingType() {
   return (
     <>
       <div className="p-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex justify-between items-center py-2.5 text-sm">
           <AddTrainingTypeModal />
-          <div>
-            <ul className="flex items-center gap-1 text-sm">
-              <Link href="/trainings/on-going" className="text-gray-700">
-                Settings /
-              </Link>
-              <li className="text-gray-500">Training Type</li>
-            </ul>
-          </div>
+          <BreadCrumbs
+            crumbs={[
+              { layerText: "Settings", path: "" },
+              { layerText: "Training Type", path: "" },
+            ]}
+          />
         </div>
+
         <TrainingTypeDataTable />
       </div>
     </>

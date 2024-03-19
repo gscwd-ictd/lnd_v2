@@ -1,6 +1,7 @@
 import { isEmpty } from "lodash";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { BucketFile } from "./training-notice-store";
 
 export enum LspSource {
   INTERNAL = "internal",
@@ -139,6 +140,8 @@ export enum LspType {
 export type LspModalStore = {
   page: number;
   setPage: (page: number) => void;
+  uploadAlertIsOpen: boolean;
+  setUploadAlertIsOpen: (uploadAlertIsOpen: boolean) => void;
 };
 
 export type EmployeeSearch = {
@@ -151,7 +154,7 @@ export type LspDetailsStore = {
   lspAction: "create" | "update" | undefined;
   id: null | string | undefined;
   employeeId: null | string | undefined;
-  photoUrl: string;
+  photoUrl: string | null;
   name: string;
   organizationName: string;
   firstName: string;
@@ -183,7 +186,7 @@ export type LspDetailsStore = {
   setLspAction: (lspAction: "create" | "update" | undefined) => void;
   setId: (id: null | string) => void;
   setEmployeeId: (employeeId: null | string) => void;
-  setPhotoUrl: (photoUrl: string) => void;
+  setPhotoUrl: (photoUrl: string | null) => void;
   setName: (name: string) => void;
   setOrganizationName: (organizationName: string) => void;
   setFirstName: (firstName: string) => void;
@@ -203,6 +206,14 @@ export type LspDetailsStore = {
   setAffiliations: (affiliations: LspAffiliation[]) => void;
   setAwards: (awards: LspAward[]) => void;
   setCertifications: (certifications: LspCertification[]) => void;
+  photoToUpload: File | null;
+  setPhotoToUpload: (uploadedPhoto: File | null) => void;
+  photoToUploadUrl: string | null;
+  setPhotoToUploadUrl: (photoToUploadUrl: string | null) => void;
+  photo: BucketFile | null;
+  setPhoto: (photo: BucketFile | null) => void;
+  photoId: string | null;
+  setPhotoId: (photoId: string | null) => void;
   reset: () => void;
 };
 
@@ -234,7 +245,15 @@ export const useLspDetailsStore = create<LspDetailsStore>()(
     certifications: [],
     prefixName: "",
     suffixName: "",
+    photo: null,
     sex: undefined,
+    photoToUpload: null,
+    photoToUploadUrl: null,
+    photoId: null,
+    setPhotoId: (photoId) => set({ photoId }),
+    setPhotoToUploadUrl: (photoToUploadUrl) => set({ photoToUploadUrl }),
+    setPhoto: (photo) => set({ photo }),
+    setPhotoToUpload: (photoToUpload) => set({ photoToUpload }),
     setSex: (sex) => set({ sex }),
     setTin: (tin: string) => set({ tin }),
     setPrefixName: (prefixName: string) => set({ prefixName }),
@@ -305,7 +324,7 @@ export const useLspDetailsStore = create<LspDetailsStore>()(
         prefixName: "",
         suffixName: "",
         employeeId: null,
-        photoUrl: "",
+        photoUrl: null,
         organizationName: "",
         firstName: "",
         middleName: "",
@@ -325,6 +344,9 @@ export const useLspDetailsStore = create<LspDetailsStore>()(
         affiliations: [],
         awards: [],
         certifications: [],
+        photoToUpload: null,
+        photoToUploadUrl: null,
+        photo: null,
       }),
   }))
 );
@@ -349,11 +371,15 @@ export const useLspSourceStore = create<LspSourceStore>((set) => ({
 export const useAddLspModalStore = create<LspModalStore>((set) => ({
   page: 1,
   setPage: (page) => set({ page }),
+  uploadAlertIsOpen: false,
+  setUploadAlertIsOpen: (uploadAlertIsOpen) => set({ uploadAlertIsOpen }),
 }));
 
 export const useEditLspModalStore = create<LspModalStore>((set) => ({
   page: 2,
   setPage: (page) => set({ page }),
+  uploadAlertIsOpen: false,
+  setUploadAlertIsOpen: (uploadAlertIsOpen) => set({ uploadAlertIsOpen }),
 }));
 
 export const useEmployeeSearchStore = create<EmployeeSearchStore>((set) => ({

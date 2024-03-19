@@ -65,6 +65,7 @@ export const TrainingNoticeSummary: FunctionComponent = () => {
           />
         </svg>
         {selectedTrainingSource.name === "Internal" ? <>{selectedTrainingDesign.courseTitle}</> : courseTitle}
+        {/* {courseTitle} */}
       </div>
 
       <div className="flex flex-col items-start justify-center gap-1">

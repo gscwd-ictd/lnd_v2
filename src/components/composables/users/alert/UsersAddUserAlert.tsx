@@ -27,7 +27,7 @@ export const UsersAddUserAlert: FunctionComponent = () => {
   const confirmToSubmit = useMutation({
     onSuccess: async () => {
       // fetch the fresh list of users in lnd
-      const getUpdatedLndUsers = await axios.get(`${url}/hrms/lnd`);
+      const getUpdatedLndUsers = await axios.get(`${url}/hrms/lnd/users`);
 
       // apply the list of users of lnd in the data table
       queryClient.setQueryData(["users"], getUpdatedLndUsers.data.items);
@@ -44,7 +44,7 @@ export const UsersAddUserAlert: FunctionComponent = () => {
       setAddModalIsOpen(false);
     },
     mutationFn: async () => {
-      const request = axios.post(`${url}/hrms/lnd`, { employeeId: id });
+      const request = axios.post(`${url}/hrms/lnd/users`, { employeeId: id });
       return request;
     },
     onError: async () => {

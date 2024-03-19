@@ -78,6 +78,7 @@ export const EditInternalCourseOutline: FunctionComponent = () => {
   const addCourseContentBtnRef = useRef(null) as unknown as MutableRefObject<HTMLButtonElement>;
 
   const {
+    courseTitle,
     facilitators,
     courseContent,
     selectedTrainingDesign,
@@ -89,11 +90,11 @@ export const EditInternalCourseOutline: FunctionComponent = () => {
     setFacilitators,
     setHasSelectedFacilitators,
   } = useTrainingNoticeStore((state) => ({
+    courseTitle: state.courseTitle,
     selectedFacilitators: state.selectedFacilitators,
     setSelectedFacilitators: state.setSelectedFacilitators,
     setFacilitators: state.setFacilitators,
     hasSelectedFacilitators: state.hasSelectedFacilitators,
-    courseTitle: state.courseTitle,
     selectedTrainingDesign: state.selectedTrainingDesign,
     facilitators: state.facilitators,
     courseContent: state.courseContent,

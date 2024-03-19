@@ -7,7 +7,6 @@ import { User } from "@lms/lib/types/users";
 import { useUsersDataTable } from "./hook/use-users-data-table";
 import { useUsersStore } from "@lms/utilities/stores/users-store";
 import { UsersAddUserAlert } from "@lms/components/composables/users/alert/UsersAddUserAlert";
-import { AddNewUsersModal } from "@lms/components/composables/users/modal/AddNewUsersModal";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { UsersToastComponent } from "@lms/components/composables/users/toast/ToastComponent";
 import { UsersRemoveUserAlert } from "@lms/components/composables/users/alert/UsersRemoveUserAlert";
@@ -46,14 +45,11 @@ export const UsersDataTable: FunctionComponent = () => {
           setToastType,
         }}
       >
-        <div className="pb-3">
-          <AddNewUsersModal />
-        </div>
         <DataTable<User>
           title="Users"
           subtitle="List of users"
           columns={columns}
-          datasource={`${url}/hrms/lnd`}
+          datasource={`${url}/hrms/lnd/users`}
           queryKey={["users"]}
         />
         <UsersRemoveUserAlert />

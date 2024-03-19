@@ -268,84 +268,84 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
   const {
     data: trainingNotice,
     isLoading: isLoadingTrainingNotice,
+    isError: isErrorTrainingNotice,
     refetch,
   } = useQuery({
     queryKey: ["training-details", trainingNoticeId],
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
+        const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
+        console.log(data);
         // INTERNAL
-        if (!isEmpty(data)) {
-          setCourseContent(data.courseContent);
-          setTrainingRequirements(data.trainingRequirements);
-          if (data.source.name === "Internal") {
-            setSelectedTrainingSource({ id: data.source.id, name: "Internal" });
-            //setSelectedTrainingSource(data.trainingSource); //TODO Uncomment this and remove line 262 code
-            setSelectedTrainingDesign({
-              courseTitle: data.trainingDesign.courseTitle,
-              id: data.trainingDesign.id,
-            });
-            setHasFetchedRecommendations(false);
-            // setSlotDistribution(data.slotDistribution);
-            setPreviousSlotDistribution(data.slotDistribution);
-            setSelectedFacilitators(data.trainingLspDetails);
-            setSelectedTags(data.trainingTags);
-            setDeadlineForSubmission(data.deadlineForSubmission);
-            setInvitationUrl!(data.invitationUrl);
-            setLocation(data.location);
-            setNomineeQualifications(data.nomineeQualifications);
-            setNumberOfHours(data.numberOfHours);
-            setNumberOfParticipants(data.numberOfParticipants);
-            setTrainingStatus(data.status);
-            setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
-            setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
-            setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
-            // setCourseTitle(data.)
-            setInitialTrainingRequirements([
-              { document: "Certificate of Appearance", isSelected: false },
-              { document: "Certificate of Training", isSelected: false },
-              { document: "Course Evaluation Report", isSelected: false },
-              { document: "Course Materials", isSelected: false },
-              { document: "Learning Application Plan", isSelected: false },
-              { document: "Post Training Report", isSelected: false },
-              { document: "Post-test", isSelected: false },
-              { document: "Pre-test", isSelected: false },
-              { document: "Program", isSelected: false },
-            ]);
-          }
+        setCourseContent(data.courseContent);
+        setTrainingRequirements(data.trainingRequirements);
+        if (data.source.name === "Internal") {
+          setSelectedTrainingSource({ id: data.source.id, name: "Internal" });
+          //setSelectedTrainingSource(data.trainingSource); //TODO Uncomment this and remove line 262 code
+          setSelectedTrainingDesign({
+            courseTitle: data.trainingDesign.courseTitle,
+            id: data.trainingDesign.id,
+          });
+          setHasFetchedRecommendations(false);
+          // setSlotDistribution(data.slotDistribution);
+          setPreviousSlotDistribution(data.slotDistribution);
+          setSelectedFacilitators(data.trainingLspDetails);
+          setSelectedTags(data.trainingTags);
+          setDeadlineForSubmission(data.deadlineForSubmission);
+          setInvitationUrl!(data.invitationUrl);
+          setLocation(data.location);
+          setNomineeQualifications(data.nomineeQualifications);
+          setNumberOfHours(data.numberOfHours);
+          setNumberOfParticipants(data.numberOfParticipants);
+          setTrainingStatus(data.status);
+          setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
+          setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
+          setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
+          // setCourseTitle(data.courseTitle);
+          setInitialTrainingRequirements([
+            { document: "Certificate of Appearance", isSelected: false },
+            { document: "Certificate of Training", isSelected: false },
+            { document: "Course Evaluation Report", isSelected: false },
+            { document: "Course Materials", isSelected: false },
+            { document: "Learning Application Plan", isSelected: false },
+            { document: "Post Training Report", isSelected: false },
+            { document: "Post-test", isSelected: false },
+            { document: "Pre-test", isSelected: false },
+            { document: "Program", isSelected: false },
+          ]);
+        }
 
-          // EXTERNAL
-          else if (data.source.name === "External") {
-            setSelectedTrainingSource({ id: data.source.id, name: "External" });
-            // getBucketFiles(trainingNoticeId!);
-            setDeadlineForSubmission(data.deadlineForSubmission);
-            setInvitationUrl!(data.invitationUrl);
-            setLocation(data.location);
-            setNomineeQualifications(data.nomineeQualifications);
-            setNumberOfHours(data.numberOfHours);
-            setCourseTitle(data.courseTitle);
-            setInitialCourseTitle(data.courseTitle);
-            setNumberOfParticipants(data.numberOfParticipants);
-            setTrainingStatus(data.status);
-            setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
-            setSlotDistribution(data.slotDistribution);
-            setSelectedTags(data.trainingTags);
-            setSelectedFacilitators(data.trainingLspDetails);
-            setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
-            setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
+        // EXTERNAL
+        else if (data.source.name === "External") {
+          setSelectedTrainingSource({ id: data.source.id, name: "External" });
+          // getBucketFiles(trainingNoticeId!);
+          setDeadlineForSubmission(data.deadlineForSubmission);
+          setInvitationUrl!(data.invitationUrl);
+          setLocation(data.location);
+          setNomineeQualifications(data.nomineeQualifications);
+          setNumberOfHours(data.numberOfHours);
+          setCourseTitle(data.courseTitle);
+          setInitialCourseTitle(data.courseTitle);
+          setNumberOfParticipants(data.numberOfParticipants);
+          setTrainingStatus(data.status);
+          setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
+          setSlotDistribution(data.slotDistribution);
+          setSelectedTags(data.trainingTags);
+          setSelectedFacilitators(data.trainingLspDetails);
+          setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
+          setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
 
-            setInitialTrainingRequirements([
-              { document: "Certificate of Appearance", isSelected: false },
-              { document: "Certificate of Training", isSelected: false },
-              { document: "Course Evaluation Report", isSelected: false },
-              { document: "Course Materials", isSelected: false },
-              { document: "Learning Application Plan", isSelected: false },
-              { document: "Post Training Report", isSelected: false },
-              { document: "Post-test", isSelected: false },
-              { document: "Pre-test", isSelected: false },
-              { document: "Program", isSelected: false },
-            ]);
-          }
+          setInitialTrainingRequirements([
+            { document: "Certificate of Appearance", isSelected: false },
+            { document: "Certificate of Training", isSelected: false },
+            { document: "Course Evaluation Report", isSelected: false },
+            { document: "Course Materials", isSelected: false },
+            { document: "Learning Application Plan", isSelected: false },
+            { document: "Post Training Report", isSelected: false },
+            { document: "Post-test", isSelected: false },
+            { document: "Pre-test", isSelected: false },
+            { document: "Program", isSelected: false },
+          ]);
         }
 
         return data;
@@ -472,7 +472,13 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
-            {isLoadingTrainingNotice ? <>Loading resources...</> : <TrainingNoticeModalBody />}
+            {isLoadingTrainingNotice ? (
+              <>Loading resources...</>
+            ) : isErrorTrainingNotice ? (
+              <>Error</>
+            ) : !isLoadingTrainingNotice && !isErrorTrainingNotice ? (
+              <TrainingNoticeModalBody />
+            ) : null}
           </ModalContent.Body>
 
           <ModalContent.Footer>

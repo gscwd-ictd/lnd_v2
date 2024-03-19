@@ -25,7 +25,7 @@ export const ChooseLspSource: FunctionComponent = () => {
       <div className="mt-5 mb-3">
         <RadioGroup.Label as="div">
           <h3>Learning Service Provider Source</h3>
-          <p className="text-xs text-gray-500">Choose the LSP source from the options below</p>
+          <div className="text-xs text-gray-500">Choose the LSP source from the options below</div>
         </RadioGroup.Label>
       </div>
 
@@ -45,7 +45,7 @@ export const ChooseLspSource: FunctionComponent = () => {
                 reset();
               }}
             >
-              <p>Internal</p>
+              <div>Internal</div>
               {checked && (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                   <path
@@ -75,7 +75,7 @@ export const ChooseLspSource: FunctionComponent = () => {
                 reset();
               }}
             >
-              <p>External</p>
+              <div>External</div>
               {checked && (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                   <path
