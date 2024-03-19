@@ -61,7 +61,7 @@ export const AddRecommendations: FunctionComponent = () => {
       const selectedTagIds = selectedTags.map((tag) => {
         return tag.id;
       });
-      const { data } = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
+      const { data } = await axios.post(`${url}/hrms/employees/tags/q`, selectedTagIds);
       data.map((slot: Recommendation) => {
         slot.numberOfSlots = 0;
         return slot;

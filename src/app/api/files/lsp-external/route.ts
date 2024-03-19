@@ -10,7 +10,7 @@ type MyError = Omit<AxiosResponse, "data"> & {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { filesToUpload, bucketId } = body;
+  const { fileToUpload, bucketId } = body;
 
   try {
     const client = new sdk.Client();
@@ -22,16 +22,15 @@ export async function POST(request: NextRequest) {
       .setKey(process.env.NEXT_PUBLIC_APPWRITE_LSP_EXTERNAL_SECRET_KEY!);
 
     // map all files to upload as we call the storage.createFile function to save it in appwrite
-    const files = await Promise.all(
-      filesToUpload.map(async (file: File) => {
-        const result = await storage.createFile(bucketId, uuidv4(), file);
-      })
-    );
+    console.log("Bucket ID: ", bucketId);
+    console.log("File to Upload: ", fileToUpload);
 
-    return NextResponse.json(files);
+    const uploadedFile = await storage.createFile(bucketId, "5d13ee6a-4e02-4380-bd0f-a3627825261e", fileToUpload);
+
+    return NextResponse.json(uploadedFile);
   } catch (error) {
     const myError = error as MyError;
     console.log(error);
-    return NextResponse.json({ error: { ...myError, step: 3 } }, { status: 400 });
+    return NextResponse.json({ error: { ...myError, step: 3, error } }, { status: 400 });
   }
 }

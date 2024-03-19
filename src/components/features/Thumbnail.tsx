@@ -147,7 +147,10 @@ export const FileThumbnail: FunctionComponent<FileThumbnailProps> = ({ mimeType,
         </svg>
       )}
 
-      {(mimeType === MimeTypes.PNG || mimeType === MimeTypes.JPEG) && (
+      {(mimeType === MimeTypes.PNG ||
+        mimeType === MimeTypes.JPEG ||
+        mimeType === MimeTypes.JPG ||
+        mimeType === MimeTypes.WEBP) && (
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32" className="w-full h-full">
           <path fill="#2dcc9f" d="M30 5.851v20.298H2V5.851h28" />
           <path

@@ -6,6 +6,7 @@ import DefaultImage from "../../../../../../../public/images/placeholders/employ
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import superUserAdminPhoto from "../../../../../../../public/images/placeholders/superuseradmin.png";
 
 export const Topbar: FunctionComponent = () => {
   const [openMenu, setOpenMenu] = useState<boolean>(false);
@@ -38,7 +39,17 @@ export const Topbar: FunctionComponent = () => {
       </li> */}
 
       <li role="button">
-        <Avatar size="sm" source={session?.photoUrl || DefaultImage.src} alt="avtar" />
+        <Avatar
+          size="sm"
+          source={
+            session?.photoUrl
+              ? session?.photoUrl
+              : session?.isSuperUser === true
+              ? superUserAdminPhoto.src
+              : DefaultImage.src
+          }
+          alt="avtar"
+        />
       </li>
 
       <li role="button">
@@ -46,7 +57,7 @@ export const Topbar: FunctionComponent = () => {
         <DropdownMenu.Root open={openMenu} onOpenChange={setOpenMenu}>
           <DropdownMenu.Trigger asChild>
             <div className="flex items-center gap-2 px-3 py-2 text-xs  text-slate-600">
-              {session?.isSuperUser === true ? session?.username : session?.email}
+              {session?.isSuperUser === true ? (session?.username).toLowerCase() : session?.email}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M6.34317 7.75732L4.92896 9.17154L12 16.2426L19.0711 9.17157L17.6569 7.75735L12 13.4142L6.34317 7.75732Z"

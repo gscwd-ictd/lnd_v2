@@ -54,7 +54,7 @@ export const ViewDocumentModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training/${id}`, { withCredentials: true })) as any;
         if (!isEmpty(data)) {
           setNumberOfParticipants(data.numberOfParticipants);
           setCourseTitle(data.courseTitle);
@@ -772,7 +772,7 @@ export const ViewDocumentModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
+        const { data } = await axios.get(`${url}/training-nominees/${id}/batch`);
 
         const fetchedBatches = data.map((batch: Batch) => {
           return {

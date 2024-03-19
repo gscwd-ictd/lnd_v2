@@ -11,7 +11,11 @@ import { Card } from "@lms/components/osprey/ui/card/view/Card";
 export default function DashboardInsights() {
   return (
     <div className="w-full p-2 sm:px-0 md:px-0">
-      <div className="p-5"></div>
+      <div className="p-5">
+        <div className="flex justify-end items-center  text-sm">
+          <BreadCrumbs crumbs={[{ layerText: "Dashboard", path: "" }]} />
+        </div>
+      </div>
       <div className="gap-4 lg:flex lg:flex-row md:flex md:flex-col sm:flex sm:flex-col p-6">
         <section className="sm:w-full md:w-full lg:w-[30%] flex flex-col gap-4">
           <CardEmployee />

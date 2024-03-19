@@ -80,7 +80,7 @@ export const HistoryDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training/${id}`)) as any;
         if (!isEmpty(data)) {
           if (data.source.name === "Internal") {
             setId(data.id);
@@ -195,7 +195,8 @@ export const HistoryDataTable: FunctionComponent = () => {
       >
         <DataTable<TrainingNotice>
           // datasource={`${url}/training-details/recents`}
-          datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/default-table`}
+          datasource={`${url}/training/history`}
+          // datasource={`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/default-table`}
           queryKey={["history-trainings"]}
           columns={columns}
           title="Trainings History"

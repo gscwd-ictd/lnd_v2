@@ -40,7 +40,7 @@ export const PrintTrainingDesign = () => {
   useQuery({
     queryKey: ["training-design", id],
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/training-designs/${id}`);
+      const { data } = await axios.get(`${url}/training/designs/${id}`);
 
       setTrainingDesignId(data.id);
       setCourseTitle(data.courseTitle);

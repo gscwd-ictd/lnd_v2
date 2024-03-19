@@ -41,23 +41,23 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// get bucket files by id
-export async function GET(request: NextRequest) {
-  const id = request.nextUrl.searchParams.get("id")!;
+// get bucket files by bucket id
+// export async function GET(request: NextRequest) {
+//   const id = request.nextUrl.searchParams.get("id")!;
 
-  try {
-    const client = new sdk.Client();
-    const storage = new sdk.Storage(client);
+//   try {
+//     const client = new sdk.Client();
+//     const storage = new sdk.Storage(client);
 
-    client
-      .setEndpoint(appwriteUrl!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!)
-      .setKey(process.env.NEXT_PUBLIC_APPWRITE_LND_SECRET_KEY!);
+//     client
+//       .setEndpoint(appwriteUrl!)
+//       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!)
+//       .setKey(process.env.NEXT_PUBLIC_APPWRITE_LND_SECRET_KEY!);
 
-    const data = await storage.listFiles(id);
+//     const data = await storage.listFiles(id);
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     return NextResponse.json(data);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

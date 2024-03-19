@@ -2,7 +2,7 @@ import cls from "classnames";
 
 export const styles = {
   avatar: (
-    size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl",
+    size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl" | "10xl",
     roundedness?: "sm" | "md" | "lg" | "xl" | "full"
   ) =>
     cls("inline-block border-2 border-white static", {
@@ -15,6 +15,10 @@ export const styles = {
       "h-[6.575rem] w-[6.575rem]": size === "4xl",
       "h-[6.875rem] w-[6.875rem]": size === "5xl",
       "h-[7rem] w-[7rem]": size === "6xl",
+      "h-[8rem] w-[8rem]": size === "7xl",
+      "h-[9rem] w-[9rem]": size === "8xl",
+      "h-[10rem] w-[10rem]": size === "9xl",
+      "h-[11rem] w-[11rem]": size === "10xl",
       "rounded-sm": roundedness === "sm",
       "rounded-md": roundedness === "md",
       "rounded-lg": roundedness === "lg",

@@ -35,7 +35,7 @@ export const AddNewUsersModal: FunctionComponent = () => {
     queryKey: ["assignable-users"],
     enabled: addModalIsOpen !== false,
     queryFn: async () => {
-      const result = await axios.get(`${url}/hrms/lnd/assignable`);
+      const result = await axios.get(`${url}/hrms/lnd/users/assignable`);
 
       setUsers(result.data);
       return result;

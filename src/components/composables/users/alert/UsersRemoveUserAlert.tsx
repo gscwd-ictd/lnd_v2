@@ -22,7 +22,7 @@ export const UsersRemoveUserAlert: FunctionComponent = () => {
   const confirmToSubmit = useMutation({
     onSuccess: async () => {
       // fetch the fresh list of users in lnd
-      const getUpdatedLndUsers = await axios.get(`${url}/hrms/lnd`);
+      const getUpdatedLndUsers = await axios.get(`${url}/hrms/lnd/users`);
 
       // apply the list of users of lnd in the data table
       queryClient.setQueryData(["users"], getUpdatedLndUsers.data.items);
@@ -34,8 +34,8 @@ export const UsersRemoveUserAlert: FunctionComponent = () => {
       setConfirmRemoveIsOpen(false);
     },
     mutationFn: async () => {
-      const request = axios.delete(`${url}/hrms/lnd/${id}`);
-      console.log(id);
+      const request = axios.delete(`${url}/hrms/lnd/users/${id}`);
+
       return request;
     },
     onError: async () => {

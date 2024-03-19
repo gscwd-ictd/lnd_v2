@@ -51,48 +51,31 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
+  const page = useAddLspModalStore((state) => state.page);
+  const sex = useLspDetailsStore((state) => state.sex);
+
   const tin = useLspDetailsStore((state) => state.tin);
-
+  const experience = useLspDetailsStore((state) => state.experience);
+  const intro = useLspDetailsStore((state) => state.introduction);
   const setTin = useLspDetailsStore((state) => state.setTin);
-
-  const setLspEmployeeId = useLspDetailsStore((state) => state.setEmployeeId);
-
+  const setSex = useLspDetailsStore((state) => state.setSex);
+  const setPage = useAddLspModalStore((state) => state.setPage);
   const setName = useLspDetailsStore((state) => state.setName);
-
+  const setEmail = useLspDetailsStore((state) => state.setEmail);
+  const setIntro = useLspDetailsStore((state) => state.setIntroduction);
   //const fname = useLspDetailsStore((state) => state.firstName);
   const setFname = useLspDetailsStore((state) => state.setFirstName);
-
   //const mname = useLspDetailsStore((state) => state.middleName);
   const setMname = useLspDetailsStore((state) => state.setMiddleName);
-
   const setLname = useLspDetailsStore((state) => state.setLastName);
-
-  const experience = useLspDetailsStore((state) => state.experience);
-
-  const setExperience = useLspDetailsStore((state) => state.setExperience);
-
-  const intro = useLspDetailsStore((state) => state.introduction);
-
-  const setIntro = useLspDetailsStore((state) => state.setIntroduction);
-
-  const setContactNumber = useLspDetailsStore((state) => state.setContactNumber);
-
-  const setEmail = useLspDetailsStore((state) => state.setEmail);
-
-  const setPostalAddress = useLspDetailsStore((state) => state.setPostalAddress);
-
-  const setEducation = useLspDetailsStore((state) => state.setEducation);
-
   const setAwards = useLspDetailsStore((state) => state.setAwards);
-
+  const setPhotoUrl = useLspDetailsStore((state) => state.setPhotoUrl);
+  const setEducation = useLspDetailsStore((state) => state.setEducation);
+  const setExperience = useLspDetailsStore((state) => state.setExperience);
+  const setContactNumber = useLspDetailsStore((state) => state.setContactNumber);
+  const setPostalAddress = useLspDetailsStore((state) => state.setPostalAddress);
+  const setLspEmployeeId = useLspDetailsStore((state) => state.setEmployeeId);
   const setCertifications = useLspDetailsStore((state) => state.setCertifications);
-
-  const setPage = useAddLspModalStore((state) => state.setPage);
-
-  const page = useAddLspModalStore((state) => state.page);
-
-  const sex = useLspDetailsStore((state) => state.sex);
-  const setSex = useLspDetailsStore((state) => state.setSex);
 
   const {
     searchInput,
@@ -160,8 +143,9 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
       clearErrors("employeeId");
       clearErrors("tin");
       // setLspEmployeeId(employeePds?.personalInfo._id as string);
+      setPhotoUrl(employeeData?.photoUrl ? employeeData?.photoUrl : null);
       setSex(employeeData?.sex);
-      setLspEmployeeId(employeeData.employeeId!);
+      setLspEmployeeId(employeeData?.employeeId!);
       // setFname(employeeData?.personalInfo?.firstName as string);
       // setMname(employeeData?.personalInfo?.middleName as string);
       // setLname(employeeData?.personalInfo?.lastName as string);

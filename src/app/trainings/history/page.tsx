@@ -1,19 +1,18 @@
 import { HistoryDataTable } from "@lms/components/composables/history-data-table/HistoryDataTable";
+import { BreadCrumbs } from "@lms/components/osprey/ui/breadcrumbs/view/BreadCrumbs";
 import Link from "next/link";
 
 export default async function TrainingHistory() {
   return (
     <>
       <div className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <ul className="flex items-center gap-1 text-sm">
-              <Link href="/trainings/notice" className="text-gray-700">
-                Trainings /
-              </Link>
-              <li className="text-gray-500">History</li>
-            </ul>
-          </div>
+        <div className="flex justify-end items-center py-2.5  gap-1 text-sm">
+          <BreadCrumbs
+            crumbs={[
+              { layerText: "Trainings", path: "/trainings/notice" },
+              { layerText: "History", path: "" },
+            ]}
+          />
         </div>
         <HistoryDataTable />
       </div>

@@ -86,7 +86,7 @@ export const RecentDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training/${id}`)) as any;
         if (!isEmpty(data)) {
           if (data.source.name === "Internal") {
             setId(data.id);
@@ -203,7 +203,7 @@ export const RecentDataTable: FunctionComponent = () => {
         }}
       >
         <DataTable<TrainingNotice>
-          datasource={`${url}/training-details/recents`}
+          datasource={`${url}/training/recent`}
           queryKey={["recent-trainings"]}
           columns={columns}
           title="Recent Trainings"

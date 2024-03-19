@@ -99,7 +99,9 @@ export default function EmployeeTagList() {
     queryKey: ["getTagsByEmployeeId", selectedEmployee],
     enabled: !!selectedEmployee,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`);
+      // const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`);
+      const { data } = await axios.get(`${url}/hrms/employees/${selectedEmployee?.employeeId}/tags`);
+
       setEmployeeTags(data);
       return data;
     },
@@ -109,7 +111,7 @@ export default function EmployeeTagList() {
     queryKey: ["getEmployeeByTagId", selectedTag],
     enabled: !!selectedTag,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+      const { data } = await axios.get(`${url}/hrms/employees/tags/${selectedTag?.id}`);
       var employeesFromTag: Array<Employee> = [];
 
       data.forEach((employeeAndSupervisors: any) => {
@@ -163,7 +165,7 @@ export default function EmployeeTagList() {
   const submitEmployeeTags = useMutation({
     onMutate: () => {},
     mutationFn: async (data: EmployeeTags) => {
-      const result = await axios.post(`${url}/hrms/employee-tags/`, data);
+      const result = await axios.post(`${url}/hrms/employees/tags`, data);
       return result;
     },
     onError: () => {
@@ -173,7 +175,8 @@ export default function EmployeeTagList() {
       // if active tab is employee
       if (activeTab === "employee") {
         setToastOptions("success", "Success", "You have successfully added a training tag!");
-        const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
+        // const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
+        const { data } = await axios.get(`${url}/hrms/employees/${selectedEmployee?.employeeId}/tags`);
         setEmployeeTags(data);
         setTag([]);
       }
@@ -182,7 +185,8 @@ export default function EmployeeTagList() {
       else {
         setToastOptions("success", "Success", "You have successfully an employee to the tag");
 
-        const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+        // const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
+        const { data } = await axios.get(`${url}/hrms/employees/tags/${selectedTag?.id}`);
         var employeesFromTag: Array<Employee> = [];
 
         data.forEach((test: any) => {

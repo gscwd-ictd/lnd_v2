@@ -82,7 +82,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
+        const { data } = (await axios.get(`${url}/training/${id}`, { withCredentials: true })) as any;
         if (!isEmpty(data)) {
           if (data.source.name === "Internal") {
             setId(data.id);
@@ -196,7 +196,7 @@ export const OnGoingDataTable: FunctionComponent = () => {
         }}
       >
         <DataTable<TrainingNotice>
-          datasource={`${url}/training-details/ongoing`}
+          datasource={`${url}/training/ongoing`}
           queryKey={["on-going-training"]}
           columns={columns}
           title="On-Going Trainings"

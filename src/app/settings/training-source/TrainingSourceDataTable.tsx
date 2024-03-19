@@ -18,9 +18,9 @@ export const TrainingSourceDataTable: FunctionComponent = () => {
             header: "Description ",
           },
         ]}
-        datasource={`${url}/training-sources`}
+        datasource={`${url}/training/sources`}
         queryKey={["trainingsource"]}
-        onRowClick={() => {}}
+        // onRowClick={() => {}}
       />
     </>
   );

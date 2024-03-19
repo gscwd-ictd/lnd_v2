@@ -44,52 +44,49 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
-        if (!isEmpty(data)) {
-          // setCourseContent(data.courseContent);
-          if (data.source.name === "Internal") {
-            setId(data.id);
-            setSelectedTrainingSource({ name: "Internal" });
-            setCourseTitle(data.courseTitle);
-            setCourseContent(data.courseContent);
-            setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
-            setSelectedTrainingType(getTrainingTypeFromString(data.type));
-            setSelectedFacilitators(data.trainingLspDetails);
-            setSelectedTags(data.trainingTags);
-            setSlotDistribution(data.slotDistribution);
-            setTrainingStart(data.trainingStart);
-            setTrainingEnd(data.trainingEnd);
-            setNumberOfParticipants(Number(data.numberOfParticipants));
-            setNumberOfHours(Number(data.numberOfHours));
-            setLocation(data.location);
-            setTrainingRequirements(data.trainingRequirements);
+      const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
 
-            // setInternalTrainingNotice(data);
-          } else if (data.source.name === "External") {
-            setId(data.id);
-            setSelectedTrainingSource({ name: "External" });
-            setCourseTitle(data.courseTitle);
-            setCourseContent(data.courseContent);
-            setSelectedTrainingType(getTrainingTypeFromString(data.type));
-            setSelectedFacilitators(data.trainingLspDetails);
-            setSelectedTags(data.trainingTags);
-            setSlotDistribution(data.slotDistribution);
-            setTrainingStart(data.trainingStart);
-            setTrainingEnd(data.trainingEnd);
-            setNumberOfParticipants(Number(data.numberOfParticipants));
-            setNumberOfHours(Number(data.numberOfHours));
-            setLocation(data.location);
-            setTrainingRequirements(data.trainingRequirements);
-            setBucketFiles(data.bucketFiles);
-            // setExternalTrainingNotice(data);
-          }
-        }
+      // setCourseContent(data.courseContent);
+      if (data.source.name === "Internal") {
+        console.log("INTERNAL NI");
+        setId(data.id);
+        setSelectedTrainingSource({ name: "Internal" });
+        setCourseTitle(data.courseTitle);
+        setCourseContent(data.courseContent);
+        setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
+        setSelectedTrainingType(getTrainingTypeFromString(data.type));
+        setSelectedFacilitators(data.trainingLspDetails);
+        setSelectedTags(data.trainingTags);
+        setSlotDistribution(data.slotDistribution);
+        setTrainingStart(data.trainingStart);
+        setTrainingEnd(data.trainingEnd);
+        setNumberOfParticipants(Number(data.numberOfParticipants));
+        setNumberOfHours(Number(data.numberOfHours));
+        setLocation(data.location);
+        setTrainingRequirements(data.trainingRequirements);
 
-        return data;
-      } catch (error) {
-        return error;
+        // setInternalTrainingNotice(data);
+      } else if (data.source.name === "External") {
+        console.log("EXTERNAL-+ NI");
+        setId(data.id);
+        setSelectedTrainingSource({ name: "External" });
+        setCourseTitle(data.courseTitle);
+        setCourseContent(data.courseContent);
+        setSelectedTrainingType(getTrainingTypeFromString(data.type));
+        setSelectedFacilitators(data.trainingLspDetails);
+        setSelectedTags(data.trainingTags);
+        setSlotDistribution(data.slotDistribution);
+        setTrainingStart(data.trainingStart);
+        setTrainingEnd(data.trainingEnd);
+        setNumberOfParticipants(Number(data.numberOfParticipants));
+        setNumberOfHours(Number(data.numberOfHours));
+        setLocation(data.location);
+        setTrainingRequirements(data.trainingRequirements);
+        setBucketFiles(data.bucketFiles);
+        // setExternalTrainingNotice(data);
       }
+
+      return data;
     },
     onError: () => {},
   });
@@ -134,10 +131,12 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
                   <Spinner size="large" color="blue" borderSize={4} />
                 </div>
               ) : isError ? (
-                <>Error</>
-              ) : (
+                <div className="flex h-full items-center justify-center text-gray-700">
+                  Something went wrong. Please try again later.
+                </div>
+              ) : !isError ? (
                 <SendTrainingNoticeSummary />
-              )}
+              ) : null}
             </main>
           </ModalContent.Body>
 

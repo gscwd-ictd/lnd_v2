@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useContext, useState } from "react";
 import { url } from "@lms/utilities/url/api-url";
 import { LearningServiceProvider } from "@lms/utilities/types/lsp";
 import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/SliderOver";
@@ -12,7 +12,7 @@ import { EditLspIndividualModal } from "../lsp-modal/individual/EditLspIndividua
 import { DeleteLspIndividualAlertDialog } from "../lsp-modal/individual/DeleteLspIndividualAlertDialog";
 import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
-import employeePlaceholder from "../../../../public/images/placeholders/employee-img-placeholder.jpg";
+import defaultPhoto from "../../../../public/images/placeholders/user-placeholder-gray.png";
 
 export const IndividualLspDataTable: FunctionComponent = () => {
   const { columns, edit, remove, lspId, setEdit, setRemove } = useIndividualLspDataTable();
@@ -41,10 +41,10 @@ export const IndividualLspDataTable: FunctionComponent = () => {
 
           <div className="px-10 py-2 pt-5">
             <Image
-              src={allLsp?.photoUrl ? allLsp?.photoUrl : employeePlaceholder}
+              src={allLsp?.photoUrl ? allLsp?.photoUrl : defaultPhoto.src}
               alt="employee-photo"
               height={120}
-              width={120}
+              width={150}
               // placeholder="blur"
               objectFit="cover"
               className="rounded-full"
@@ -350,12 +350,6 @@ export const IndividualLspDataTable: FunctionComponent = () => {
           setRowId(row.original.id!);
         }}
       />
-
-      {/* <Modal isOpen={edit} setIsOpen={setEdit}>
-        <ModalContent>
-          <ModalContent.Body>{JSON.stringify(firstName)}</ModalContent.Body>
-        </ModalContent>
-      </Modal> */}
       <DeleteLspIndividualAlertDialog id={lspId} remove={remove} setRemove={setRemove} />
       <EditLspIndividualModal edit={edit} id={lspId} setEdit={setEdit} />
     </>

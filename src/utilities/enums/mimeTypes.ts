@@ -8,4 +8,6 @@ export enum MimeTypes {
   XLS = "application/vnd.ms-excel",
   TXT = "text/plain",
   CSV = "application/csv",
+  JPG = "image/jpg",
+  WEBP = "image/webp",
 }

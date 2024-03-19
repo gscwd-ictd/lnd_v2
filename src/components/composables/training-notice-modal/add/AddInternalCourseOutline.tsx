@@ -130,7 +130,7 @@ export const AddInternalCourseOutline: FunctionComponent = () => {
   // TODO the union of individual and organization lsp's for fetching its details should be handled by the server.
   useEffect(() => {
     const getTrainingDesigns = async () => {
-      const result = await axios.get(`${url}/training-designs?limit=500`);
+      const result = await axios.get(`${url}/training/designs?limit=500`);
       setTrainingDesigns(result.data.items);
     };
 
