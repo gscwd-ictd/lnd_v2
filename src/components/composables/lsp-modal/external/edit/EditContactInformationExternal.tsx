@@ -79,6 +79,7 @@ export const EditContactInformationExternal: FunctionComponent = () => {
     setValue("contactNumber", number);
     setValue("emailAddress", email);
     setValue("postalAddress", address);
+    // setValue('sex')
     reset({ contactNumber: number, tin, emailAddress: email, postalAddress: address });
   }, [email, number, address, tin]);
 

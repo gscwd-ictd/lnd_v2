@@ -90,7 +90,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}`)) as any;
+        const { data } = (await axios.get(`${url}/training/${id}/nominees`)) as any;
         if (data.length > 0) {
           let tempCountEmployees = 0;
           let newAcceptedEmployees = [...acceptedEmployees];

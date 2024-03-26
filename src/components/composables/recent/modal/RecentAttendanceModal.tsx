@@ -18,7 +18,7 @@ export const RecentAttendanceModal: FunctionComponent = () => {
       const newSelectedBatchEmployees = selectedBatch.employees.map((employee) => {
         return { ...employee, isCompleteAttendance: employee.isCompleteAttendance ?? false };
       });
-      console.log("HERE");
+
       setEmployeeAttendance(newSelectedBatchEmployees ?? []);
       setTimeout(() => {
         setIsLoading(false);
@@ -28,7 +28,7 @@ export const RecentAttendanceModal: FunctionComponent = () => {
 
   const [employeeAttendance, setEmployeeAttendance] = useState<BatchEmployee[]>([]);
   return (
-    <Modal isOpen={batchAttendanceIsOpen} setIsOpen={setBatchAttendanceIsOpen} size="xl">
+    <Modal isOpen={batchAttendanceIsOpen} setIsOpen={setBatchAttendanceIsOpen} size="lg">
       <ModalContent>
         <ModalContent.Title>
           <div className="p-3">

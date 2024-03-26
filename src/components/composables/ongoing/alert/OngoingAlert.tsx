@@ -18,14 +18,18 @@ export const OngoingAlertSubmission: FunctionComponent = () => {
 
   const confirmToSubmit = useMutation({
     onSuccess: async () => {
-      const getUpdatedOngoingTrainings = await axios.get(`${url}/training-details/ongoing`);
+      const getUpdatedOngoingTrainings = await axios.get(`${url}/training/ongoing`);
       queryClient.setQueryData(["on-going-training"], getUpdatedOngoingTrainings.data.items);
       setToastOptions("success", "Success", "You have moved the training to recents.");
       setAlertSubmissionIsOpen(false);
       setSlideOverIsOpen(false);
     },
     mutationFn: async () => {
-      const request = axios.put(`${url}/training-details/requirements-submission/${id}`);
+      const request = axios.patch(
+        `${url}/training`,
+        { trainingId: id, status: "requirements submission" },
+        { withCredentials: true }
+      );
       return request;
     },
   });

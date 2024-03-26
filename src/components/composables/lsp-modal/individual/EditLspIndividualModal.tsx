@@ -51,6 +51,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     id: lspId,
     employeeId,
     firstName,
+    middleName,
     lastName,
     contactNumber,
     email,
@@ -67,6 +68,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     trainings,
     introduction,
     sex,
+    tin,
     setPhotoId,
     reset,
     setEmail,
@@ -99,6 +101,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
 
   const lspSource = useLspSourceStore((state) => state.lspSource);
   const setLspSource = useLspSourceStore((state) => state.setLspSource);
+  const employeeReset = useEmployeeSearchStore((state) => state.reset);
   const setSelectedEmployee = useEmployeeSearchStore((state) => state.setSelectedEmployee);
   const { lspType } = useLspTypeStore();
   const queryClient = useQueryClient();
@@ -110,6 +113,9 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
       setLspSource(undefined);
       setLspAction(undefined);
       reset();
+      employeeReset();
+
+      setPage(1);
     } else {
       setPage(page - 1);
     }
@@ -130,6 +136,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     setLspAction(undefined);
     reset();
     setLspSource(undefined);
+    employeeReset();
   };
 
   // per lsp query
@@ -138,11 +145,12 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp/${id}`);
-
+        console.log(data);
         if (lspSource === "internal") {
           setTin(data.tin);
           setContactNumber(data.contactNumber);
           setExperience(data.experience);
+
           setEducation(!isEmpty(data.education) ? data.education : []);
           setExpertise(!isEmpty(data.expertise) ? data.expertise : []);
           setTrainings(!isEmpty(data.trainings) ? data.trainings : []);
@@ -152,7 +160,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
           setAffiliations(!isEmpty(data.affiliations) ? data.affiliations : []);
           setAwards(!isEmpty(data.awards) ? data.awards : []);
           setIntroduction(data.introduction);
-          setEmployeeId(data.tin);
+          setEmployeeId(data.employeeId);
           setEmail(data.email);
           setPhotoUrl(data.photoUrl);
           setPostalAddress(data.postalAddress);
@@ -240,48 +248,49 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
       setToastOptions("danger", "Error", "Please try again in a few seconds");
     },
     mutationFn: async () => {
-      try {
-        const response = await axios.put(`${url}/lsp/individual/external`, {
-          //data
-          id: lspId,
-          firstName,
-          lastName,
-          contactNumber,
-          email,
-          postalAddress,
-          experience,
-          sex,
-          photoUrl,
-          expertise,
-          affiliations,
-          awards,
-          certifications,
-          coaching,
-          education,
-          projects,
-          trainings,
-          introduction,
-        });
+      const response = await axios.put(`${url}/lsp/individual/external`, {
+        //data
+        id: lspId,
+        firstName,
+        middleName,
+        lastName,
+        contactNumber,
+        email,
+        postalAddress,
+        experience,
+        sex,
+        expertise,
+        affiliations,
+        awards,
+        certifications,
+        coaching,
+        education,
+        projects,
+        trainings,
+        introduction,
+        tin,
+      });
 
-        return response.data;
-      } catch (error) {
-        return error;
-      }
+      return response.data;
     },
   });
 
   const lspDataTableMutationInternal = useMutation({
-    onSuccess: (data) => {
+    onSuccess: async () => {
       setEdit(false);
       setToastOptions("success", "Success", "Successfully Updated");
-      queryClient.refetchQueries({
-        queryKey: ["lsp-individual"],
-        type: "all",
-        exact: true,
-        stale: true,
-      });
+      employeeReset();
+      reset();
+      setPage(1);
+      // queryClient.refetchQueries({
+      //   queryKey: ["lsp-individual"],
+      //   type: "all",
+      //   exact: true,
+      //   stale: true,
+      // });
+      const getUpdatedIndividualLsp = await axios.get(`${url}/lsp/q?type=individual&page=1&limit=40`);
 
-      return data;
+      queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
     onError: () => {
       // toast here
@@ -289,24 +298,21 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
       setToastOptions("danger", "Error", "Please try again in a few seconds");
     },
     mutationFn: async () => {
-      try {
-        const response = await axios.put(`${url}/lsp/individual/internal`, {
-          //data
-          id: lspId,
-          employeeId: employeeId,
-          expertise,
-          experience,
-          introduction,
-          affiliations,
-          coaching,
-          projects,
-          trainings,
-        });
+      console.log(employeeId);
+      const response = await axios.put(`${url}/lsp/individual/internal`, {
+        //data
+        id: lspId,
+        employeeId: employeeId,
+        expertise,
+        experience,
+        introduction,
+        affiliations,
+        coaching,
+        projects,
+        trainings,
+      });
 
-        return response.data;
-      } catch (error) {
-        return error;
-      }
+      return response.data;
     },
   });
 
@@ -329,8 +335,12 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
         <ModalContent>
           <ModalContent.Title>
             <div className="px-2 flex gap-2">
-              {photoUrl ? (
+              {photoUrl && lspSource === LspSource.EXTERNAL ? (
                 <AvatarWithAppwriteUpload source={photoUrl} size="xl" />
+              ) : photoUrl && lspSource === LspSource.INTERNAL ? (
+                <Avatar source={photoUrl} size="xl" />
+              ) : photoUrl === null && lspSource === LspSource.INTERNAL ? (
+                <Avatar source={defaultPhoto.src} size="xl" />
               ) : (
                 <AvatarWithAppwriteUpload source={defaultPhoto.src} size="xl" />
               )}

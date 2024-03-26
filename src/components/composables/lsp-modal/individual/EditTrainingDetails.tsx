@@ -44,13 +44,14 @@ export const EditTrainingDetails: FunctionComponent = () => {
   const [trainingVal, setTrainingVal] = useState("");
   const [trainingIndexToEdit, setTrainingIndexToEdit] = useState(-1);
   const [trainingMutation, setTrainingMutation] = useState<TrainingMutation>({ isShowing: false, type: null });
+  const page = useEditLspModalStore((state) => state.page);
   const setPage = useEditLspModalStore((state) => state.setPage);
   const lspType = useLspTypeStore((state) => state.lspType);
 
   const trainingInputRef = useRef(null) as unknown as MutableRefObject<HTMLInputElement>;
 
   const onSubmit = () => {
-    setPage(6);
+    setPage(page + 1);
   };
 
   useEffect(() => {

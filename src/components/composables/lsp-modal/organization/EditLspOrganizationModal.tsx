@@ -191,16 +191,19 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
   });
 
   const lspDataTableMutation = useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      onClose();
       setEdit(false);
       setToastOptions("success", "Success", "Successfully Updated");
+      // queryClient.refetchQueries({
+      //   queryKey: ["lsp_organization"],
+      //   type: "all",
+      //   exact: true,
+      //   stale: true,
+      // });
+      const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp/q?type=organization&page=1&limit=40`);
 
-      queryClient.refetchQueries({
-        queryKey: ["lsp_organization"],
-        type: "all",
-        exact: true,
-        stale: true,
-      });
+      queryClient.setQueryData(["lsp-organization"], getUpdatedOrganizationLsp.data.items);
     },
     onError: () => {
       setToastOptions("danger", "Error", "Please try again in a few seconds");
@@ -213,15 +216,15 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         contactNumber,
         email,
         postalAddress,
-        photoUrl,
         tin,
         experience,
         introduction,
+
+        expertise,
         affiliations,
         awards,
         certifications,
         coaching,
-        expertise,
         trainings,
       });
 

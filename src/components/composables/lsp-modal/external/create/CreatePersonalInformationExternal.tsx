@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { Sex, useAddLspModalStore, useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
 import { isEmpty, trim } from "lodash";
-import { Fragment, FunctionComponent } from "react";
+import { Fragment, FunctionComponent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -26,6 +26,7 @@ export const CreatePersonalInformationExternal: FunctionComponent = () => {
     register,
     handleSubmit,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
@@ -62,6 +63,13 @@ export const CreatePersonalInformationExternal: FunctionComponent = () => {
   const onSubmit = () => {
     setPage(3);
   };
+
+  useEffect(() => {
+    if (!isEmpty(sex)) {
+      setValue("sex", sex!);
+      clearErrors("sex");
+    }
+  }, [sex]);
 
   return (
     <>
@@ -167,7 +175,7 @@ export const CreatePersonalInformationExternal: FunctionComponent = () => {
             </div>
 
             {/* <div className={`p-1 mb-2 border rounded ${errors.sex ? "border-red-400" : "border-inherit"}`}> */}
-            <RadioGroup.Option value={Sex} as={Fragment}>
+            <RadioGroup.Option value={sex} as={Fragment}>
               {({ checked }) => {
                 checked = sex === Sex.MALE;
                 return (
@@ -199,7 +207,7 @@ export const CreatePersonalInformationExternal: FunctionComponent = () => {
                 );
               }}
             </RadioGroup.Option>
-            <RadioGroup.Option value={Sex} as={Fragment}>
+            <RadioGroup.Option value={sex} as={Fragment}>
               {({ checked }) => {
                 checked = sex === Sex.FEMALE;
                 return (
@@ -233,6 +241,7 @@ export const CreatePersonalInformationExternal: FunctionComponent = () => {
             </RadioGroup.Option>
             {/* </div> */}
           </RadioGroup>
+          <span className="text-red-500 text-xs">{errors.sex?.message}</span>
         </div>
 
         <div>

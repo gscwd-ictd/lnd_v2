@@ -25,14 +25,18 @@ export const SetToUpcomingModal: FunctionComponent = () => {
 
   const setToUpcomingTrainingNoticeMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.put(`${url}/training-details/done/${id}`, {}, { withCredentials: true });
+      // const response = await axios.put(`${url}/training-details/done/${id}`, {}, { withCredentials: true });
+      const response = await axios.patch(`${url}/training`, {
+        trainingId: id,
+        status: "upcoming",
+      });
 
       return response.data;
     },
     onError: (error: AxiosError<{ message: string }>) =>
       setToastOptions("danger", "Error", error.response?.data.message),
     onSuccess: async (data) => {
-      const getAllTrainingNotices = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getAllTrainingNotices = await axios.get(`${url}/training?page=1&limit=1000`);
 
       queryClient.setQueryData(["training-notice"], getAllTrainingNotices.data.items);
 

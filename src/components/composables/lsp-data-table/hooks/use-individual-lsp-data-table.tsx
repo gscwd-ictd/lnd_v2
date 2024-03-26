@@ -16,6 +16,7 @@ export const useIndividualLspDataTable = () => {
   const [edit, setEdit] = useState<boolean>(false);
   const [remove, setRemove] = useState<boolean>(false);
   const [lspId, setLspId] = useState<string>("");
+  const [trainingIsOpen, setTrainingIsOpen] = useState<boolean>(false);
   const setLspType = useLspTypeStore((state) => state.setLspType);
   const setName = useLspDetailsStore((state) => state.setName);
   const { setPage } = useEditLspModalStore();
@@ -79,6 +80,8 @@ export const useIndividualLspDataTable = () => {
               className="text-gray-800 transition-colors rounded"
               onClick={(e) => {
                 setLspId(info.getValue()!);
+                setName(info.row.original.name);
+                setTrainingIsOpen(true);
                 e.stopPropagation();
               }}
             >
@@ -138,5 +141,5 @@ export const useIndividualLspDataTable = () => {
     }),
   ];
 
-  return { columns, edit, remove, lspId, setEdit, setRemove };
+  return { columns, edit, remove, lspId, setEdit, setRemove, trainingIsOpen, setTrainingIsOpen };
 };

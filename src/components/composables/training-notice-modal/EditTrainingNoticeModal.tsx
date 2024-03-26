@@ -133,7 +133,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           type: selectedTrainingType,
           courseContent,
           trainingLspDetails: selectedFacilitators.map((faci) => {
-            return { id: faci.id }; //TODO rename lspDetails to lspDetailsId
+            return { id: faci.id };
           }),
           location,
           slotDistribution: slotDistribution.map((slot) => {
@@ -281,7 +281,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         setTrainingRequirements(data.trainingRequirements);
         if (data.source.name === "Internal") {
           setSelectedTrainingSource({ id: data.source.id, name: "Internal" });
-          //setSelectedTrainingSource(data.trainingSource); //TODO Uncomment this and remove line 262 code
+          //setSelectedTrainingSource(data.trainingSource);
           setSelectedTrainingDesign({
             courseTitle: data.trainingDesign.courseTitle,
             id: data.trainingDesign.id,
@@ -303,6 +303,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
           // setCourseTitle(data.courseTitle);
           setInitialTrainingRequirements([
+            { document: "Attendance", isSelected: true },
             { document: "Certificate of Appearance", isSelected: false },
             { document: "Certificate of Training", isSelected: false },
             { document: "Course Evaluation Report", isSelected: false },
@@ -336,6 +337,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
 
           setInitialTrainingRequirements([
+            { document: "Attendance", isSelected: true },
             { document: "Certificate of Appearance", isSelected: false },
             { document: "Certificate of Training", isSelected: false },
             { document: "Course Evaluation Report", isSelected: false },

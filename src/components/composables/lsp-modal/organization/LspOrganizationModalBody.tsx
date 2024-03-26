@@ -10,13 +10,14 @@ import { EditCoachingExperience } from "../EditCoachingExperience";
 import { EditTrainingDetails } from "../individual/EditTrainingDetails";
 import { EditAffiliations } from "../EditAffiliations";
 import { EditCertificationsExternal } from "../external/EditCertificationsExternal";
+import { OrganizationSummary } from "./OrganizationSummary";
 
 export const LspOrganizationModalBody = () => {
   const page = useEditLspModalStore((state) => state.page);
 
   return (
     <>
-      <main className="px-2 space-y-2">
+      <main className="px-2 space-y-2 h-[34rem]">
         {/* PAGE 1 */}
         {page === 1 && <EditOrganizationDetails />}
         {/* PAGE 2 */}
@@ -34,7 +35,7 @@ export const LspOrganizationModalBody = () => {
         {/* PAGE 8 */}
         {page === 8 && <EditCertificationsExternal />}
         {/* PAGE 9 */}
-        {page === 9 && <LspDetailsSummary />}
+        {page === 9 && <OrganizationSummary />}
       </main>
     </>
   );

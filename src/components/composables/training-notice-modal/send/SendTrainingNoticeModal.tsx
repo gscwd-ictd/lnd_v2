@@ -65,7 +65,7 @@ export const SendTrainingNoticeModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-details/${id}`, { withCredentials: true })) as any;
+        const { data } = (await axios.get(`${url}/training/${id}`, { withCredentials: true })) as any;
         if (!isEmpty(data)) {
           // setCourseContent(data.courseContent);
           if (data.source.name === "Internal") {

@@ -62,7 +62,7 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       setConfirmCompleteModalIsOpen(false);
       setSendConfirmationModalIsOpen(false);
       setSendModalIsOpen(false);
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training?page=1&limit=1000`, {
         withCredentials: true,
       });
 
@@ -73,7 +73,7 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
     },
     mutationFn: async () => {
       const response = await axios.patch(
-        `${url}/training-notices/internal`,
+        `${url}/training/notices/internal`,
         {
           id,
           source: { id: selectedTrainingSource.id }, // updated
@@ -119,7 +119,7 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       setConfirmCompleteModalIsOpen(false);
       setSendConfirmationModalIsOpen(false);
       setSendModalIsOpen(false);
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`);
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training?page=1&limit=1000`);
 
       queryClient.setQueryData(["training-notice"], getUpdatedTrainingNotice.data.items);
     },
@@ -127,40 +127,43 @@ export const SendConfirmationTrainingModal: FunctionComponent = () => {
       setToastOptions("danger", "Error", `There is a problem with the request: ${error}`);
     },
     mutationFn: async () => {
-      const response = await axios.patch(`${url}/training-notices/external`, {
-        id,
-        source: { id: selectedTrainingSource.id },
-        // trainingDesign: selectedTrainingDesign?.id,
-        type: selectedTrainingType,
-        courseTitle,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        location,
-        bucketFiles,
-        slotDistribution: slotDistribution.map((slot) => {
-          const employees = slot.employees.map((emp) => {
-            return { employeeId: emp.employeeId };
-          });
+      const response = await axios.patch(
+        `${url}/training/notices/external`,
+        {
+          id,
+          source: { id: selectedTrainingSource.id },
+          // trainingDesign: selectedTrainingDesign?.id,
+          type: selectedTrainingType,
+          courseTitle,
+          courseContent,
+          trainingLspDetails: selectedFacilitators.map((faci) => {
+            return { id: faci.id };
+          }),
+          location,
+          slotDistribution: slotDistribution.map((slot) => {
+            const employees = slot.employees.map((emp) => {
+              return { employeeId: emp.employeeId };
+            });
 
-          return {
-            supervisor: { supervisorId: slot.supervisor.supervisorId },
-            numberOfSlots: slot.numberOfSlots,
-            employees,
-          };
-        }),
-        trainingStart: from,
-        trainingEnd: to,
-        numberOfHours,
-        // deadlineForSubmission: dayjs().add(3, "day"),
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { id: tag.id };
-        }),
+            return {
+              supervisor: { supervisorId: slot.supervisor.supervisorId },
+              numberOfSlots: slot.numberOfSlots,
+              employees,
+            };
+          }),
+          trainingStart: from,
+          trainingEnd: to,
+          numberOfHours,
+          // deadlineForSubmission: dayjs().add(3, "day"),
+          numberOfParticipants,
+          trainingTags: selectedTags.map((tag) => {
+            return { id: tag.id };
+          }),
 
-        trainingRequirements,
-      });
+          trainingRequirements,
+        },
+        { withCredentials: true }
+      );
 
       return response.data;
     },

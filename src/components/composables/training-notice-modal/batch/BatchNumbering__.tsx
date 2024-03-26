@@ -98,11 +98,7 @@ export const BatchNumberingBack: FunctionComponent = () => {
                         const currentEmployeePool = [...employeePool];
 
                         // insert logic here to filter array based on array of employees to remove
-                        //TODO might uncomment this later
-                        // const tempTotalSelectedEmployees = totalSelectedEmployees.filter(
-                        //   (employee) => !updatedBatches[updatedBatches.length - 1].employees.includes(employee)
-                        // );
-                        // setTotalSelectedEmployees(tempTotalSelectedEmployees);
+
                         currentEmployeePool.push(...updatedBatches[updatedBatches.length - 1].employees);
                         currentEmployeePool
                           .sort((a, b) => (a.name > b.name ? 1 : -1))

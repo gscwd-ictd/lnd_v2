@@ -38,19 +38,15 @@ import { CreateAffiliations } from "./CreateAffiliations";
 import { CreateContactInformationExternal } from "./external/create/CreateContactInformationExternal";
 import { CreateEducationDetailsExternal } from "./external/create/CreateEducationDetailsExternal";
 import { AwardsAndRecognitionInternal } from "./individual/AwardsAndRecognitionInternal";
-import { AwardsAndRecognitionsExternal } from "./individual/AwardsAndRecognitionsExternal";
 import { CreateAwardsAndRecognitionsExternal } from "./external/create/CreateAwardsAndRecognitionsExternal";
 import { CreateOrganizationDetails } from "./organization/create/CreateOrganizationDetails";
 import { CreateCertificationsExternal } from "./external/CreateCertificationsExternal";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
-import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWithAppwriteUpload";
 import defaultPhoto from "../../../../public/images/placeholders/user-placeholder-gray.png";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { AddUploadPhotoAlert } from "./individual/AddUploadPhotoAlert";
 import { useLspExternal } from "@lms/hooks/use-lsp-external";
-import { Storage } from "appwrite";
-import { v4 as uuidv4 } from "uuid";
 
 export const AddNewLspModal: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -103,9 +99,10 @@ export const AddNewLspModal: FunctionComponent = () => {
   // on previous or back button
   const onPrev = () => {
     if (page === 1) {
+      onClose();
       setOpen(false);
-      resetLspDetailsStore();
-      resetEmployeeStore();
+      // resetLspDetailsStore();
+      // resetEmployeeStore();
     } else {
       setPage(page - 1);
     }
@@ -178,6 +175,9 @@ export const AddNewLspModal: FunctionComponent = () => {
 
   const lspDataTableIndIntMutation = useMutation({
     onSuccess: async (data) => {
+      setPage(1);
+      resetLspDetailsStore();
+      resetEmployeeStore();
       setOpen(false);
       setToastOptions("success", "Success", "You have successfully added an LSP");
       const getUpdatedIndividualLsp = await axios.get(`${url}/lsp/q?type=individual&page=1&limit=40`);
@@ -209,6 +209,7 @@ export const AddNewLspModal: FunctionComponent = () => {
     onSuccess: async (data) => {
       setOpen(false);
       setToastOptions("success", "Success", "You have successfully added an LSP");
+      setPage(1);
       resetLspDetailsStore();
       resetEmployeeStore();
 
@@ -216,12 +217,12 @@ export const AddNewLspModal: FunctionComponent = () => {
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
-    onError: (data) => {
+    onError: () => {
       setToastOptions("danger", "Error", "Something went wrong, please try again later.");
     },
     mutationFn: async () => {
-      //! create a route where it creates the file in the appwrite, then it returns the url and id,
-      //! and post it in lsp creation
+      // create a route where it creates the file in the appwrite, then it returns the url and id,
+      // and post it in lsp creation
 
       // create the file in appwrite
 
@@ -258,8 +259,6 @@ export const AddNewLspModal: FunctionComponent = () => {
         email,
         postalAddress,
         experience: experience ?? [],
-        // photoUrl: photoToUpload !== null ? uploadedFileData?.photoUrl : null, //! new changes
-        // photoId: photoToUpload !== null ? uploadedFileData?.id : null, //! new changes
         tin,
         sex,
         introduction,
@@ -284,13 +283,12 @@ export const AddNewLspModal: FunctionComponent = () => {
       const getUpdatedOrganizationLsp = await axios.get(`${url}/lsp/q?type=organization&page=1&limit=40`);
       queryClient.setQueryData(["lsp-organization"], getUpdatedOrganizationLsp.data.items);
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       setToastOptions("danger", "Error", "Something went wrong. Please try again later.");
     },
     mutationFn: async () => {
-      //! create a route where it creates the file in the appwrite, then it returns the url and id,
-      //! and post it in lsp creation
+      // create a route where it creates the file in the appwrite, then it returns the url and id,
+      // and post it in lsp creation
 
       // initially assign this object to null
       // let uploadedFileData: { id: string | null; photoUrl: string | null } = { id: null, photoUrl: null };
@@ -326,8 +324,6 @@ export const AddNewLspModal: FunctionComponent = () => {
         experience,
         tin,
         introduction,
-        // photoUrl: photoToUpload !== null ? uploadedFileData?.photoUrl : null, //! new changes
-        // photoId: photoToUpload !== null ? uploadedFileData?.id : null, //! new changes
         expertise,
         affiliations,
         awards,
@@ -422,12 +418,12 @@ export const AddNewLspModal: FunctionComponent = () => {
           <ModalContent.Title>
             <div className="px-2 flex gap-2">
               <Suspense fallback={<Spinner />}>
-                {/* {lspSource === LspSource.INTERNAL ? (
+                {lspSource === LspSource.INTERNAL ? (
                   <Avatar source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
                 ) : (
-                  <AvatarWithAppwriteUpload source={photoToUploadUrl ? photoToUploadUrl : defaultPhoto.src} size="xl" />
-                )} */}
-                <Avatar source={defaultPhoto.src} size="xl" />
+                  <Avatar source={defaultPhoto.src} size="xl" />
+                )}
+                {/* <Avatar source={defaultPhoto.src} size="xl" /> */}
               </Suspense>
             </div>
             <header className="px-2 mt-1">

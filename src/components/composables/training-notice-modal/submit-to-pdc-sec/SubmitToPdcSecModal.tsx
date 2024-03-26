@@ -25,18 +25,14 @@ export const SubmitToPdcSecModal = () => {
 
   const submitToPdcMutation = useMutation({
     onSuccess: async () => {
-      const getTrainingNotice = await axios.get(`${url}/training-details`, { withCredentials: true });
+      const getTrainingNotice = await axios.get(`${url}/training`, { withCredentials: true });
 
       queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
       setToastOptions("success", "Success", "You have sent the training to the PDC Secretary.");
       setSubmitToPdcSecModalIsOpen(false);
     },
     mutationFn: async () => {
-      const response = await axios.post(
-        `${url}/training-approvals`,
-        { trainingDetails: id },
-        { withCredentials: true }
-      );
+      const response = await axios.patch(`${url}/training/${id}/approvals`, {}, { withCredentials: true });
       return response;
     },
     onError: () => {

@@ -155,6 +155,7 @@ export const useTrainingNoticeDataTable = () => {
                       setLspSource(LspSource.EXTERNAL);
                     }
                     setInitialTrainingRequirements([
+                      { document: "Attendance", isSelected: true },
                       { document: "Certificate of Appearance", isSelected: false },
                       { document: "Certificate of Training", isSelected: false },
                       { document: "Course Evaluation Report", isSelected: false },
@@ -171,7 +172,7 @@ export const useTrainingNoticeDataTable = () => {
                 </button>
               ) : null}
               {props.row.original.status === TrainingStatus.ON_GOING_NOMINATION ||
-              props.row.original.status === TrainingStatus.PDC_SECRETARY_APPROVAL ||
+              props.row.original.status === TrainingStatus.PDC_SECRETARIAT_APPROVAL ||
               props.row.original.status === TrainingStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.status === TrainingStatus.NOMINATION_DONE ||
               props.row.original.status === TrainingStatus.GM_APPROVAL ||
@@ -201,7 +202,7 @@ export const useTrainingNoticeDataTable = () => {
               ) : null}
               {props.row.original.status === TrainingStatus.ON_GOING_NOMINATION ||
               props.row.original.status === TrainingStatus.NOMINATION_DONE ||
-              props.row.original.status === TrainingStatus.PDC_SECRETARY_APPROVAL ||
+              props.row.original.status === TrainingStatus.PDC_SECRETARIAT_APPROVAL ||
               props.row.original.status === TrainingStatus.PDC_CHAIRMAN_APPROVAL ||
               props.row.original.status === TrainingStatus.GM_APPROVAL ||
               props.row.original.status === TrainingStatus.FOR_BATCHING ||
@@ -406,10 +407,10 @@ export const GetTrainingStatus = (status: TrainingStatus) => {
         Nomination Done
       </div>
     );
-  else if (status === TrainingStatus.PDC_SECRETARY_APPROVAL)
+  else if (status === TrainingStatus.PDC_SECRETARIAT_APPROVAL)
     return (
       <div className="text-center text-xs px-[0.25rem] py-[0.1rem] border font-semibold rounded text-amber-700 bg-amber-300 border-amber-400">
-        For Secretary Approval
+        For Secretariat Approval
       </div>
     );
   else if (status === TrainingStatus.PDC_CHAIRMAN_APPROVAL)

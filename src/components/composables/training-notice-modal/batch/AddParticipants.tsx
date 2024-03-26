@@ -394,7 +394,7 @@ export const AddParticipants: FunctionComponent = () => {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="w-10 h-10 stroke-sky-500"
+                    className="w-10 h-10 stroke-indigo-500"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
                   </svg>
@@ -509,7 +509,7 @@ export const AddParticipants: FunctionComponent = () => {
                         className={`"w-auto rounded ${
                           tempEmployeePool.length === 0
                             ? "bg-gray-700 cursor-not-allowed"
-                            : "bg-orange-500 hover:bg-orange-400"
+                            : "bg-indigo-400 hover:bg-indigo-500"
                         } text-xs text-white px-3 py-2`}
                       >
                         {tempEmployeePool.length === 0
@@ -589,7 +589,7 @@ export const AddParticipants: FunctionComponent = () => {
 
                   <div className="relative overflow-x-auto rounded-lg shadow-md">
                     <table className="w-full text-left ">
-                      <thead className="text-white rounded-t bg-sky-700">
+                      <thead className="text-white rounded-t bg-indigo-700">
                         <tr>
                           <th className="p-2 font-medium text-center border">#</th>
                           <th className="p-2 font-medium border">Participant Name</th>

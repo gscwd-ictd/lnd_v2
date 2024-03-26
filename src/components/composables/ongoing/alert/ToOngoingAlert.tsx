@@ -21,11 +21,19 @@ export const ToOngoingAlertSubmission: FunctionComponent = () => {
       // setToastOptions("success", "Success", "You have moved the training to recents.");
       setToOngoingAlertIsOpen(false);
       // setSlideOverIsOpen(false);
-      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training-details`);
+      const getUpdatedNoticeOfTraining = await axios.get(`${url}/training`);
       queryClient.setQueryData(["training-notice"], getUpdatedNoticeOfTraining.data.items);
     },
     mutationFn: async () => {
-      const request = axios.put(`${url}/training-details/on-going/${id}`, {}, { withCredentials: true });
+      // const request = axios.put(`${url}/training-details/on-going/${id}`, {}, { withCredentials: true });
+      const request = axios.patch(
+        `${url}/training`,
+        {
+          trainingId: id,
+          status: "on going training",
+        },
+        { withCredentials: true }
+      );
       return request;
     },
   });
