@@ -2,14 +2,10 @@
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 import { useUserDetails } from "@lms/hooks/use-userdetails";
 import { LearningSVG } from "@lms/svg/LearningSVG";
-import { useEffect } from "react";
 
 export const CardEmployee = () => {
   const user = useUserDetails();
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
   return (
     <div className="static flex flex-col w-full h-[18rem] bg-white rounded-md border shadow overflow-hidden">
       {/** TOP PART */}
@@ -26,7 +22,7 @@ export const CardEmployee = () => {
       {/** BOTTOM PART */}
       <section className="w-full h-[50%] rounded-b p-6">
         <div className="font-medium text-gray-700">
-          {user.photoUrl ? (
+          {user?.photoUrl ? (
             <div>
               <Avatar source={user.photoUrl} size="xl" />
             </div>
@@ -45,8 +41,8 @@ export const CardEmployee = () => {
           )}
         </div>
         <div className="flex flex-col ">
-          <span className="font-medium text-slate-600">{user.fullName}</span>
-          <span className="text-sm font-light text-slate-500 ">{user.email}</span>
+          <span className="font-medium text-slate-600">{user?.fullName}</span>
+          <span className="text-sm font-light text-slate-500 ">{user?.email}</span>
         </div>
       </section>
     </div>

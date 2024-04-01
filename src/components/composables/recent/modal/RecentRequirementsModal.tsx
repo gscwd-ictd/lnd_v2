@@ -1,47 +1,65 @@
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import dayjs from "dayjs";
 import { FunctionComponent, Suspense, useContext, useEffect, useState } from "react";
-import { RecentContext } from "../../recent-data-table/RecentDataTable";
+import {
+  BatchWithEmployees,
+  EmployeeWithRequirements,
+  NewTrainingRequirements,
+  RecentContext,
+} from "../../recent-data-table/RecentDataTable";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
-import { Button } from "@lms/components/osprey/ui/button/view/Button";
-import { EmployeeAttendance } from "../slideover/EmployeeAttendance";
-import { BatchEmployee, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
-
-export const ListOfAllRequirements = [
-  { document: "Attendance" },
-  { document: "Pre-test" },
-  { document: "Course Materials" },
-  { document: "Post Training Report" },
-  { document: "Course Evaluation Report" },
-  // { document: "Learning Application Plan", },
-  // { document: "Post-test", },
-  // { document: "Certificate Of Training",  },
-  // { document: "Program", },
-];
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { url } from "@lms/utilities/url/api-url";
 
 export const RecentRequirementsModal: FunctionComponent = () => {
-  const { batches, requirementsModalIsOpen, setRequirementsModalIsOpen } = useContext(RecentContext);
-  const trainingRequirements = useTrainingNoticeStore((state) => state.trainingRequirements);
-  const [employeeAttendance, setEmployeeAttendance] = useState<BatchEmployee[]>([]);
+  const { requirementsModalIsOpen, setRequirementsModalIsOpen, id, requirements } = useContext(RecentContext);
+  const [employeeWithRequirements, setEmployeeWithRequirements] = useState<Array<EmployeeWithRequirements>>([]);
+
+  const { data } = useQuery({
+    queryKey: ["training-requirements", id],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/training/${id}/requirements`);
+      if (data?.batches.length > 0) {
+        let allEmployees: Array<EmployeeWithRequirements> = [];
+        data.batches.map((batch: BatchWithEmployees) => {
+          // map per employee
+          batch.employees.map((emp) => {
+            let employeeStatusCount: number = 0;
+            let employeeStatus: string = "";
+
+            // map per employee requirement
+            emp.requirements.map((req) => {
+              if (req.isSelected === true) {
+                employeeStatusCount++;
+              }
+            });
+
+            if (employeeStatusCount === emp.requirements.length) employeeStatus = "Complete";
+            else employeeStatus = "Incomplete";
+
+            return allEmployees.push({ ...emp, status: employeeStatus });
+          });
+        });
+
+        setEmployeeWithRequirements(allEmployees);
+      }
+      return data;
+    },
+    enabled: !!id && requirementsModalIsOpen !== false,
+  });
 
   // useEffect(() => {
-  //   if (batchAttendanceIsOpen) {
-  //     const newSelectedBatchEmployees = selectedBatch.employees.map((employee) => {
-  //       return { ...employee, isCompleteAttendance: employee.isCompleteAttendance ?? false };
-  //     });
-  //     console.log("HERE");
-  //     setEmployeeAttendance(newSelectedBatchEmployees ?? []);
-  //     setTimeout(() => {
-  //       setIsLoading(false);
-  //     }, 300);
-  //   }
-  // }, [selectedBatch.employees, batchAttendanceIsOpen]);
 
-  useEffect(() => {}, [batches]);
+  // }, [data]);
 
   return (
-    <Modal isOpen={requirementsModalIsOpen} setIsOpen={setRequirementsModalIsOpen} size="lg">
+    <Modal
+      isOpen={requirementsModalIsOpen}
+      setIsOpen={setRequirementsModalIsOpen}
+      size={requirements.length > 5 ? "xl" : "lg"}
+    >
       <ModalContent>
         <ModalContent.Title>
           <div className="p-3">
@@ -57,28 +75,14 @@ export const RecentRequirementsModal: FunctionComponent = () => {
               </div>
             }
           >
-            {/* { document: "Pre-test", isSelected: false },
-                      { document: "Course Materials", isSelected: false },
-                    { document: "Post Training Report", isSelected: false },
-                      { document: "Course Evaluation Report", isSelected: false },
-                      { document: "Learning Application Plan", isSelected: false },
-                      { document: "Post-test", isSelected: false }, */}
             <div className="px-3 py-5">
               <div className="relative overflow-x-auto rounded-lg shadow-md ">
                 <table className="w-full table-fixed">
                   <thead className="text-white rounded-t bg-gradient-to-r from-indigo-700 to-purple-500">
                     <tr>
                       <th className="p-2 font-medium border ">Employee Name</th>
-                      {/* <th className="p-2 font-medium border">Participant Name</th>
-                      <th className="p-2 font-medium border">Complete Attendance</th>
-                      <th className="p-2 font-medium border">Pre-test</th>
-                      <th className="p-2 font-medium border">Course Materials</th>
-                      <th className="p-2 font-medium border">Post Training Report</th>
-                      <th className="p-2 font-medium border">Course Evaluation Report</th>
-                      <th className="p-2 font-medium border">Learning Application Plan</th>
-                      <th className="p-2 font-medium border">Post-test</th>
-                      <th className="p-2 font-medium border">Remarks</th> */}
-                      {ListOfAllRequirements.map((req, idx) => {
+
+                      {data?.requirements.map((req: NewTrainingRequirements, idx: number) => {
                         return (
                           <th key={idx} className="p-2 font-medium border">
                             {req.document}
@@ -89,106 +93,25 @@ export const RecentRequirementsModal: FunctionComponent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {batches.map((batch) => {
-                      return batch.employees.map((employee, emp_idx) => {
-                        return (
-                          <tr
-                            className="even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/50"
-                            key={employee.employeeId}
-                          >
-                            <td className="p-2 text-sm font-light border text-center ">{employee.name}</td>
-                            {ListOfAllRequirements.map((req, idx) => {
-                              return (
-                                <td key={idx} className="text-center items-center border hover:bg-indigo-200 ">
-                                  <Checkbox
-                                    id={`checkbox-${idx}-${req.document.toLowerCase()}`}
-                                    // checked={req.isSelected ? true : false}
-                                  />
-                                </td>
-                              );
-                            })}
-                            {/* <td
-                              className="text-center border hover:bg-indigo-200 "
-                              // onClick={() => onChangeAttendance(idx)}
-                            >
-                              <Checkbox
-                                id={`checkbox-${emp_idx}`}
-                                checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-pt-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-cm-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-ptr-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-cer-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-lap-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td>
-                            <td className="text-center border hover:bg-indigo-200">
-                              <Checkbox
-                                id={`checkbox-postt-${emp_idx}`}
-                                // checked={employee.isCompleteAttendance}
-                                readOnly
-                                // onChange={() => onChangeAttendance(idx)}
-                              />
-                            </td> */}
-                            <td className="text-sm text-center text-gray-600 border hover:cursor-pointer">
-                              Incomplete
-                            </td>
-                          </tr>
-                        );
-                      });
-                    })}
-
-                    {employeeAttendance?.map((employee, idx) => {
+                    {employeeWithRequirements?.map((employee) => {
                       return (
                         <tr className="even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80" key={employee.employeeId}>
                           <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                          <td
-                            className="text-center border hover:bg-indigo-200 "
-                            // onClick={() => onChangeAttendance(idx)}
-                          >
-                            <Checkbox
-                              id={`checkbox-${idx}`}
-                              checked={employee.isCompleteAttendance}
-                              readOnly
-                              // onChange={() => onChangeAttendance(idx)}
-                            />
-                          </td>
+                          {employee.requirements.map((requirements, idx) => {
+                            return (
+                              <td
+                                className="p-2 text-sm font-light  text-center items-center border hover:bg-indigo-200 "
+                                key={idx}
+                              >
+                                <Checkbox
+                                  id={`checkbox-${idx}-${requirements.document.toLowerCase()}`}
+                                  checked={requirements.isSelected ? true : false}
+                                  readOnly
+                                />
+                              </td>
+                            );
+                          })}
+                          <td className="p-2 text-sm font-light border items-center text-center ">{employee.status}</td>
                         </tr>
                       );
                     })}
@@ -198,18 +121,7 @@ export const RecentRequirementsModal: FunctionComponent = () => {
             </div>
           </Suspense>
         </ModalContent.Body>
-        <ModalContent.Footer>
-          {/* <div className="flex justify-end w-full">
-            <Button
-              onClick={() => {
-                // set this to false
-                setRequirementsModalIsOpen(false);
-              }}
-            >
-              Apply
-            </Button>
-          </div> */}
-        </ModalContent.Footer>
+        <ModalContent.Footer></ModalContent.Footer>
       </ModalContent>
     </Modal>
   );

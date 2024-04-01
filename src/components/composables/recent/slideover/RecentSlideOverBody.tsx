@@ -19,9 +19,7 @@ export const RecentSlideOverBody = () => {
   const from = useTrainingNoticeStore((state) => state.trainingStart);
   const to = useTrainingNoticeStore((state) => state.trainingEnd);
   const trainingHours = useTrainingNoticeStore((state) => state.numberOfHours);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const trainingRequirements = useTrainingNoticeStore((state) => state.trainingRequirements);
-  const { batches, setRequirementsModalIsOpen } = useContext(RecentContext);
+  const { batchesWithEmployees, setRequirementsModalIsOpen } = useContext(RecentContext);
   const participants = useTrainingNoticeStore((state) => state.numberOfParticipants);
 
   return (
@@ -52,14 +50,6 @@ export const RecentSlideOverBody = () => {
             })}
           </div>
         </div>
-
-        {/* Training Requirements */}
-        {/* <div>
-          {trainingRequirements &&
-            trainingRequirements.map((training) => {
-              return <div key={training.document}>{training.document}</div>;
-            })}
-        </div> */}
 
         {/* Training Type */}
         <div>
@@ -152,7 +142,7 @@ export const RecentSlideOverBody = () => {
             </div>
           }
         >
-          <EmployeeBatches batches={batches} />
+          <EmployeeBatches batches={batchesWithEmployees} />
         </Suspense>
       </div>
 

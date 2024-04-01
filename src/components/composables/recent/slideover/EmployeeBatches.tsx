@@ -1,17 +1,17 @@
 import { Disclosure } from "@headlessui/react";
-import { Batch, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
+import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent, useContext } from "react";
-import { RecentContext } from "../../recent-data-table/RecentDataTable";
+import { BatchWithEmployees, RecentContext } from "../../recent-data-table/RecentDataTable";
 type EmployeeBatchesProps = {
-  batches: Array<Batch>;
+  batches: Array<BatchWithEmployees>;
 };
 
 export const EmployeeBatches: FunctionComponent<EmployeeBatchesProps> = ({ batches }) => {
   const to = useTrainingNoticeStore((state) => state.trainingEnd);
 
-  const { setBatchAttendanceIsOpen, setSelectedBatch } = useContext(RecentContext);
+  const { setBatchAttendanceIsOpen, setSelectedBatch, setTemporarySelectedBatch } = useContext(RecentContext);
 
   return (
     <div>
@@ -82,7 +82,7 @@ export const EmployeeBatches: FunctionComponent<EmployeeBatchesProps> = ({ batch
                           setSelectedBatch(batch);
                         }}
                       >
-                        Attendance
+                        Requirements
                       </button>
                     </div>
                   </Disclosure.Panel>

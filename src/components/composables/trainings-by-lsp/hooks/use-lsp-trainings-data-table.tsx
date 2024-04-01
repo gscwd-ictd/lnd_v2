@@ -10,28 +10,8 @@ type TrainingByLsp = {
   rating: number;
 };
 
-type Star = {
-  first: { isActive: boolean };
-  second: { isActive: boolean };
-  third: { isActive: boolean };
-  fourth: { isActive: boolean };
-  fifth: { isActive: boolean };
-};
-
 export const useLspTrainingsDataTable = () => {
   const helper = createColumnHelper<TrainingByLsp>();
-
-  const setStarDefault = () => {
-    return {
-      first: { isActive: false },
-      second: { isActive: false },
-      third: { isActive: false },
-      fourth: { isActive: false },
-      fifth: { isActive: false },
-    };
-  };
-
-  const [star, setStar] = useState<Star>(setStarDefault);
 
   const columns = [
     helper.accessor("title", {

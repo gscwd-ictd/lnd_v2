@@ -141,5 +141,14 @@ export const useIndividualLspDataTable = () => {
     }),
   ];
 
-  return { columns, edit, remove, lspId, setEdit, setRemove, trainingIsOpen, setTrainingIsOpen };
+  return {
+    columns,
+    edit,
+    remove,
+    lspId,
+    setEdit,
+    setRemove,
+    trainingIsOpen,
+    setTrainingIsOpen,
+  };
 };

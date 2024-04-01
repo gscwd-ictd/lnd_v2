@@ -11,6 +11,7 @@ import { isEmpty } from "lodash";
 import {
   Batch,
   BatchEmployee,
+  TrainingRequirement,
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
@@ -24,10 +25,10 @@ import { RecentRequirementsModal } from "../recent/modal/RecentRequirementsModal
 type RecentState = {
   id: string;
   setId: Dispatch<SetStateAction<string>>;
-  batches: Array<Batch>;
-  setBatches: Dispatch<SetStateAction<Array<Batch>>>;
-  selectedBatch: Batch;
-  setSelectedBatch: Dispatch<SetStateAction<Batch>>;
+  batchesWithEmployees: Array<BatchWithEmployees>;
+  setBatchesWithEmployees: Dispatch<SetStateAction<Array<BatchWithEmployees>>>;
+  selectedBatch: BatchWithEmployees;
+  setSelectedBatch: Dispatch<SetStateAction<BatchWithEmployees>>;
   batchAttendanceIsOpen: boolean;
   setBatchAttendanceIsOpen: Dispatch<SetStateAction<boolean>>;
   hasFetchedBatches: boolean;
@@ -41,20 +42,50 @@ type RecentState = {
   setToastIsOpen: Dispatch<SetStateAction<boolean>>;
   toastType: ToastType;
   setToastType: Dispatch<SetStateAction<ToastType>>;
+  requirements: Array<NewTrainingRequirements>;
+  setRequirements: Dispatch<SetStateAction<Array<NewTrainingRequirements>>>;
   requirementsModalIsOpen: boolean;
   setRequirementsModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  temporarySelectedBatch: BatchWithEmployees;
+  setTemporarySelectedBatch: Dispatch<SetStateAction<BatchWithEmployees>>;
 };
+
+export type NewTrainingRequirements = Pick<TrainingRequirement, "document">;
+
+export type EmployeeWithRequirements = {
+  employeeId: string;
+  name: string;
+  nomineeId: string;
+  requirements: Array<TrainingRequirement>;
+  status: string;
+};
+
+export type BatchWithEmployees = {
+  batchNumber: number;
+  trainingDate: { from: string; to: string };
+  employees: Array<EmployeeWithRequirements>;
+  requirements: Array<TrainingRequirement>;
+};
+
+export type TrainingWithRequirements = {
+  batches: Array<BatchWithEmployees>;
+  requirements: Array<NewTrainingRequirements>;
+};
+
 export const RecentContext = createContext({} as RecentState);
 
 export const RecentDataTable: FunctionComponent = () => {
   const [requirementsModalIsOpen, setRequirementsModalIsOpen] = useState<boolean>(false);
   const [slideOverIsOpen, setSlideOverIsOpen] = useState<boolean>(false);
   const [alertSubmissionIsOpen, setAlertSubmissionIsOpen] = useState<boolean>(false);
-  const [selectedBatch, setSelectedBatch] = useState<Batch>({} as Batch);
+  const [selectedBatch, setSelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useRecentDataTable();
+  const [requirements, setRequirements] = useState<Array<NewTrainingRequirements>>([]);
+  const [temporarySelectedBatch, setTemporarySelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);
+  const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
+  const { columns, id, setId, batchesWithEmployees, setBatchesWithEmployees } = useRecentDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -142,6 +173,45 @@ export const RecentDataTable: FunctionComponent = () => {
   //   enabled: !!id && hasFetchedBatches === false,
   // });
 
+  // // this is to check the status if it already has batching and fetch the batches
+  // useQuery({
+  //   queryKey: ["training-details-nominees-batches", id],
+  //   enabled: !!id && hasFetchedBatches === false,
+  //   staleTime: 2,
+  //   refetchOnReconnect: false,
+  //   refetchOnMount: false,
+  //   refetchOnWindowFocus: false,
+  //   queryFn: async () => {
+  //     const { data } = await axios.get(`${url}/training/${id}/batch`);
+  //     // const { data } = await axios.get(`${url}/training/${id}/requirements`);
+
+  //     let updatedSelectedEmployees: BatchEmployee[] = [];
+  //     const fetchedBatches = data.map((batch: Batch) => {
+  //       if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
+  //       return {
+  //         batchNumber: batch.batchNumber,
+
+  //         trainingDate: {
+  //           from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+  //           to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+  //         },
+  //         isOneDayTraining:
+  //           dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
+  //         employees: batch.employees,
+  //       };
+  //     });
+
+  //     // set fetched batches to true
+  //     setHasFetchedBatches(true);
+  //     setBatches(fetchedBatches);
+
+  //     // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+  //     // setEmployeePool([]);
+
+  //     return batches;
+  //   },
+  // });
+
   // this is to check the status if it already has batching and fetch the batches
   useQuery({
     queryKey: ["training-details-nominees-batches", id],
@@ -151,33 +221,35 @@ export const RecentDataTable: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/training/${id}/batch`);
-      // const { data } = await axios.get(`${url}/training/${id}/requirements`);
+      // const { data } = await axios.get(`${url}/training/${id}/batch`);
+      const { data } = await axios.get(`${url}/training/${id}/requirements`);
+      let updatedSelectedEmployees: EmployeeWithRequirements[] = [];
 
-      let updatedSelectedEmployees: BatchEmployee[] = [];
-      const fetchedBatches = data.map((batch: Batch) => {
-        if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
+      const fetchedBatches = data.batches.map((batch: BatchWithEmployees) => {
+        if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees!);
         return {
           batchNumber: batch.batchNumber,
 
           trainingDate: {
-            from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
-            to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+            from: dayjs(batch.trainingDate?.from).format("YYYY-MM-DD hh:mm"),
+            to: dayjs(batch.trainingDate?.to).format("YYYY-MM-DD hh:mm"),
           },
           isOneDayTraining:
-            dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
+            dayjs(batch.trainingDate?.from).isSame(dayjs(batch.trainingDate?.to), "day") === true ? true : false,
           employees: batch.employees,
         };
       });
 
+      setRequirements(data.requirements);
+
       // set fetched batches to true
       setHasFetchedBatches(true);
-      setBatches(fetchedBatches);
+      setBatchesWithEmployees(fetchedBatches);
 
       // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
       // setEmployeePool([]);
 
-      return batches;
+      return fetchedBatches;
     },
   });
 
@@ -186,15 +258,20 @@ export const RecentDataTable: FunctionComponent = () => {
       <RecentContext.Provider
         value={{
           id,
-          batches,
           selectedBatch,
+          batchesWithEmployees,
           batchAttendanceIsOpen,
           hasFetchedBatches,
           slideOverIsOpen,
           alertSubmissionIsOpen,
           toastIsOpen,
           toastType,
+          requirements,
           requirementsModalIsOpen,
+          temporarySelectedBatch,
+          setTemporarySelectedBatch,
+          setRequirements,
+          setBatchesWithEmployees,
           setRequirementsModalIsOpen,
           setToastIsOpen,
           setId,
@@ -205,7 +282,6 @@ export const RecentDataTable: FunctionComponent = () => {
           setHasFetchedBatches,
           setBatchAttendanceIsOpen,
           setSelectedBatch,
-          setBatches,
         }}
       >
         <DataTable<TrainingNotice>
