@@ -2,11 +2,14 @@ import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { TrainingNotice } from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
+import { BatchWithEmployees, NewTrainingRequirements } from "../RecentDataTable";
 
 export const useRecentDataTable = () => {
   const helper = createColumnHelper<TrainingNotice>();
-  const [batches, setBatches] = useState<Batch[]>([
-    { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
+
+  // updated batch
+  const [batchesWithEmployees, setBatchesWithEmployees] = useState<BatchWithEmployees[]>([
+    { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" }, requirements: [] },
   ]);
   const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
   const [viewSlideOverIsOpen, setViewSlideOverIsOpen] = useState<boolean>(false);
@@ -66,11 +69,12 @@ export const useRecentDataTable = () => {
   return {
     columns,
     id,
-    batches,
     viewSlideOverIsOpen,
     hasFetchedBatches,
+    batchesWithEmployees,
+
+    setBatchesWithEmployees,
     setHasFetchedBatches,
-    setBatches,
     setViewSlideOverIsOpen,
     setId,
   };

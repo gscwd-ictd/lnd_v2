@@ -5,7 +5,7 @@ export type Benchmarking = {
   id: string;
   title: string;
   location: string;
-  dateFrom: string;
-  dateTo: string;
+  dateStarted: string;
+  dateEnd: string;
   partner: string;
 };

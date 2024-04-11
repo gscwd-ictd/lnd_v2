@@ -12,8 +12,13 @@ import { url } from "@lms/utilities/url/api-url";
 import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import convertSize from "convert-size";
+import { useLnd } from "@lms/hooks/use-lnd";
+import { Storage } from "appwrite";
 
 export const ViewTrainingNoticeModal: FunctionComponent = () => {
+  const client = useLnd();
+  const selectedTrainingSource = useTrainingNoticeStore((state) => state.selectedTrainingSource);
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -45,10 +50,9 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-
+      console.log(data);
       // setCourseContent(data.courseContent);
       if (data.source.name === "Internal") {
-        console.log("INTERNAL NI");
         setId(data.id);
         setSelectedTrainingSource({ name: "Internal" });
         setCourseTitle(data.courseTitle);
@@ -67,7 +71,6 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
 
         // setInternalTrainingNotice(data);
       } else if (data.source.name === "External") {
-        console.log("EXTERNAL-+ NI");
         setId(data.id);
         setSelectedTrainingSource({ name: "External" });
         setCourseTitle(data.courseTitle);
@@ -89,6 +92,46 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
       return data;
     },
     onError: () => {},
+  });
+
+  // fetch uploaded files
+  useQuery({
+    queryKey: ["uploaded-files", trainingNoticeId],
+    enabled:
+      !!trainingNoticeId && viewTrainingNoticeModalIsOpen !== false && selectedTrainingSource.name === "External",
+    queryFn: async () => {
+      try {
+        const storage = new Storage(client!);
+        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd?id=${id}`);
+
+        if (getBucketListFiles.data.files.length > 0) {
+          const newBucketFiles = Promise.all(
+            getBucketListFiles.data.files.map(async (file: any) => {
+              const fileDetails = await storage.getFile(id!, file.$id);
+              const filePreview = storage.getFilePreview(id!, file.$id);
+              const fileView = storage.getFileView(id!, file.$id);
+
+              return {
+                id: file.$id,
+                name: fileDetails.name,
+                href: fileView.href,
+                fileLink: fileView.href,
+                sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+                mimeType: fileDetails.mimeType,
+              };
+            })
+          );
+          setBucketFiles(await newBucketFiles);
+          return await newBucketFiles;
+        } else setBucketFiles([]);
+      } catch (error) {
+        return setBucketFiles([]);
+      }
+    },
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   // set the training notice id only on one instance upon opening the modal

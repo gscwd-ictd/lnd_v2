@@ -2,6 +2,9 @@ import { Combobox } from "@headlessui/react";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
+import { url } from "@lms/utilities/url/api-url";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import React from "react";
 import { FunctionComponent, useState } from "react";
 
@@ -60,6 +63,19 @@ export const employeesWithSupervisor: EmployeeFlatWithSupervisor[] = [
     positionTitle: "Test",
     supervisor: { supervisorId: "345", name: "Anjo Turija" },
   },
+  {
+    employeeId: "010a02be-5b3d-11ed-a08b-000c29f95a80",
+    name: "Sample 1",
+    positionTitle: "Testo A",
+    supervisor: { supervisorId: "345", name: "Ungasers Uroges" },
+  },
+
+  {
+    employeeId: "05b0614c-b191-11ed-a79b-000c29f95a80",
+    name: "Sample 2",
+    positionTitle: "Testo B",
+    supervisor: { supervisorId: "345", name: "Ungasers Uroges" },
+  },
 ];
 
 export const AddParticipants: FunctionComponent = () => {
@@ -68,6 +84,19 @@ export const AddParticipants: FunctionComponent = () => {
   const [searchParticipant, setSearchParticipant] = useState<string>("");
   const participants = useBenchmarkingStore((state) => state.participants);
   const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
+
+  /**
+   *  get employee names
+   */
+  const { data } = useQuery({
+    queryKey: ["employee-names", searchParticipant],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/hrms/employees/q?name=${searchParticipant}`);
+
+      return data;
+    },
+    enabled: searchParticipant !== "",
+  });
 
   // filtered facilitators
   const filteredParticipants =
@@ -153,74 +182,80 @@ export const AddParticipants: FunctionComponent = () => {
           </Combobox>
         </div>
 
-        <div className="relative overflow-x-auto rounded-lg shadow-md">
-          <table className="w-full text-left ">
-            <thead className="text-white rounded-t bg-slate-900">
-              <tr>
-                <th className="p-2 font-medium text-center border">#</th>
-                <th className="p-2 font-medium border">Participant Name</th>
-                <th className="p-2 font-medium border">Supervisor</th>
-                <th className="p-2 font-medium border"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {participants.length > 0 ? (
-                participants.map((participant, idx) => {
-                  return (
-                    <tr className="even:bg-inherit odd:bg-zinc-50" key={participant.employeeId}>
-                      <td className="p-2 text-sm font-light text-center border ">{idx + 1}</td>
-                      <td className="p-2 text-sm font-light border ">{participant.name}</td>
-                      <td className="p-2 text-sm font-light border ">{participant.supervisor.name}</td>
-                      <td className="p-2 text-sm font-light border ">
-                        <div className="text-center">
-                          <button
-                            className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
-                            type="button"
-                            onClick={() => {
-                              const newSelectedParticipants = [...participants];
-                              newSelectedParticipants.splice(idx, 1);
-                              setParticipants(newSelectedParticipants);
-                              const newParticipants = [...participantsPool];
-                              newParticipants.push(participant);
+        {participants.length > 0 ? (
+          <div className="relative overflow-x-auto rounded-lg shadow-md">
+            <table className="w-full text-left ">
+              <thead className="text-slate-600 rounded-t bg-slate-200">
+                <tr>
+                  <th className="p-2 font-medium text-center border">#</th>
+                  <th className="p-2 font-medium border">Participant Name</th>
+                  <th className="p-2 font-medium border">Supervisor</th>
+                  <th className="p-2 font-medium border"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {participants.length > 0 ? (
+                  participants.map((participant, idx) => {
+                    return (
+                      <tr className="even:bg-inherit odd:bg-zinc-50" key={participant.employeeId}>
+                        <td className="p-2 text-sm font-light text-center border ">{idx + 1}</td>
+                        <td className="p-2 text-sm font-light border ">{participant.name}</td>
+                        <td className="p-2 text-sm font-light border ">{participant.supervisor.name}</td>
+                        <td className="p-2 text-sm font-light border ">
+                          <div className="text-center">
+                            <button
+                              className="text-white bg-red-500 border rounded-lg hover:text-black hover:bg-red-200"
+                              type="button"
+                              onClick={() => {
+                                const newSelectedParticipants = [...participants];
+                                newSelectedParticipants.splice(idx, 1);
+                                setParticipants(newSelectedParticipants);
+                                const newParticipants = [...participantsPool];
+                                newParticipants.push(participant);
 
-                              setParticipantsPool(
-                                newParticipants
-                                  .sort((a, b) => (a.name > b.name ? 1 : -1))
-                                  .sort((a, b) =>
-                                    a.supervisor.name! > b.supervisor.name!
-                                      ? 1
-                                      : a.supervisor.name! === b.supervisor.name
-                                      ? 0
-                                      : -1
-                                  )
-                              );
-                            }}
-                          >
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
+                                setParticipantsPool(
+                                  newParticipants
+                                    .sort((a, b) => (a.name > b.name ? 1 : -1))
+                                    .sort((a, b) =>
+                                      a.supervisor.name! > b.supervisor.name!
+                                        ? 1
+                                        : a.supervisor.name! === b.supervisor.name
+                                        ? 0
+                                        : -1
+                                    )
+                                );
+                              }}
                             >
-                              <path
-                                d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z"
-                                fill="currentColor"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <></>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="pb-24"></div>
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z"
+                                  fill="currentColor"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <></>
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="flex justify-center  min-h-[6.1rem] border-dashed items-center text-center rounded border-2">
+            <span className="text-gray-500   font-sans"> Select at lease one participant</span>
+          </div>
+        )}
+        <div className="pb-36"></div>
       </div>
     </>
   );

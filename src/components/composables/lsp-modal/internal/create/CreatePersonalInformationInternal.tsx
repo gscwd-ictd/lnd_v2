@@ -128,8 +128,9 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
         // const { data } = await axios.get(`${portalBackendUrl}/${employeeId}`);
         const { data } = await axios.get(`${url}/portal/employees/details/${employeeId}`);
         // setEmployeePds(data);
+
         setEmployeeData(data);
-        console.log(data);
+
         return data;
       } catch (error) {
         setEmployeePds(undefined);
@@ -270,25 +271,35 @@ export const CreatePersonalInformationInternal: FunctionComponent = () => {
           </Combobox>
         </div>
 
-        {sex !== undefined && (
-          <div>
+        {sex !== undefined ? (
+          <div className="flex flex-col gap-0">
             <label htmlFor="sex" className="text-xs font-medium text-gray-600">
               Sex
             </label>
-            <div className="w-[8rem] mb-2">
-              {sex === Sex.MALE ? (
-                <span className="w-full px-2 py-1 text-xs text-white bg-indigo-500 rounded">Male</span>
-              ) : sex === Sex.FEMALE ? (
-                <span className="w-full px-2 py-1 text-xs border border-indigo-700 text-indigo-700 rounded bg-indigo-200">
-                  Female
-                </span>
-              ) : (
-                <span>-</span>
-              )}
-            </div>
+
+            {sex === Sex.MALE ? (
+              <span className="w-[5rem] px-2 py-1 flex justify-center text-xs text-white bg-indigo-500 rounded">
+                Male
+              </span>
+            ) : sex === Sex.FEMALE ? (
+              <span className="w-[5rem] px-2 py-1 flex justify-center text-xs  text-indigo-700 rounded bg-indigo-200">
+                Female
+              </span>
+            ) : (
+              <span>-</span>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-0">
+            <label htmlFor="sex" className="text-xs font-medium text-gray-600">
+              Sex
+            </label>
+            <span className="w-[5rem] justify-center flex px-2 py-1 text-xs text-white bg-gray-500 rounded">
+              Not found
+            </span>
+            <span className="text-xs text-red-500">{errors.sex ? errors.sex.message : null}</span>
           </div>
         )}
-        <span className="text-xs text-red-500">{errors.sex ? errors.sex.message : null}</span>
 
         <div>
           <label htmlFor="exp" className="text-xs font-medium text-gray-600">

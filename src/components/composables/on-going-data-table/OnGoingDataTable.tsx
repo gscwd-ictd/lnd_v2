@@ -50,7 +50,8 @@ export const OnGoingDataTable: FunctionComponent = () => {
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useRecentDataTable();
+  const [batches, setBatches] = useState<Array<Batch>>([]);
+  const { columns, id, hasFetchedBatches, setHasFetchedBatches, setId } = useRecentDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -81,51 +82,46 @@ export const OnGoingDataTable: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = (await axios.get(`${url}/training/${id}`, { withCredentials: true })) as any;
-        if (!isEmpty(data)) {
-          if (data.source.name === "Internal") {
-            setId(data.id);
-            setSelectedTrainingSource({ name: "Internal" });
-            setCourseTitle(data.courseTitle);
-            setCourseContent(data.courseContent);
-            setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
-            setSelectedTrainingType(getTrainingTypeFromString(data.type));
-            setSelectedFacilitators(data.trainingLspDetails);
-            setSelectedTags(data.trainingTags);
-            setSlotDistribution(data.slotDistribution);
-            setTrainingStart(data.trainingStart);
-            setTrainingEnd(data.trainingEnd);
-            setNumberOfParticipants(Number(data.numberOfParticipants));
-            setNumberOfHours(Number(data.numberOfHours));
-            setLocation(data.location);
-            setTrainingRequirements(data.trainingRequirements);
+      const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
 
-            // setInternalTrainingNotice(data);
-          } else if (data.source.name === "External") {
-            setId(data.id);
-            setSelectedTrainingSource({ name: "External" });
-            setCourseTitle(data.courseTitle);
-            setCourseContent(data.courseContent);
-            setSelectedTrainingType(getTrainingTypeFromString(data.type));
-            setSelectedFacilitators(data.trainingLspDetails);
-            setSelectedTags(data.trainingTags);
-            setSlotDistribution(data.slotDistribution);
-            setTrainingStart(data.trainingStart);
-            setTrainingEnd(data.trainingEnd);
-            setNumberOfParticipants(Number(data.numberOfParticipants));
-            setNumberOfHours(Number(data.numberOfHours));
-            setLocation(data.location);
-            setTrainingRequirements(data.trainingRequirements);
-            setBucketFiles(data.bucketFiles);
-            // setExternalTrainingNotice(data);
-          }
-        }
+      if (data.source.name === "Internal") {
+        setId(data.id);
+        setSelectedTrainingSource({ name: "Internal" });
+        setCourseTitle(data.courseTitle);
+        setCourseContent(data.courseContent);
+        setSelectedTrainingDesign({ id: data.trainingDesign.id, courseTitle: data.trainingDesign.courseTitle });
+        setSelectedTrainingType(getTrainingTypeFromString(data.type));
+        setSelectedFacilitators(data.trainingLspDetails);
+        setSelectedTags(data.trainingTags);
+        setSlotDistribution(data.slotDistribution);
+        setTrainingStart(data.trainingStart);
+        setTrainingEnd(data.trainingEnd);
+        setNumberOfParticipants(Number(data.numberOfParticipants));
+        setNumberOfHours(Number(data.numberOfHours));
+        setLocation(data.location);
+        setTrainingRequirements(data.trainingRequirements);
 
-        return data;
-      } catch (error) {
-        return error;
+        // setInternalTrainingNotice(data);
+      } else if (data.source.name === "External") {
+        setId(data.id);
+        setSelectedTrainingSource({ name: "External" });
+        setCourseTitle(data.courseTitle);
+        setCourseContent(data.courseContent);
+        setSelectedTrainingType(getTrainingTypeFromString(data.type));
+        setSelectedFacilitators(data.trainingLspDetails);
+        setSelectedTags(data.trainingTags);
+        setSlotDistribution(data.slotDistribution);
+        setTrainingStart(data.trainingStart);
+        setTrainingEnd(data.trainingEnd);
+        setNumberOfParticipants(Number(data.numberOfParticipants));
+        setNumberOfHours(Number(data.numberOfHours));
+        setLocation(data.location);
+        setTrainingRequirements(data.trainingRequirements);
+        setBucketFiles(data.bucketFiles);
+        // setExternalTrainingNotice(data);
       }
+
+      return data;
     },
   });
 
@@ -139,11 +135,10 @@ export const OnGoingDataTable: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`, { withCredentials: true })) as any;
+        const { data } = (await axios.get(`${url}/training/${id}/batch`, { withCredentials: true })) as any;
         let updatedSelectedEmployees: BatchEmployee[] = [];
         const fetchedBatches = data.map((batch: Batch) => {
           if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
-
           return {
             batchNumber: batch.batchNumber,
 

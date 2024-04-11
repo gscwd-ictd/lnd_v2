@@ -15,11 +15,11 @@ export const RootContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEl
     return (
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools />
-        <SessionProvider>
-          <div {...restProps} ref={forwardedRef} className={styles.root(className)}>
-            <SidebarContext.Provider value={{ activeNav, setActiveNav }}>{children}</SidebarContext.Provider>
-          </div>
-        </SessionProvider>
+        {/* <SessionProvider> */}
+        <div {...restProps} ref={forwardedRef} className={styles.root(className)}>
+          <SidebarContext.Provider value={{ activeNav, setActiveNav }}>{children}</SidebarContext.Provider>
+        </div>
+        {/* </SessionProvider> */}
       </QueryClientProvider>
     );
   }

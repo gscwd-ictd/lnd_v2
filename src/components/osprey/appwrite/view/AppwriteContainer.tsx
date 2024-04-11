@@ -15,7 +15,6 @@ type AppwriteContainerProps = {
 
 export const useAppwriteClient = (projectId: string) => {
   const { client } = useContext(AppwriteClientContext);
-
   client?.setProject(projectId);
   return client;
 };

@@ -257,10 +257,6 @@ const UploadedCard: FunctionComponent<UploadedFileProps> = ({ file }) => {
   const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
   const setFilesToDelete = useTrainingNoticeStore((state) => state.setFilesToDelete);
 
-  useEffect(() => {
-    console.log(filesToDelete);
-  }, [filesToDelete]);
-
   return (
     <>
       <div className="flex items-center w-full gap-2 p-2 bg-gray-200 border-2 rounded-lg">

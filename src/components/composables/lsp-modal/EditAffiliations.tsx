@@ -53,11 +53,12 @@ export const EditAffiliations: FunctionComponent = () => {
 
   const positionInputRef = useRef(null) as unknown as MutableRefObject<HTMLInputElement>;
   const institutionInputRef = useRef(null) as unknown as MutableRefObject<HTMLInputElement>;
+  const page = useEditLspModalStore((state) => state.page);
   const setPage = useEditLspModalStore((state) => state.setPage);
 
   // on submit
   const onSubmit = () => {
-    setPage(9);
+    setPage(page + 1);
   };
 
   useEffect(() => {

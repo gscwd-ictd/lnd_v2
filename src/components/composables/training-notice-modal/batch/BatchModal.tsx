@@ -15,22 +15,36 @@ import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
+import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
+import { BatchModalTraining } from "./BatchModalTraining";
 
 export const BatchModal: FunctionComponent = () => {
+  const selectedTags = useTrainingNoticeStore((state) => state.selectedTags);
   const courseTitle = useTrainingNoticeStore((state) => state.courseTitle);
   const trainingStart = useTrainingNoticeStore((state) => state.trainingStart);
   const trainingEnd = useTrainingNoticeStore((state) => state.trainingEnd);
+  const numberOfHours = useTrainingNoticeStore((state) => state.numberOfHours);
+  const location = useTrainingNoticeStore((state) => state.location);
+  const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
+  const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
+  const selectedFacilitators = useTrainingNoticeStore((state) => state.selectedFacilitators);
+  const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
+  const setLocation = useTrainingNoticeStore((state) => state.setLocation);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const reset = useTrainingNoticeStore((state) => state.reset);
+  const setSelectedTags = useTrainingNoticeStore((state) => state.setSelectedTags);
+  const setNumberOfHours = useTrainingNoticeStore((state) => state.setNumberOfHours);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
-  const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
   const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
   const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
-  const trainingNoticeId = useTrainingNoticeStore((state) => state.id);
+  const setSelectedFacilitators = useTrainingNoticeStore((state) => state.setSelectedFacilitators);
+  const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
+
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const [hasFetchedDetails, setHasFetchedDetails] = useState<boolean>(false);
+
   const queryClient = useQueryClient();
 
   // this function checks if a batch is empty
@@ -55,11 +69,11 @@ export const BatchModal: FunctionComponent = () => {
     employeePool,
     batches,
     trainingStatus,
-    setTrainingStatus,
+    batchingModalIsOpen,
     setBatches,
     setEmployeePool,
+    setTrainingStatus,
     setTotalSelectedEmployees,
-    batchingModalIsOpen,
     setBatchingModalIsOpen,
   } = useContext(TrainingNoticeContext);
 
@@ -79,14 +93,14 @@ export const BatchModal: FunctionComponent = () => {
         batches: newBatches,
       };
 
-      const data = await axios.post(`${url}/training-nominees/batch`, trainingWithBatches, { withCredentials: true });
+      const data = await axios.post(`${url}/training/batch`, trainingWithBatches, { withCredentials: true });
       return data;
     },
 
     onSuccess: async () => {
       setBatchingModalIsOpen(false);
 
-      const getTrainingNotice = await axios.get(`${url}/training-details`, { withCredentials: true });
+      const getTrainingNotice = await axios.get(`${url}/training`, { withCredentials: true });
 
       queryClient.setQueryData(["training-notice"], getTrainingNotice.data.items);
 
@@ -113,7 +127,7 @@ export const BatchModal: FunctionComponent = () => {
         batches: newBatches,
       };
 
-      const data = await axios.patch(`${url}/training-nominees/batch`, trainingWithBatches, { withCredentials: true });
+      const data = await axios.patch(`${url}/training/batch`, trainingWithBatches, { withCredentials: true });
       return data;
     },
 
@@ -129,7 +143,7 @@ export const BatchModal: FunctionComponent = () => {
   });
 
   // this is to fetch the training details
-  const { isLoading, isFetching, data } = useQuery({
+  const { isLoading, isFetching, data, isError } = useQuery({
     queryKey: ["training-details", trainingNoticeId],
     enabled: !!trainingNoticeId && batchingModalIsOpen !== false,
     staleTime: 2,
@@ -137,20 +151,24 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = await axios.get(`${url}/training-details/${id}`, { withCredentials: true });
-        setHasFetchedDetails(true);
-        if (!isEmpty(data)) {
-          setNumberOfParticipants(data.numberOfParticipants);
-          setCourseTitle(data.courseTitle);
-          setTrainingStart(data.trainingStart);
-          setTrainingEnd(data.trainingEnd);
-          setBatches([{ batchNumber: 1, employees: [], trainingDate: { from: "", to: "" }, isOneDayTraining: false }]);
-        }
-        return data;
-      } catch (error) {
-        return error;
-      }
+      const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
+      setNumberOfParticipants(data.numberOfParticipants);
+      setCourseTitle(data.courseTitle);
+      setTrainingStart(data.trainingStart);
+      setTrainingEnd(data.trainingEnd);
+      setBatches([{ batchNumber: 1, employees: [], trainingDate: { from: "", to: "" }, isOneDayTraining: false }]);
+      setNumberOfHours(data.numberOfHours);
+      setSelectedTags(data.trainingTags);
+      setLocation(data.location);
+      setSelectedTrainingType(data.type);
+      setSelectedFacilitators(data.trainingLspDetails);
+      return data;
+    },
+    onSuccess: () => {
+      setHasFetchedDetails(true);
+    },
+    onError: () => {
+      setHasFetchedDetails(false);
     },
   });
 
@@ -174,17 +192,14 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data: acceptedNominees } = (await axios.get(`${url}/training-nominees/${id}/accepted`, {
-          withCredentials: true,
-        })) as any;
-        setEmployeePool(acceptedNominees);
-        setTotalSelectedEmployees([]);
+      const { data: acceptedNominees } = await axios.get(`${url}/training/${id}/nominees/accepted`, {
+        withCredentials: true,
+      });
+      console.log(acceptedNominees);
+      setEmployeePool(acceptedNominees);
+      setTotalSelectedEmployees([]);
 
-        return acceptedNominees;
-      } catch (error) {
-        return error;
-      }
+      return acceptedNominees;
     },
   });
 
@@ -201,7 +216,7 @@ export const BatchModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/training-nominees/${id}/batch`);
+      const { data } = await axios.get(`${url}/training/${id}/batch`);
 
       let updatedSelectedEmployees: EmployeeWithSupervisor[] = [];
       const fetchedBatches = data.map((batch: Batch) => {
@@ -241,7 +256,7 @@ export const BatchModal: FunctionComponent = () => {
       <Modal
         isOpen={batchingModalIsOpen}
         setIsOpen={setBatchingModalIsOpen}
-        size="3md"
+        size="lg"
         animate={false}
         isStatic
         onClose={() => {
@@ -251,7 +266,7 @@ export const BatchModal: FunctionComponent = () => {
       >
         <ModalContent>
           <ModalContent.Title>
-            <header className="px-8">
+            {/* <header className="px-8">
               <div className="flex items-start gap-2">
                 <h3 className="text-2xl font-sans font-bold text-gray-700 ">{courseTitle}</h3>
               </div>
@@ -270,24 +285,35 @@ export const BatchModal: FunctionComponent = () => {
                   )}
                 </div>
               )}
-            </header>
+            </header> */}
           </ModalContent.Title>
           <ModalContent.Body>
-            <main className="space-y-4">
+            <main className="max-h-[34rem]">
               {/* <BatchNumbering /> */}
 
-              {isLoading || isEmpty(data) || isFetching ? (
-                <div className="flex justify-center w-full h-full overflow-hidden">
-                  <Spinner borderSize={4} size="large" />
+              {isLoading || isFetching ? (
+                <Spinner size="medium" />
+              ) : isError ? (
+                <div className="h-full flex justify-center items-center">
+                  Something went wrong. Please try again in a few seconds.
                 </div>
-              ) : (
-                <BatchNumbering />
-              )}
+              ) : !isLoading && !isFetching && !isEmpty(data) ? (
+                <div className="flex grid-cols-2 w-full px-3">
+                  {/* COL 1 */}
+                  <div className="w-[35%] px-2 font-sans">
+                    <BatchModalTraining />
+                  </div>
+
+                  <div className="w-[65%] rounded-md p-3 border-2 border-dashed">
+                    <BatchNumbering />
+                  </div>
+                </div>
+              ) : null}
             </main>
           </ModalContent.Body>
 
           <ModalContent.Footer>
-            <div className="px-5 pt-2 pb-5">
+            <div className="px-3 pt-2 pb-5">
               <div className="flex items-center justify-end w-full gap-2">
                 {trainingStatus === TrainingStatus.FOR_BATCHING ? (
                   <Button

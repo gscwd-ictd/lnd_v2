@@ -35,6 +35,7 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
           document: yup.string().required(),
         })
       )
+      .min(2)
       .required(),
   });
 
@@ -100,6 +101,7 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
 
   useEffect(() => {
     register("trainingRequirements");
+    // setValue("trainingRequirements", [{ document: "Attendance" }]);
   }, []);
 
   return (
@@ -114,20 +116,36 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
             <div>
               Training Requirement Documents <span className="text-red-600 text-md">*</span>
             </div>
-            {errors.trainingRequirements ? <div className="text-xs font-normal">Select at least one (1)</div> : null}
+            {errors.trainingRequirements ? <div className="text-xs font-normal">Select at least two (2)</div> : null}
           </div>
 
           {initialTrainingRequirements &&
             initialTrainingRequirements.map((doc, index) => {
               return (
-                <div key={index} className="flex items-center gap-2 p-2 border">
-                  <Checkbox
-                    id={`checkbox-${index}`}
-                    label={doc.document}
-                    checked={doc.isSelected}
-                    onChange={() => onChangePtr(index)}
-                  />
-                </div>
+                <>
+                  {doc.document === "Attendance" ? (
+                    <div key={index} className="flex items-center gap-2 p-2  bg-gray-200">
+                      <input
+                        id="checkbox-attendance"
+                        type="checkbox"
+                        checked={true}
+                        className="border-2 border-gray-200 rounded-sm transition-colors  cursor-not-allowed hover:border-indigo-500 checked:bg-indigo-500 hover:checked:bg-indigo-500 focus:ring-indigo-500 focus:checked:bg-indigo-500"
+                      />
+                      <label htmlFor="checkbox-attendance" className="select-none">
+                        Attendance <span className="text-xs ">(default)</span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div key={index} className="flex items-center gap-2 p-2 border">
+                      <Checkbox
+                        id={`checkbox-${index}`}
+                        label={doc.document}
+                        checked={doc.isSelected}
+                        onChange={() => onChangePtr(index)}
+                      />
+                    </div>
+                  )}
+                </>
               );
             })}
         </div>

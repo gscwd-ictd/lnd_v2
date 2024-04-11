@@ -10,7 +10,7 @@ type MyError = Omit<AxiosResponse, "data"> & {
 // create a bucket
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  console.log(request);
+
   const { id, name } = body;
 
   try {

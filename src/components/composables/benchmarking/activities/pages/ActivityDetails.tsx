@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
-import { useBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
+import { useAddBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent } from "react";
@@ -9,7 +9,7 @@ import * as yup from "yup";
 
 const schema = yup.object({
   title: yup.string().label("Title").required(),
-  dateFrom: yup
+  dateStarted: yup
     .string()
     .label("Date start")
     .trim()
@@ -19,7 +19,7 @@ const schema = yup.object({
         return dayjs().diff(dayjs(value), "day") <= 0;
       } else return true;
     }),
-  dateTo: yup
+  dateEnd: yup
     .string()
     .label("Date end")
     .test({
@@ -29,7 +29,7 @@ const schema = yup.object({
       message: "Date is not permissible",
       test: function (value) {
         if (!isEmpty(value)) {
-          return value! >= this.parent.dateFrom && dayjs().diff(dayjs(value), "day") <= 0;
+          return value! >= this.parent.dateStarted && dayjs().diff(dayjs(value), "day") <= 0;
         } else return true;
       },
     })
@@ -47,16 +47,16 @@ export const ActivityDetails: FunctionComponent = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const title = useBenchmarkingStore((state) => state.title);
-  const dateTo = useBenchmarkingStore((state) => state.dateTo);
+  const dateEnd = useBenchmarkingStore((state) => state.dateEnd);
   const location = useBenchmarkingStore((state) => state.location);
-  const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
+  const dateStarted = useBenchmarkingStore((state) => state.dateStarted);
   const partner = useBenchmarkingStore((state) => state.partner);
   const setPartner = useBenchmarkingStore((state) => state.setPartner);
-  const setPage = useBenchmarkingModalStore((state) => state.setPage);
+  const setPage = useAddBenchmarkingModalStore((state) => state.setPage);
   const setTitle = useBenchmarkingStore((state) => state.setTitle);
-  const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
+  const setDateEnd = useBenchmarkingStore((state) => state.setDateEnd);
   const setLocation = useBenchmarkingStore((state) => state.setLocation);
-  const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
+  const setDateStarted = useBenchmarkingStore((state) => state.setDateStarted);
 
   const onSubmit = () => {
     setPage(3);
@@ -117,21 +117,21 @@ export const ActivityDetails: FunctionComponent = () => {
                 From <span className="text-red-600 text-md">*</span>
               </label>
               <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateFrom) ? errors.dateFrom?.message : undefined}
+                {!isEmpty(errors.dateStarted) ? errors.dateStarted?.message : undefined}
               </span>
             </div>
             <input
               id="from"
-              {...register("dateFrom", {
-                value: dateFrom,
+              {...register("dateStarted", {
+                value: dateStarted,
                 onChange: (e) => {
-                  setDateFrom(e.target.value);
+                  setDateStarted(e.target.value);
                 },
               })}
               type="date"
               // className="w-full text-sm text-gray-700 border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500"
               className={`block w-full placeholder:text-gray-400  ${
-                errors.dateFrom
+                errors.dateStarted
                   ? "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
@@ -143,15 +143,15 @@ export const ActivityDetails: FunctionComponent = () => {
                 To <span className="text-red-600 text-md">*</span>
               </label>
               <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateTo) ? errors.dateTo?.message : undefined}
+                {!isEmpty(errors.dateEnd) ? errors.dateEnd?.message : undefined}
               </span>
             </div>
             <input
               id="to"
-              {...register("dateTo", { value: dateTo, onChange: (e) => setDateTo(e.target.value) })}
+              {...register("dateEnd", { value: dateEnd, onChange: (e) => setDateEnd(e.target.value) })}
               type="date"
               className={`mb-1 ${
-                errors.dateTo
+                errors.dateEnd
                   ? "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}

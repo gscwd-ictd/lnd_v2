@@ -771,29 +771,24 @@ export const ViewDocumentModal: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = await axios.get(`${url}/training-nominees/${id}/batch`);
+      const { data } = await axios.get(`${url}/training/${id}/batch`);
+      const fetchedBatches = data.map((batch: Batch) => {
+        return {
+          batchNumber: batch.batchNumber,
+          trainingDate: {
+            from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+            to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+          },
+          employees: batch.employees,
+        };
+      });
 
-        const fetchedBatches = data.map((batch: Batch) => {
-          return {
-            batchNumber: batch.batchNumber,
-            trainingDate: {
-              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
-              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
-            },
-            employees: batch.employees,
-          };
-        });
+      setBatches(fetchedBatches);
 
-        setBatches(fetchedBatches);
+      // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+      // setEmployeePool([]);
 
-        // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
-        // setEmployeePool([]);
-
-        return batches;
-      } catch (error) {
-        return error;
-      }
+      return batches;
     },
   });
 

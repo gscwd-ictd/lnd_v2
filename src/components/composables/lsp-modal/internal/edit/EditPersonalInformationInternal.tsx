@@ -42,6 +42,7 @@ const schema = yup.object({
     )
     .required()
     .label("TIN Number"),
+  // sex: yup.string().label("Sex").required("Sex is required"),
 });
 
 export const EditPersonalInformationInternal: FunctionComponent = () => {
@@ -91,11 +92,19 @@ export const EditPersonalInformationInternal: FunctionComponent = () => {
     if (!isEmpty(tin)) setValue("tin", tin);
   }, [tin]);
 
+  // useEffect(() => {
+  //   if (!isEmpty(sex)) setValue("sex", sex!);
+  // }, [sex]);
+
   // on initial load
   useEffect(() => {
     register("employeeId");
     register("tin");
   }, []);
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   return (
     <>

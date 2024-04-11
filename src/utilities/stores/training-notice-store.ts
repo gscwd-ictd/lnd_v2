@@ -95,6 +95,7 @@ export type BatchEmployee = {
   nomineeId?: string;
   name: string;
   supervisor: { supervisorId: string; name: string };
+  requirements?: Array<TrainingRequirement>;
   distributionId?: string;
   isCompleteAttendance?: boolean;
 };

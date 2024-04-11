@@ -43,6 +43,7 @@ export const EditCoachingExperience: FunctionComponent = () => {
   const [coachingVal, setCoachingVal] = useState("");
   const [coachingIndexToEdit, setCoachingIndexToEdit] = useState(-1);
   const [coachingMutation, setCoachingMutation] = useState<CoachingMutation>({ isShowing: false, type: null });
+  const page = useEditLspModalStore((state) => state.page);
   const setPage = useEditLspModalStore((state) => state.setPage);
   const lspType = useLspTypeStore((state) => state.lspType);
 
@@ -50,7 +51,7 @@ export const EditCoachingExperience: FunctionComponent = () => {
 
   // on submit
   const onSubmit = () => {
-    setPage(8);
+    setPage(page + 1);
   };
 
   useEffect(() => {
