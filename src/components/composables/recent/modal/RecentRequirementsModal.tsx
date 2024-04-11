@@ -1,128 +1,124 @@
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import dayjs from "dayjs";
 import { FunctionComponent, Suspense, useContext, useEffect, useState } from "react";
-import {
-  BatchWithEmployees,
-  EmployeeWithRequirements,
-  NewTrainingRequirements,
-  RecentContext,
-} from "../../recent-data-table/RecentDataTable";
+import { EmployeeWithRequirements, RecentContext } from "../../recent-data-table/RecentDataTable";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
-import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@lms/components/osprey/ui/button/view/Button";
+import { EmployeeRequirements } from "../slideover/EmployeeRequirements";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 
 export const RecentRequirementsModal: FunctionComponent = () => {
-  const { requirementsModalIsOpen, setRequirementsModalIsOpen, id, requirements } = useContext(RecentContext);
-  const [employeeWithRequirements, setEmployeeWithRequirements] = useState<Array<EmployeeWithRequirements>>([]);
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+  const {
+    batchAttendanceIsOpen,
+    setBatchAttendanceIsOpen,
+    selectedBatch,
+    setHasFetchedBatches,
+    requirements,
+    temporarySelectedBatch,
+  } = useContext(RecentContext);
 
-  const { data } = useQuery({
-    queryKey: ["training-requirements", id],
-    queryFn: async () => {
-      const { data } = await axios.get(`${url}/training/${id}/requirements`);
-      if (data?.batches.length > 0) {
-        let allEmployees: Array<EmployeeWithRequirements> = [];
-        data.batches.map((batch: BatchWithEmployees) => {
-          // map per employee
-          batch.employees.map((emp) => {
-            let employeeStatusCount: number = 0;
-            let employeeStatus: string = "";
-
-            // map per employee requirement
-            emp.requirements.map((req) => {
-              if (req.isSelected === true) {
-                employeeStatusCount++;
-              }
-            });
-
-            if (employeeStatusCount === emp.requirements.length) employeeStatus = "Complete";
-            else employeeStatus = "Incomplete";
-
-            return allEmployees.push({ ...emp, status: employeeStatus });
-          });
-        });
-
-        setEmployeeWithRequirements(allEmployees);
-      }
-      return data;
+  // mutate function
+  const mutateRequirements = useMutation({
+    onSuccess: async () => {
+      // set this to false
+      setBatchAttendanceIsOpen(false);
+      // set this to true to fetch batches
+      setHasFetchedBatches(true);
+      setToastOptions("success", "Success", "You have successfully updated the batch requirements!");
     },
-    enabled: !!id && requirementsModalIsOpen !== false,
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try again in a while.");
+    },
+    mutationFn: async () => {
+      await axios.put(
+        `${url}/training/requirements`,
+        {
+          batchNumber: selectedBatch.batchNumber,
+          employees: selectedBatch.employees,
+        },
+        { withCredentials: true }
+      );
+      //  console.log({ batchNumber: selectedBatch.batchNumber, employees: selectedBatch.employees });
+    },
   });
 
-  // useEffect(() => {
-
-  // }, [data]);
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
 
   return (
-    <Modal
-      isOpen={requirementsModalIsOpen}
-      setIsOpen={setRequirementsModalIsOpen}
-      size={requirements.length > 5 ? "xl" : "lg"}
-    >
-      <ModalContent>
-        <ModalContent.Title>
-          <div className="p-3">
-            <p className="text-lg font-semibold text-gray-700">Requirements Summary</p>
-            <div className="flex gap-2"></div>
-          </div>
-        </ModalContent.Title>
-        <ModalContent.Body>
-          <Suspense
-            fallback={
-              <div className="flex justify-center w-full h-full">
-                <Spinner />
-              </div>
-            }
-          >
-            <div className="px-3 py-5">
-              <div className="relative overflow-x-auto rounded-lg shadow-md ">
-                <table className="w-full table-fixed">
-                  <thead className="text-white rounded-t bg-gradient-to-r from-indigo-700 to-purple-500">
-                    <tr>
-                      <th className="p-2 font-medium border ">Employee Name</th>
-
-                      {data?.requirements.map((req: NewTrainingRequirements, idx: number) => {
-                        return (
-                          <th key={idx} className="p-2 font-medium border">
-                            {req.document}
-                          </th>
-                        );
-                      })}
-                      <th className="p-2 font-medium border">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {employeeWithRequirements?.map((employee) => {
-                      return (
-                        <tr className="even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80" key={employee.employeeId}>
-                          <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                          {employee.requirements.map((requirements, idx) => {
-                            return (
-                              <td
-                                className="p-2 text-sm font-light  text-center items-center border hover:bg-indigo-200 "
-                                key={idx}
-                              >
-                                <Checkbox
-                                  id={`checkbox-${idx}-${requirements.document.toLowerCase()}`}
-                                  checked={requirements.isSelected ? true : false}
-                                  readOnly
-                                />
-                              </td>
-                            );
-                          })}
-                          <td className="p-2 text-sm font-light border items-center text-center ">{employee.status}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+    <>
+      <Modal
+        isOpen={batchAttendanceIsOpen}
+        setIsOpen={setBatchAttendanceIsOpen}
+        size={requirements.length > 5 ? "xl" : "lg"}
+        onClose={() => {
+          setHasFetchedBatches(false);
+        }}
+      >
+        <ModalContent>
+          <ModalContent.Title>
+            <div className="px-10 py-3">
+              <p className="text-lg font-semibold text-gray-700">Batch {selectedBatch.batchNumber} Requirements</p>
+              <div className="flex gap-2">
+                {dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day") ===
+                true ? (
+                  <span className="text-sm text-gray-600">
+                    {dayjs(selectedBatch.trainingDate?.from).format("MMM DD, YYYY hh:mmA")}-
+                    {dayjs(selectedBatch.trainingDate?.to).format("hh:mmA")}
+                  </span>
+                ) : dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day") ===
+                  false ? (
+                  <span className="text-sm text-gray-600">
+                    {dayjs(selectedBatch.trainingDate?.from).format("MMM DD, YYYY hh:mmA")}-
+                    {dayjs(selectedBatch.trainingDate?.to).format("MMM DD, YYYY hh:mmA")}
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
-          </Suspense>
-        </ModalContent.Body>
-        <ModalContent.Footer></ModalContent.Footer>
-      </ModalContent>
-    </Modal>
+          </ModalContent.Title>
+          <ModalContent.Body>
+            <Suspense
+              fallback={
+                <div className="flex justify-center w-full h-full">
+                  <Spinner />
+                </div>
+              }
+            >
+              <EmployeeRequirements />
+            </Suspense>
+          </ModalContent.Body>
+          <ModalContent.Footer>
+            <div className="flex justify-end w-full gap-1 px-10 py-3">
+              <button
+                onClick={() => {
+                  mutateRequirements.mutateAsync();
+                }}
+                className="w-[6rem] bg-indigo-500 px-3 py-2 rounded text-white active:bg-indigo-700 hover:bg-indigo-600"
+              >
+                Apply
+              </button>
+            </div>
+          </ModalContent.Footer>
+        </ModalContent>
+      </Modal>
+      <Toast
+        duration={toastType.color === "danger" ? 2000 : 1500}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
+    </>
   );
 };

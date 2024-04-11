@@ -1,96 +1,91 @@
 import { FileThumbnail } from "@lms/components/features/Thumbnail";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
-import {
-  BucketFile,
-  useTrainingNoticeModalStore,
-  useTrainingNoticeStore,
-} from "@lms/utilities/stores/training-notice-store";
+import { useBenchmarking } from "@lms/hooks/use-benchmarking";
+import { useBenchmarkingStore, useEditBenchmarkingModalStore } from "@lms/utilities/stores/benchmarking-store";
 import { useQuery } from "@tanstack/react-query";
 import convertSize from "convert-size";
-import Link from "next/link";
+import { FunctionComponent, MutableRefObject, createContext, useContext, useRef, useState } from "react";
 import { Storage } from "appwrite";
-
-import { FunctionComponent, MutableRefObject, createContext, useContext, useEffect, useRef, useState } from "react";
-import { TrainingNoticeContext } from "../training-notice-data-table/TrainingNoticeDataTable";
 import axios from "axios";
 import { isEmpty } from "lodash";
-import { useLnd } from "@lms/hooks/use-lnd";
+import { BucketFile } from "@lms/utilities/stores/training-notice-store";
+import Link from "next/link";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { useBenchmarkingToastOptions } from "../data-table/BenchmarkingDataTable";
+import { HiExclamation } from "react-icons/hi";
+import { AlertNotification } from "@lms/components/osprey/ui/alert-notification/view/AlertNotification";
 
 type FileToUploadCardProps = {
   file: File;
   fileId: number;
 };
 
+type FilesToUploadContextState = {
+  inputRef: MutableRefObject<HTMLInputElement>;
+};
+
 type UploadedFileProps = {
   file: BucketFile;
 };
 
-type FilesToUploadContextState = {
-  //   filesToUpload: File[];
-  //   setFilesToUpload: (files: File[]) => void;
-  inputRef: MutableRefObject<HTMLInputElement>;
-};
-
 const FilesToUploadContext = createContext({} as FilesToUploadContextState);
 
-// hook for the toast
-const useToastOptions = () => {
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-  return { toastIsOpen, setToastIsOpen, toastType, setToastOptions };
-};
-
-export const UploadTrainingDesign: FunctionComponent = () => {
+export const EditUploadActivityAttachment: FunctionComponent = () => {
+  const id = useBenchmarkingStore((state) => state.id);
+  const client = useBenchmarking();
+  const bucketFiles = useBenchmarkingStore((state) => state.bucketFiles);
+  const setBucketFiles = useBenchmarkingStore((state) => state.setBucketFiles);
+  const hasFetchedFiles = useEditBenchmarkingModalStore((state) => state.hasFetchedFiles);
+  const setHasFetchedFiles = useEditBenchmarkingModalStore((state) => state.setHasFetchedFiles);
+  const modalIsOpen = useEditBenchmarkingModalStore((state) => state.modalIsOpen);
+  const action = useBenchmarkingStore((state) => state.action);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
-  const filesToUpload = useTrainingNoticeStore((state) => state.filesToUpload);
-  const setFilesToUpload = useTrainingNoticeStore((state) => state.setFilesToUpload);
-  const { setToastIsOpen, setToastOptions, toastIsOpen, toastType } = useToastOptions();
-  const bucketFiles = useTrainingNoticeStore((state) => state.bucketFiles);
-  const id = useTrainingNoticeStore((state) => state.id);
-  const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
-  const { editModalIsOpen, setEditModalIsOpen } = useContext(TrainingNoticeContext);
-  const client = useLnd();
-  const action = useTrainingNoticeModalStore((state) => state.action);
+  const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
+  const setFilesToUpload = useBenchmarkingStore((state) => state.setFilesToUpload);
+  const { setToastOptions } = useBenchmarkingToastOptions();
 
   // fetch uploaded files
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["uploaded-files", id],
+  const { data, isLoading, isFetching, isError } = useQuery({
+    queryKey: ["uploaded-benchmarking-files", id],
     queryFn: async () => {
-      try {
-        const storage = new Storage(client!);
-        const getBucketListFiles = await axios.get(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd?id=${id}`);
+      const storage = new Storage(client!);
+      const getBucketListFiles = await axios.get(
+        `${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/benchmarking?id=${id}`
+      );
 
-        if (getBucketListFiles.data.files.length > 0) {
-          const newBucketFiles = Promise.all(
-            getBucketListFiles.data.files.map(async (file: any) => {
-              const fileDetails = await storage.getFile(id!, file.$id);
-              const filePreview = storage.getFilePreview(id!, file.$id);
-              const fileView = storage.getFileView(id!, file.$id);
+      if (getBucketListFiles.data.files.length > 0) {
+        const newBucketFiles = Promise.all(
+          getBucketListFiles.data.files.map(async (file: any) => {
+            const fileDetails = await storage.getFile(id!, file.$id);
+            const filePreview = storage.getFilePreview(id!, file.$id);
+            const fileView = storage.getFileView(id!, file.$id);
 
-              return {
-                id: file.$id,
-                name: fileDetails.name,
-                href: fileView.href,
-                fileLink: fileView.href,
-                sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
-                mimeType: fileDetails.mimeType,
-              };
-            })
-          );
-          setBucketFiles(await newBucketFiles);
-          return await newBucketFiles;
-        } else setBucketFiles([]);
-      } catch (error) {
-        return setBucketFiles([]);
-      }
+            return {
+              id: file.$id,
+              name: fileDetails.name,
+              href: fileView.href,
+              fileLink: fileView.href,
+              sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
+              mimeType: fileDetails.mimeType,
+            };
+          })
+        );
+        // setBucketFiles(await newBucketFiles);
+        return await newBucketFiles;
+      } else setBucketFiles([]);
     },
-    enabled: !!id && editModalIsOpen !== false && action === "update",
+    onSuccess: async (data) => {
+      setBucketFiles(data!);
+      setToastOptions("success", "Success", "Successfully fetched the files from server!");
+      setHasFetchedFiles(true);
+    },
+    onError: () => {
+      setBucketFiles([]);
+      setToastOptions("danger", "Error", "Bucket with the requested ID could not be found!");
+      setHasFetchedFiles(true);
+    },
+    enabled: !!id && modalIsOpen !== false && action === "update" && hasFetchedFiles !== true,
     // staleTime: 2,
     // refetchOnReconnect: false,
     // refetchOnMount: false,
@@ -101,20 +96,22 @@ export const UploadTrainingDesign: FunctionComponent = () => {
     <>
       <div className="pt-5">
         <div className="flex flex-col">
-          <span className="px-4 font-normal">Training Design</span>
-          <span className="px-4 text-xs text-gray-500">Upload a training design attachment</span>
+          <span className=" font-normal">Attachment</span>
+          <span className=" text-xs text-gray-500">Upload benchmarking letter of approval</span>
         </div>
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
-          {(isEmpty(data) || isLoading || isFetching) && action === "update" ? (
+          {(isEmpty(data) || isLoading || isFetching) && action === "update" && !isError ? (
             <div className="flex items-center justify-center w-full h-full">
               <Spinner borderSize={2} />
             </div>
+          ) : isError ? (
+            <AlertNotification alertType="error" notifMessage="Attachment not found" />
           ) : (
             <>
               {bucketFiles && bucketFiles.length > 0 && (
-                <div className="px-4 py-4 mx-4 space-y-2 border-2 rounded ">
+                <div className="px-4 py-4  space-y-2 border-2 rounded ">
                   <span className="items-center text-gray-700 text-md">
                     Uploaded Files <span className="text-xs">(Click file name to preview the file)</span>
                   </span>
@@ -124,7 +121,8 @@ export const UploadTrainingDesign: FunctionComponent = () => {
               )}
             </>
           )}
-          <div className="flex flex-col gap-5 px-4 mt-5">
+
+          <div className="flex flex-col gap-5 mt-5">
             <div className="w-full mb-2">
               <input
                 type="file"
@@ -173,12 +171,12 @@ export const UploadTrainingDesign: FunctionComponent = () => {
             </div>
           </div>
           {filesToUpload && filesToUpload.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 p-4 mx-4 mt-2 border-2 border-dashed">
+            <div className="flex flex-col items-center justify-center gap-2 p-4  mt-2 border-2 border-dashed">
               <h3 className="text-xl font-semibold text-zinc-600">No new files selected</h3>
             </div>
           ) : (
             <FilesToUploadContext.Provider value={{ inputRef }}>
-              <div className="px-4 py-2 mx-4 space-y-2 border rounded">
+              <div className="px-4 py-2 space-y-2 border rounded">
                 <span className="items-center text-gray-700 text-md">
                   Files to upload <span className="text-xs">(File will be uploaded upon submission)</span>
                 </span>
@@ -189,22 +187,21 @@ export const UploadTrainingDesign: FunctionComponent = () => {
           )}
         </div>
       </div>
-
-      <Toast
+      {/* <Toast
         duration={toastType.color === "danger" ? 2000 : 1500}
         open={toastIsOpen}
         setOpen={setToastIsOpen}
         color={toastType.color}
         title={toastType.title}
         content={toastType.content}
-      />
+      /> */}
     </>
   );
 };
 
 const FileToUploadCard: FunctionComponent<FileToUploadCardProps> = ({ file }) => {
-  const filesToUpload = useTrainingNoticeStore((state) => state.filesToUpload);
-  const setFilesToUpload = useTrainingNoticeStore((state) => state.setFilesToUpload);
+  const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
+  const setFilesToUpload = useBenchmarkingStore((state) => state.setFilesToUpload);
   const { inputRef } = useContext(FilesToUploadContext);
 
   return (
@@ -252,10 +249,10 @@ const FileToUploadCard: FunctionComponent<FileToUploadCardProps> = ({ file }) =>
 };
 
 const UploadedCard: FunctionComponent<UploadedFileProps> = ({ file }) => {
-  const bucketFiles = useTrainingNoticeStore((state) => state.bucketFiles);
-  const filesToDelete = useTrainingNoticeStore((state) => state.filesToDelete);
-  const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
-  const setFilesToDelete = useTrainingNoticeStore((state) => state.setFilesToDelete);
+  const bucketFiles = useBenchmarkingStore((state) => state.bucketFiles);
+  const filesToDelete = useBenchmarkingStore((state) => state.filesToDelete);
+  const setBucketFiles = useBenchmarkingStore((state) => state.setBucketFiles);
+  const setFilesToDelete = useBenchmarkingStore((state) => state.setFilesToDelete);
 
   return (
     <>

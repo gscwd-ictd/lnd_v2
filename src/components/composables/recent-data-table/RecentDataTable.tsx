@@ -19,8 +19,8 @@ import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingT
 import dayjs from "dayjs";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { RecentSlideOver } from "../recent/slideover/RecentSlideOver";
-import { RecentAttendanceModal } from "../recent/modal/RecentAttendanceModal";
 import { RecentRequirementsModal } from "../recent/modal/RecentRequirementsModal";
+import { RecentRequirementsSummaryModal } from "../recent/modal/RecentRequirementsSummaryModal";
 
 type RecentState = {
   id: string;
@@ -42,8 +42,8 @@ type RecentState = {
   setToastIsOpen: Dispatch<SetStateAction<boolean>>;
   toastType: ToastType;
   setToastType: Dispatch<SetStateAction<ToastType>>;
-  requirements: Array<NewTrainingRequirements>;
-  setRequirements: Dispatch<SetStateAction<Array<NewTrainingRequirements>>>;
+  requirements: Array<TrainingRequirement>;
+  setRequirements: Dispatch<SetStateAction<Array<TrainingRequirement>>>;
   requirementsModalIsOpen: boolean;
   setRequirementsModalIsOpen: Dispatch<SetStateAction<boolean>>;
   temporarySelectedBatch: BatchWithEmployees;
@@ -82,7 +82,7 @@ export const RecentDataTable: FunctionComponent = () => {
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const [requirements, setRequirements] = useState<Array<NewTrainingRequirements>>([]);
+  const [requirements, setRequirements] = useState<Array<TrainingRequirement>>([]);
   const [temporarySelectedBatch, setTemporarySelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);
   const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
   const { columns, id, setId, batchesWithEmployees, setBatchesWithEmployees } = useRecentDataTable();
@@ -296,8 +296,8 @@ export const RecentDataTable: FunctionComponent = () => {
           }}
         />
         <RecentSlideOver />
-        <RecentAttendanceModal />
         <RecentRequirementsModal />
+        <RecentRequirementsSummaryModal />
       </RecentContext.Provider>
     </>
   );

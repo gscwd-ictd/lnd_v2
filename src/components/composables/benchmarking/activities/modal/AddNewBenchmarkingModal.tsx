@@ -2,28 +2,35 @@
 
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { useBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
+import { useAddBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { AddParticipants } from "../pages/AddParticipants";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { useState } from "react";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import axios from "axios";
+import { url } from "@lms/utilities/url/api-url";
+import { useBenchmarking } from "@lms/hooks/use-benchmarking";
+import { Storage } from "appwrite";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddNewBenchmarkingModal = () => {
+  const queryClient = useQueryClient();
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const page = useBenchmarkingModalStore((state) => state.page);
-  const modalIsOpen = useBenchmarkingModalStore((state) => state.modalIsOpen);
+  const page = useAddBenchmarkingModalStore((state) => state.page);
+  const modalIsOpen = useAddBenchmarkingModalStore((state) => state.modalIsOpen);
   const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
   const participants = useBenchmarkingStore((state) => state.participants);
   const reset = useBenchmarkingStore((state) => state.reset);
-  const setPage = useBenchmarkingModalStore((state) => state.setPage);
-  const resetModal = useBenchmarkingModalStore((state) => state.resetModal);
-  const setModalIsOpen = useBenchmarkingModalStore((state) => state.setModalIsOpen);
+  const setPage = useAddBenchmarkingModalStore((state) => state.setPage);
+  const resetModal = useAddBenchmarkingModalStore((state) => state.resetModal);
+  const setModalIsOpen = useAddBenchmarkingModalStore((state) => state.setModalIsOpen);
   const benchmarking = useBenchmarkingStore();
+  const client = useBenchmarking();
 
   const onClose = () => {
     setModalIsOpen(false);
@@ -47,9 +54,91 @@ export const AddNewBenchmarkingModal = () => {
 
   const addBenchmarkingMutation = useMutation({
     mutationFn: async () => {
-      const { title, dateFrom, dateTo, location, participants, partner } = benchmarking;
+      const { title, dateStarted, dateEnd, location, participants, partner, filesToUpload } = benchmarking;
 
-      console.log({ title, dateFrom, dateTo, location, participants, partner });
+      const storage = new Storage(client!);
+
+      // step 1
+      const benchmarkCreationResponse = await axios.post(`${url}/benchmark`, {
+        title,
+        partner,
+        dateStarted,
+        dateEnd,
+        location,
+        participants: participants.map((participant) => {
+          return { employeeId: participant.employeeId };
+        }),
+      });
+
+      // second  - create the bucket
+      // create the bucket according to the benchmark creation response id and title
+      const bucketCreationResponse = await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/benchmarking`, {
+        id: benchmarkCreationResponse.data.id,
+        name: benchmarkCreationResponse.data.title,
+      });
+
+      // third create the file inside the bucket
+
+      try {
+        const files = await Promise.all(
+          filesToUpload.map(async (file) => {
+            return await storage.createFile(bucketCreationResponse.data.$id, uuidv4(), file);
+          })
+        );
+      } catch (error: any) {
+        return (error.response.data.error = 3);
+      }
+
+      return benchmarkCreationResponse.data;
+    },
+    onSuccess: async (data) => {
+      setToastOptions("success", "Success", "You have successfully added a benchmarking activity.");
+      setModalIsOpen(false);
+      reset();
+      const getUpdatedBenchmarkings = await axios.get(`${url}/benchmark?page=1&limit=1000`);
+      queryClient.setQueryData(["benchmarking-activities"], getUpdatedBenchmarkings.data.items);
+    },
+    onError: async (error: any) => {
+      setToastOptions("danger", "Error", "Encountered an error, Please try again later!");
+      if (error.response.data.error.step === 1) {
+        // this step creates the training notice in the backend
+        // if this step fails, it should just show an error in toast
+        setToastOptions("danger", "1", "Encountered an error.");
+      } else if (error.response.data.error.step === 2) {
+        // this step creates the bucket(folder) in appwrite
+        // if this step fails, it should call the delete training notice by id function
+        // and show an error in toast
+
+        // call delete training here
+        const id = error.response.data.error.id;
+        await axios.delete(`${url}/benchmark/${id}`);
+
+        setToastOptions(
+          "danger",
+          "2",
+          "Failed to create a folder for the Benchmarking. Please try again in a few seconds."
+        );
+      } else if (error.response.data.error.step === 3) {
+        // this step creates the files inside the bucket in appwrite
+        // if this step fails, it should call the delete bucket
+        // and delete training notice by id function
+        // and show an error in toast
+
+        // call delete bucket here
+
+        await axios.delete(
+          `${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/benchmark/${error.response.data.error.id}`
+        );
+
+        // call delete training notice here
+        await axios.delete(`${url}/benchmark/${error.response.data.error.id}`);
+
+        setToastOptions(
+          "danger",
+          "2",
+          "Failed to create the file/s inside the folder. Please try again in a few seconds"
+        );
+      }
     },
   });
 

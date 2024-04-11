@@ -106,7 +106,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       reset();
       resetModal();
 
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training?page=1&limit=1000`, {
         withCredentials: true,
       });
 
@@ -125,7 +125,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       } = training;
 
       const response = await axios.put(
-        `${url}/training-details/internal`,
+        `${url}/training/internal`,
         {
           id: trainingNoticeId,
           source: { id: selectedTrainingSource.id },
@@ -172,7 +172,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       reset();
       // resetModal();
 
-      const getUpdatedTrainingNotice = await axios.get(`${url}/training-details?page=1&limit=1000`, {
+      const getUpdatedTrainingNotice = await axios.get(`${url}/training?page=1&limit=1000`, {
         withCredentials: true,
       });
 
@@ -227,7 +227,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         });
       }
 
-      const response = await axios.put(`${url}/training-details/external`, {
+      const response = await axios.put(`${url}/training/external`, {
         id: trainingNoticeId,
         source: { id: selectedTrainingSource.id },
         courseTitle,

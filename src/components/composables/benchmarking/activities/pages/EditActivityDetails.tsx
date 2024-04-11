@@ -38,7 +38,7 @@ const schema = yup.object({
   location: yup.string().label("Location").required("Please input location"),
 });
 
-export const ActivityDetails: FunctionComponent = () => {
+export const EditActivityDetails: FunctionComponent = () => {
   const {
     register,
     setValue,

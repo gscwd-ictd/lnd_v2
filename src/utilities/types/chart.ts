@@ -7,12 +7,15 @@ export type Dataset = {
 };
 
 export type ChartData = {
-  labels: Array<string>;
+  labels?: Array<string>;
   datasets: Array<Dataset>;
 };
 
 export type LegendChart = {
   position: "top";
+  labels?: {
+    boxWidth?: number;
+  };
 };
 
 export type TitleChart = {

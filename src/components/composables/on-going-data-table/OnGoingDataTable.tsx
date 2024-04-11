@@ -50,7 +50,8 @@ export const OnGoingDataTable: FunctionComponent = () => {
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useRecentDataTable();
+  const [batches, setBatches] = useState<Array<Batch>>([]);
+  const { columns, id, hasFetchedBatches, setHasFetchedBatches, setId } = useRecentDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
