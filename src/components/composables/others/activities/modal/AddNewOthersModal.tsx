@@ -32,6 +32,8 @@ export const AddNewOthersModal = () => {
   const resetModal = useOthersModalStore((state) => state.resetModal);
   const setCategory = useOthersCategoryStore((state) => state.setCategory);
 
+  const setAction = useOthersStore((state) => state.setAction);
+
   const addOrientationMutation = useMutation({
     mutationFn: async () => {
       const { filesToUpload, dateTo, dateFrom, location, title } = orientation;
@@ -99,8 +101,10 @@ export const AddNewOthersModal = () => {
         <Button
           size="small"
           onClick={() => {
+            setAction("create");
             setModalIsOpen(true);
           }}
+          className="mb-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

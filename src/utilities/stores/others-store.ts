@@ -5,8 +5,6 @@ import { BucketFile } from "./training-notice-store";
 export type OthersModalStore = {
   page: number;
   setPage: (page: number) => void;
-  action: "create" | "update" | undefined;
-  setAction: (action: "create" | "update" | undefined) => void;
   modalIsOpen: boolean;
   setModalIsOpen: (modalIsOpen: boolean) => void;
   resetModal: () => void;
@@ -17,7 +15,9 @@ export type OthersCategoryState = {
   setCategory: (category: OthersCategory | undefined) => void;
 };
 
-export type OrientationState = {
+export type OthersState = {
+  id: string;
+  setId: (id: string) => void;
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
   bucketFiles: Array<BucketFile>;
@@ -30,20 +30,19 @@ export type OrientationState = {
   setDateTo: (dateTo: string) => void;
   location: string;
   setLocation: (location: string) => void;
+  action: "create" | "update" | undefined;
+  setAction: (action: "create" | "update" | undefined) => void;
   reset: () => void;
 };
 
 export const useOthersModalStore = create<OthersModalStore>((set) => ({
   page: 1,
   setPage: (page: number) => set({ page }),
-  action: undefined,
-  setAction: (action: "create" | "update" | undefined) => set({ action }),
   modalIsOpen: false,
   setModalIsOpen: (modalIsOpen: boolean) => set({ modalIsOpen }),
   resetModal: () => {
     set({
       modalIsOpen: false,
-      action: undefined,
       page: 1,
     });
   },
@@ -54,7 +53,9 @@ export const useOthersCategoryStore = create<OthersCategoryState>((set) => ({
   setCategory: (category) => set({ category }),
 }));
 
-export const useOthersStore = create<OrientationState>((set) => ({
+export const useOthersStore = create<OthersState>((set) => ({
+  id: "",
+  setId: (id) => set({ id }),
   filesToUpload: [],
   setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
   title: "",
@@ -67,5 +68,17 @@ export const useOthersStore = create<OrientationState>((set) => ({
   setLocation: (location) => set({ location }),
   bucketFiles: [],
   setBucketFIles: (bucketFiles) => set({ bucketFiles }),
-  reset: () => set({ filesToUpload: [], title: "", dateFrom: "", dateTo: "", location: "", bucketFiles: [] }),
+  action: undefined,
+  setAction: (action) => set({ action }),
+  reset: () =>
+    set({
+      action: undefined,
+      filesToUpload: [],
+      title: "",
+      dateFrom: "",
+      dateTo: "",
+      location: "",
+      bucketFiles: [],
+      id: "",
+    }),
 }));

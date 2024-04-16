@@ -6,7 +6,7 @@ import { Suspense } from "react";
 export default function Benchmarking() {
   return (
     <div className="p-5">
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <Suspense
           fallback={
             <div className="w-full justify-center">
@@ -16,7 +16,7 @@ export default function Benchmarking() {
         >
           <AddNewBenchmarkingModal />
         </Suspense>
-      </div>
+      </div> */}
       <BenchmarkingDataTable />
     </div>
   );

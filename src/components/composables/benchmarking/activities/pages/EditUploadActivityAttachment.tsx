@@ -1,19 +1,12 @@
 import { FileThumbnail } from "@lms/components/features/Thumbnail";
-import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
-import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { useBenchmarking } from "@lms/hooks/use-benchmarking";
-import { useBenchmarkingStore, useEditBenchmarkingModalStore } from "@lms/utilities/stores/benchmarking-store";
-import { useQuery } from "@tanstack/react-query";
+import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
+import { useQueryClient } from "@tanstack/react-query";
 import convertSize from "convert-size";
-import { FunctionComponent, MutableRefObject, createContext, useContext, useRef, useState } from "react";
-import { Storage } from "appwrite";
-import axios from "axios";
-import { isEmpty } from "lodash";
+import { FunctionComponent, MutableRefObject, createContext, useContext, useRef } from "react";
 import { BucketFile } from "@lms/utilities/stores/training-notice-store";
 import Link from "next/link";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useBenchmarkingToastOptions } from "../data-table/BenchmarkingDataTable";
-import { HiExclamation } from "react-icons/hi";
 import { AlertNotification } from "@lms/components/osprey/ui/alert-notification/view/AlertNotification";
 
 type FileToUploadCardProps = {
@@ -33,64 +26,15 @@ const FilesToUploadContext = createContext({} as FilesToUploadContextState);
 
 export const EditUploadActivityAttachment: FunctionComponent = () => {
   const id = useBenchmarkingStore((state) => state.id);
-  const client = useBenchmarking();
   const bucketFiles = useBenchmarkingStore((state) => state.bucketFiles);
-  const setBucketFiles = useBenchmarkingStore((state) => state.setBucketFiles);
-  const hasFetchedFiles = useEditBenchmarkingModalStore((state) => state.hasFetchedFiles);
-  const setHasFetchedFiles = useEditBenchmarkingModalStore((state) => state.setHasFetchedFiles);
-  const modalIsOpen = useEditBenchmarkingModalStore((state) => state.modalIsOpen);
   const action = useBenchmarkingStore((state) => state.action);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
   const setFilesToUpload = useBenchmarkingStore((state) => state.setFilesToUpload);
   const { setToastOptions } = useBenchmarkingToastOptions();
+  const queryClient = useQueryClient();
 
-  // fetch uploaded files
-  const { data, isLoading, isFetching, isError } = useQuery({
-    queryKey: ["uploaded-benchmarking-files", id],
-    queryFn: async () => {
-      const storage = new Storage(client!);
-      const getBucketListFiles = await axios.get(
-        `${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/benchmarking?id=${id}`
-      );
-
-      if (getBucketListFiles.data.files.length > 0) {
-        const newBucketFiles = Promise.all(
-          getBucketListFiles.data.files.map(async (file: any) => {
-            const fileDetails = await storage.getFile(id!, file.$id);
-            const filePreview = storage.getFilePreview(id!, file.$id);
-            const fileView = storage.getFileView(id!, file.$id);
-
-            return {
-              id: file.$id,
-              name: fileDetails.name,
-              href: fileView.href,
-              fileLink: fileView.href,
-              sizeOriginal: convertSize(fileDetails.sizeOriginal, "KB", { stringify: true }),
-              mimeType: fileDetails.mimeType,
-            };
-          })
-        );
-        // setBucketFiles(await newBucketFiles);
-        return await newBucketFiles;
-      } else setBucketFiles([]);
-    },
-    onSuccess: async (data) => {
-      setBucketFiles(data!);
-      setToastOptions("success", "Success", "Successfully fetched the files from server!");
-      setHasFetchedFiles(true);
-    },
-    onError: () => {
-      setBucketFiles([]);
-      setToastOptions("danger", "Error", "Bucket with the requested ID could not be found!");
-      setHasFetchedFiles(true);
-    },
-    enabled: !!id && modalIsOpen !== false && action === "update" && hasFetchedFiles !== true,
-    // staleTime: 2,
-    // refetchOnReconnect: false,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-  });
+  const uploadedFilesData = queryClient.getQueryState(["uploaded-benchmarking-files", id]);
 
   return (
     <>
@@ -102,11 +46,20 @@ export const EditUploadActivityAttachment: FunctionComponent = () => {
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
-          {(isEmpty(data) || isLoading || isFetching) && action === "update" && !isError ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <Spinner borderSize={2} />
+          {(!uploadedFilesData ||
+            uploadedFilesData?.status === "loading" ||
+            uploadedFilesData?.fetchStatus === "fetching") &&
+          action === "update" &&
+          uploadedFilesData?.status !== "error" ? (
+            <div className="flex flex-col">
+              <div className="flex items-center justify-center w-full h-full">
+                <Spinner size="medium" />
+              </div>
+              <div className="flex items-center justify-center w-full h-full font-sans tracking-widest animate-pulse">
+                Loading...
+              </div>
             </div>
-          ) : isError ? (
+          ) : uploadedFilesData?.status === "error" ? (
             <AlertNotification alertType="error" notifMessage="Attachment not found" />
           ) : (
             <>
@@ -145,6 +98,7 @@ export const EditUploadActivityAttachment: FunctionComponent = () => {
               />
               <button
                 className="w-full border-2 bg-gray-50  border-dashed rounded-md h-[8rem]"
+                type="button"
                 onClick={() => inputRef?.current.click()}
               >
                 <section className="flex flex-col items-center justify-center w-full">
@@ -276,7 +230,7 @@ const UploadedCard: FunctionComponent<UploadedFileProps> = ({ file }) => {
             onClick={() => {
               const index = bucketFiles.findIndex((element) => element.id === file?.id);
               const updatedFiles = [...bucketFiles];
-              setFilesToDelete([...filesToDelete, file.id]);
+              setFilesToDelete([...filesToDelete, file]);
               updatedFiles.splice(index, 1);
 
               setBucketFiles(updatedFiles);

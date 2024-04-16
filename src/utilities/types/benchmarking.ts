@@ -8,4 +8,10 @@ export type Benchmarking = {
   dateStarted: string;
   dateEnd: string;
   partner: string;
+  status: BenchmarkingStatus | undefined;
 };
+
+export enum BenchmarkingStatus {
+  PENDING = "pending",
+  DONE = "done",
+}

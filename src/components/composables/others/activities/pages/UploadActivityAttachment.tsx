@@ -66,6 +66,7 @@ export const UploadActivityAttachment: FunctionComponent = () => {
               />
               <button
                 className="w-full border-2 bg-gray-50  border-dashed rounded-md h-[8rem]"
+                type="button"
                 onClick={() => inputRef?.current.click()}
               >
                 <section className="flex flex-col items-center justify-center w-full">

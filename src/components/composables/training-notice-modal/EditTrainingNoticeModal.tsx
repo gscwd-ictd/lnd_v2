@@ -221,11 +221,43 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       }
 
       if (initialCourseTitle !== courseTitle) {
-        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/rename`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd/rename`, {
           id: trainingNoticeId!,
           name: courseTitle,
         });
       }
+
+      console.log({
+        id: trainingNoticeId,
+        source: { id: selectedTrainingSource.id },
+        courseTitle,
+        type: selectedTrainingType,
+        courseContent,
+        trainingLspDetails: selectedFacilitators.map((faci) => {
+          return { id: faci.id };
+        }),
+        location,
+        slotDistribution: slotDistribution.map((slot) => {
+          const employees = slot.employees.map((emp) => {
+            return { employeeId: emp.employeeId };
+          });
+
+          return {
+            supervisor: { supervisorId: slot.supervisor.supervisorId },
+            numberOfSlots: slot.numberOfSlots,
+            employees,
+          };
+        }),
+        trainingStart: new Date(training.trainingStart).toISOString(),
+        trainingEnd: new Date(training.trainingEnd).toISOString(),
+        numberOfHours,
+        numberOfParticipants,
+        trainingTags: selectedTags.map((tag) => {
+          return { id: tag.id };
+        }),
+
+        trainingRequirements,
+      });
 
       const response = await axios.put(`${url}/training/external`, {
         id: trainingNoticeId,
@@ -257,7 +289,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         }),
 
         trainingRequirements,
-        bucketFiles,
       });
 
       return response.data;

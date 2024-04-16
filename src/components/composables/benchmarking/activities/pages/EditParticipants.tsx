@@ -2,27 +2,25 @@ import { Combobox } from "@headlessui/react";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
-import { useQueryClient } from "@tanstack/react-query";
+import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
+import { url } from "@lms/utilities/url/api-url";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import React from "react";
 import { FunctionComponent, useState } from "react";
 
-export const AddParticipants: FunctionComponent = () => {
-  // const [selectedParticipants, setSelectedParticipants] = useState<Array<EmployeeFlatWithSupervisor>>([]);
+export const EditParticipants: FunctionComponent = () => {
   const [searchParticipant, setSearchParticipant] = useState<string>("");
+  const id = useBenchmarkingStore((state) => state.id);
   const participants = useBenchmarkingStore((state) => state.participants);
   const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
   const participantsPool = useBenchmarkingStore((state) => state.participantsPool);
   const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
-  const hasFetchedParticipants = useBenchmarkingStore((state) => state.hasFetchedParticipants);
-  const setHasFetchedParticipants = useBenchmarkingStore((state) => state.setHasFetchedParticipants);
-  const id = useBenchmarkingStore((state) => state.id);
-
   const queryClient = useQueryClient();
 
   /**
    *  get employee names
    */
-  const participantsData = queryClient.getQueryState(["new-assignable-participants"]);
 
   // filtered facilitators
   const filteredParticipants =
@@ -31,6 +29,8 @@ export const AddParticipants: FunctionComponent = () => {
       : participantsPool?.filter((participant) =>
           participant.name.toLowerCase().includes(searchParticipant.toLowerCase())
         );
+
+  const participantsData = queryClient.getQueryState(["assignable-participants"]);
 
   return (
     <>
@@ -54,7 +54,7 @@ export const AddParticipants: FunctionComponent = () => {
             : "selected"}
         </div>
         {!participantsData?.data ||
-        participantsData?.status === "loading" ||
+        // participantsData?.status === "loading" ||
         participantsData?.fetchStatus === "fetching" ? (
           <div className="flex flex-col">
             <div className="flex items-center justify-center w-full h-full">
@@ -68,7 +68,7 @@ export const AddParticipants: FunctionComponent = () => {
           <div className="flex justify-center items-center h-full text-red-600 text-lg pt-5">
             Error in fetching participants
           </div>
-        ) : participantsData?.data ? (
+        ) : participantsData?.status === "success" ? (
           <>
             <div className="relative mt-2">
               <Combobox
@@ -135,7 +135,7 @@ export const AddParticipants: FunctionComponent = () => {
             </div>
 
             {participants.length > 0 ? (
-              <div className="relative overflow-x-auto rounded-lg shadow-md">
+              <div className="relative overflow-auto rounded-lg shadow-md">
                 <table className="w-full text-left ">
                   <thead className="text-slate-600 rounded-t bg-slate-200">
                     <tr>
@@ -209,7 +209,6 @@ export const AddParticipants: FunctionComponent = () => {
             )}
           </>
         ) : null}
-
         <div className="pb-36"></div>
       </div>
     </>

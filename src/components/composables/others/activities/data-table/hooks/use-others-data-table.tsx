@@ -1,3 +1,4 @@
+import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
 import { Others } from "@lms/utilities/types/others";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -22,6 +23,11 @@ export const useOrientationDataTable = () => {
     helper.accessor("dateTo", {
       header: "End Date",
       cell: (info) => info.getValue(),
+    }),
+
+    helper.accessor("category", {
+      header: "Category",
+      cell: (info) => getActivityCategoryBadgePill(info.getValue()),
     }),
   ];
   return { columns };

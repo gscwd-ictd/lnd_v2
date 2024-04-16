@@ -13,7 +13,7 @@ const schema = yup.object({
     .string()
     .label("Date start")
     .trim()
-    .notRequired()
+    .required()
     .test("DS", "Date is not permissible", (value) => {
       if (!isEmpty(value)) {
         return dayjs().diff(dayjs(value), "day") <= 0;
@@ -33,7 +33,7 @@ const schema = yup.object({
         } else return true;
       },
     })
-    .notRequired(),
+    .required(),
   partner: yup.string().label("Partner").required(),
   location: yup.string().label("Location").required("Please input location"),
 });
@@ -111,7 +111,7 @@ export const ActivityDetails: FunctionComponent = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-full pb-2 ">
+          <div className="w-full pb-2">
             <div className="flex justify-between gap-2">
               <label htmlFor="from" className="block pl-1 text-xs font-medium text-indigo-700">
                 From <span className="text-red-600 text-md">*</span>

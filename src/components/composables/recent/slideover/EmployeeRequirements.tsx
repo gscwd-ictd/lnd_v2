@@ -2,19 +2,6 @@ import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { BatchWithEmployees, RecentContext } from "../../recent-data-table/RecentDataTable";
 
-const TempRequirements = [
-  { document: "Attendance", isSelected: true },
-  { document: "Certificate of Appearance", isSelected: null },
-  { document: "Certificate of Training", isSelected: null },
-  { document: "Course Evaluation Report", isSelected: null },
-  { document: "Course Materials", isSelected: null },
-  { document: "Learning Application Plan", isSelected: true },
-  { document: "Post Training Report", isSelected: true },
-  { document: "Post-test", isSelected: true },
-  { document: "Pre-test", isSelected: true },
-  { document: "Program", isSelected: null },
-];
-
 export const EmployeeRequirements: FunctionComponent = () => {
   const { requirements, selectedBatch, setSelectedBatch, batchAttendanceIsOpen } = useContext(RecentContext);
   const [newSelectedBatch, setNewSelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);

@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
-import { useAddBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
+import { useBenchmarkingStore, useEditBenchmarkingModalStore } from "@lms/utilities/stores/benchmarking-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent } from "react";
@@ -41,7 +41,6 @@ const schema = yup.object({
 export const EditActivityDetails: FunctionComponent = () => {
   const {
     register,
-    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
@@ -52,11 +51,12 @@ export const EditActivityDetails: FunctionComponent = () => {
   const dateStarted = useBenchmarkingStore((state) => state.dateStarted);
   const partner = useBenchmarkingStore((state) => state.partner);
   const setPartner = useBenchmarkingStore((state) => state.setPartner);
-  const setPage = useAddBenchmarkingModalStore((state) => state.setPage);
+  const setPage = useEditBenchmarkingModalStore((state) => state.setPage);
   const setTitle = useBenchmarkingStore((state) => state.setTitle);
   const setDateEnd = useBenchmarkingStore((state) => state.setDateEnd);
   const setLocation = useBenchmarkingStore((state) => state.setLocation);
   const setDateStarted = useBenchmarkingStore((state) => state.setDateStarted);
+  const modalIsOpen = useEditBenchmarkingModalStore((state) => state.modalIsOpen);
 
   const onSubmit = () => {
     setPage(3);
@@ -64,7 +64,7 @@ export const EditActivityDetails: FunctionComponent = () => {
 
   return (
     <>
-      <form id="benchmarkDetailsForm" key="benchmarkDetailsForm" onSubmit={handleSubmit(onSubmit)}>
+      <form id="editBenchmarkDetailsForm" key="editBenchmarkDetailsForm" onSubmit={handleSubmit(onSubmit)}>
         <div className="mt-1 mb-4">
           <div className="mb-2">
             <label htmlFor="course-title" className="block text-xs font-medium text-gray-700">
