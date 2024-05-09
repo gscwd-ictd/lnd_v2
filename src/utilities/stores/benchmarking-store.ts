@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { Employee } from "./employee-tags-store";
 import { EmployeeFlatWithSupervisor } from "../types/training";
 import { BucketFile } from "./training-notice-store";
+import { BenchmarkingStatus } from "../types/benchmarking";
 
 export type BenchmarkingModalStore = {
   page: number;
@@ -12,27 +12,35 @@ export type BenchmarkingModalStore = {
 };
 
 export type BenchmarkingState = {
-  id: string;
-  setId: (id: string) => void;
+  id: string | null;
+  setId: (id: string | null) => void;
+  initialTitle: string;
+  setInitialTitle: (initialTitle: string) => void;
   title: string;
   setTitle: (title: string) => void;
   partner: string;
   setPartner: (partner: string) => void;
   participants: Array<EmployeeFlatWithSupervisor>;
   setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
+  participantsPool: Array<EmployeeFlatWithSupervisor>;
+  setParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
+  hasFetchedParticipants: boolean;
+  setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   location: string;
   setLocation: (location: string) => void;
-  dateStarted: string;
-  setDateStarted: (dateFrom: string) => void;
-  dateEnd: string;
-  setDateEnd: (dateTo: string) => void;
+  dateFrom: string;
+  setDateFrom: (dateFrom: string) => void;
+  dateTo: string;
+  setDateTo: (dateTo: string) => void;
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
   bucketFiles: Array<BucketFile>;
   setBucketFiles: (bucketFiles: Array<BucketFile>) => void;
-  filesToDelete: Array<string>;
-  setFilesToDelete: (filesToDelete: Array<string>) => void;
+  filesToDelete: Array<BucketFile>;
+  setFilesToDelete: (filesToDelete: Array<BucketFile>) => void;
   action: "create" | "update" | undefined;
+  status: BenchmarkingStatus | undefined;
+  setStatus: (status: BenchmarkingStatus | undefined) => void;
   setAction: (action: "create" | "update" | undefined) => void;
   reset: () => void;
 };
@@ -71,6 +79,8 @@ export const useEditBenchmarkingModalStore = create<
 export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   id: "",
   setId: (id) => set({ id }),
+  initialTitle: "",
+  setInitialTitle: (initialTitle) => set({ initialTitle }),
   title: "",
   setTitle: (title) => set({ title }),
   partner: "",
@@ -81,16 +91,22 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   setParticipants: (participants) => set({ participants }),
   location: "",
   setLocation: (location) => set({ location }),
-  dateStarted: "",
-  setDateStarted: (dateStarted) => set({ dateStarted }),
-  dateEnd: "",
-  setDateEnd: (dateEnd) => set({ dateEnd }),
+  dateFrom: "",
+  setDateFrom: (dateFrom) => set({ dateFrom }),
+  dateTo: "",
+  setDateTo: (dateTo) => set({ dateTo }),
   filesToUpload: [],
   setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
   bucketFiles: [],
   setBucketFiles: (bucketFiles) => set({ bucketFiles }),
   filesToDelete: [],
   setFilesToDelete: (filesToDelete) => set({ filesToDelete }),
+  participantsPool: [],
+  setParticipantsPool: (participantsPool) => set({ participantsPool }),
+  hasFetchedParticipants: false,
+  setHasFetchedParticipants: (hasFetchedParticipants) => set({ hasFetchedParticipants }),
+  status: undefined,
+  setStatus: (status) => set({ status }),
   reset: () => {
     set({
       id: "",
@@ -98,10 +114,22 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
       title: "",
       participants: [],
       partner: "",
-      dateStarted: "",
-      dateEnd: "",
+      dateFrom: "",
+      dateTo: "",
       filesToUpload: [],
       action: undefined,
+      initialTitle: "",
+      participantsPool: [],
+      hasFetchedParticipants: false,
     });
   },
+}));
+
+type DeleteBenchmarkingModalState = {
+  modalIsOpen: boolean;
+  setModalIsOpen: (modalIsOpen: boolean) => void;
+};
+export const useDeleteBenchmarkingModalStore = create<DeleteBenchmarkingModalState>((set) => ({
+  modalIsOpen: false,
+  setModalIsOpen: (modalIsOpen) => set({ modalIsOpen }),
 }));

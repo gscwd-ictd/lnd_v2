@@ -20,8 +20,9 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspOrganizationModalBody } from "./LspOrganizationModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWithAppwriteUpload";
+import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/IndAvatarWithAppwriteUpload";
 import { EditUploadPhotoAlert } from "../individual/EditUploadPhotoAlert";
+import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 
 type EditLspOrganizationModalProps = {
   edit: boolean;
@@ -255,7 +256,8 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
                 source="https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1224.jpg"
                 size="xl"
               /> */}
-              <AvatarWithAppwriteUpload source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
+              {/* <AvatarWithAppwriteUpload source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" /> */}
+              <Avatar source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
             </div>
             <header className="px-2 mt-1">
               <p className="text-xs font-medium text-indigo-500">{page} of 9</p>

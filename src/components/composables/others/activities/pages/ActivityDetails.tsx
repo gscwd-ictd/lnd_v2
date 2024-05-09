@@ -3,7 +3,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
-import { useOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
+import { useAddOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent, useEffect, useState } from "react";
@@ -16,7 +16,7 @@ const schema = yup.object({
     .string()
     .label("Date start")
     .trim()
-    .notRequired()
+    .required()
     .test("DS", "Date is not permissible", (value) => {
       if (!isEmpty(value)) {
         return dayjs().diff(dayjs(value), "day") <= 0;
@@ -36,13 +36,12 @@ const schema = yup.object({
         } else return true;
       },
     })
-    .notRequired(),
+    .required(),
 
   location: yup.string().label("Location").required("Please input location"),
 });
 
 export const ActivityDetails: FunctionComponent = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(false);
   const {
     register,
     formState: { errors },
@@ -59,17 +58,11 @@ export const ActivityDetails: FunctionComponent = () => {
   const setDateTo = useOthersStore((state) => state.setDateTo);
   const setDateFrom = useOthersStore((state) => state.setDateFrom);
   const setLocation = useOthersStore((state) => state.setLocation);
-  const setPage = useOthersModalStore((state) => state.setPage);
+  const setPage = useAddOthersModalStore((state) => state.setPage);
 
   const onSubmit = () => {
-    setPage(3);
+    setPage(4);
   };
-
-  useEffect(() => {
-    if (location === "Online") {
-      setIsOnline(true);
-    }
-  }, [location]);
 
   return (
     <>
@@ -94,22 +87,19 @@ export const ActivityDetails: FunctionComponent = () => {
           />
         </div>
 
-        <div className="mb-2">
+        <div className="pb-2">
           <label htmlFor="from" className="block text-xs font-medium text-gray-700">
             Inclusive dates
           </label>
           <p className="text-xs text-gray-500">The specific timeframe during which the activity would take place.</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="w-full pb-2 ">
+        <div className="flex gap-2 ">
+          <section className="w-full">
             <div className="flex justify-between gap-2">
               <label htmlFor="from" className="block pl-1 text-xs font-medium text-indigo-700">
                 From <span className="text-red-600 text-md">*</span>
               </label>
-              <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateFrom) ? errors.dateFrom?.message : undefined}
-              </span>
             </div>
             <input
               id="from"
@@ -120,177 +110,62 @@ export const ActivityDetails: FunctionComponent = () => {
                 },
               })}
               type="date"
-              // className="w-full text-sm text-gray-700 border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500"
-              className={`block w-full placeholder:text-gray-400  ${
+              className={` w-full placeholder:text-gray-400  ${
                 errors.dateFrom
                   ? "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
             />
-          </div>
-          <div className="w-full pb-2">
+            <span className="text-xs text-red-600">
+              {!isEmpty(errors.dateFrom) ? errors.dateFrom?.message : undefined}
+            </span>
+          </section>
+          <section className="w-full">
             <div className="flex justify-between gap-2">
               <label htmlFor="to" className="block pl-1 text-xs font-medium text-indigo-700">
                 To <span className="text-red-600 text-md">*</span>
               </label>
-              <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateTo) ? errors.dateTo?.message : undefined}
-              </span>
             </div>
             <input
               id="to"
               {...register("dateTo", { value: dateTo, onChange: (e) => setDateTo(e.target.value) })}
               type="date"
-              className={`mb-1 ${
+              className={` w-full placeholder:text-gray-400  ${
                 errors.dateTo
-                  ? "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
-                  : "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
+                  ? " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
+                  : " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
             />
-          </div>
+            <span className="text-xs text-red-600">{!isEmpty(errors.dateTo) ? errors.dateTo?.message : undefined}</span>
+          </section>
         </div>
 
-        <div className="mt-1">
-          <div className="items-center mt-2">
+        <div>
+          <div className="items-center pt-4">
             <label htmlFor="location" className="block text-xs font-medium text-gray-700">
               Location <span className="text-red-600 text-md">*</span>
             </label>
             <div className="flex w-full gap-2">
               <div className="text-xs text-gray-500">The designated venue or setting for the activity.</div>
-              <div className="flex items-center w-auto gap-1 pb-2 text-xs">
-                <Checkbox
-                  id={`checkboxLocation`}
-                  label="Conducted online"
-                  checked={isOnline}
-                  onChange={(e) => {
-                    setIsOnline(!isOnline);
-                    if (e.currentTarget.checked === true) {
-                      setValue("location", "Online");
-                      setLocation("Online");
-                      clearErrors("location");
-                    } else if (e.currentTarget.checked === false) {
-                      setValue("location", "");
-                      setLocation("");
-                    }
-                  }}
-                />
-              </div>
             </div>
           </div>
-          {!isOnline ? (
-            <textarea
-              {...register("location", { value: location, onChange: (e) => setLocation(e.target.value) })}
-              id="location"
-              style={{ resize: "none" }}
-              rows={2}
-              placeholder="Please indicate the activity's venue"
-              // className="block w-full px-4 py-3 text-sm border-gray-200 rounded-md placeholder:text-gray-300 placeholder:text-xs focus:border-indigo-500 focus:ring-indigo-500"
 
-              className={`block w-full px-4 py-3 placeholder:text-gray-300 placeholder:text-xs rounded-md  ${
-                errors.location
-                  ? "outline-none border focus:ring-2 text-sm transition-colors border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
-                  : "outline-none border focus:ring-2 text-sm transition-colors border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
-              }`}
-            />
-          ) : null}
+          <textarea
+            {...register("location", { value: location, onChange: (e) => setLocation(e.target.value) })}
+            id="location"
+            style={{ resize: "none" }}
+            rows={2}
+            placeholder="Please indicate the activity's venue"
+            // className="block w-full px-4 py-3 text-sm border-gray-200 rounded-md placeholder:text-gray-300 placeholder:text-xs focus:border-indigo-500 focus:ring-indigo-500"
+
+            className={`block w-full px-4 py-3 placeholder:text-gray-300 placeholder:text-xs rounded-md  ${
+              errors.location
+                ? "outline-none border focus:ring-2 text-sm transition-colors border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
+                : "outline-none border focus:ring-2 text-sm transition-colors border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
+            }`}
+          />
+
           <div className="text-xs text-red-600">{!isEmpty(errors.location) ? errors.location?.message : undefined}</div>
-          {/* {!isOnline ? (
-            <div className="flex items-center float-right gap-2">
-              <div className="text-xs text-gray-600">Suggested: </div>
-              <div className="grid grid-cols-3 gap-1">
-                <button
-                  tabIndex={-1}
-                  className="px-1.5 py-0.5 mt-1 bg-orange-200 border border-orange-500 text-orange-700 rounded hover:bg-orange-500 hover:text-white"
-                  type="button"
-                  onClick={() => {
-                    setLocation(
-                      "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    setValue(
-                      "location",
-                      "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    clearErrors("location");
-                  }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <div className="flex items-center gap-1 text-xs text-center transition-all">
-                    <span>GSCWD Multi-Purpose Hall</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      className={`w-3 h-3 ${isHovered ? "stroke-orange-800" : "stroke-orange-600"} `}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                  </div>
-                </button>
-                <button
-                  tabIndex={-1}
-                  className="px-1.5 py-0.5 mt-1 bg-indigo-200 border border-indigo-500 text-indigo-700 rounded hover:bg-indigo-500 hover:text-white"
-                  type="button"
-                  onClick={() => {
-                    setLocation(
-                      "General Santos City Water District - Orientation Room, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    setValue(
-                      "location",
-                      "General Santos City Water District - Orientation Room, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    clearErrors("location");
-                  }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <div className="flex items-center gap-1 text-xs text-center transition-all">
-                    <span>GSCWD Orientation Room</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      className={`w-3 h-3 ${isHovered ? "stroke-indigo-800" : "stroke-indigo-600"} `}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                  </div>
-                </button>
-                <button
-                  tabIndex={-1}
-                  className="px-1.5 py-0.5 mt-1 bg-rose-200 border border-rose-500 text-rose-700 rounded hover:bg-rose-500 hover:text-white"
-                  type="button"
-                  onClick={() => {
-                    setLocation(
-                      "General Santos City Water District - Board of Directors Room, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    setValue(
-                      "location",
-                      "General Santos City Water District - Board of Directors Room, E. Fernandez St., Lagao, General Santos City"
-                    );
-                    clearErrors("location");
-                  }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <div className="flex items-center gap-1 text-xs text-center transition-all">
-                    <span>GSCWD BOD Room</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      className={`w-3 h-3 ${isHovered ? "stroke-rose-800" : "stroke-rose-600"} `}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                  </div>
-                </button>
-              </div>
-            </div>
-          ) : null} */}
         </div>
       </form>
     </>

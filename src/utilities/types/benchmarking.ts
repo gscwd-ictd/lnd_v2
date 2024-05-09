@@ -5,7 +5,13 @@ export type Benchmarking = {
   id: string;
   title: string;
   location: string;
-  dateStarted: string;
-  dateEnd: string;
+  dateFrom: string;
+  dateTo: string;
   partner: string;
+  status: BenchmarkingStatus | undefined;
 };
+
+export enum BenchmarkingStatus {
+  PENDING = "pending",
+  DONE = "done",
+}

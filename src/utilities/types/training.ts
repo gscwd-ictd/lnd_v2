@@ -65,7 +65,13 @@ export type EmployeeWithStatus = {
   remarks?: string | null;
 };
 
-export type EmployeeFlatWithSupervisor = Employee & Pick<Recommendation, "supervisor">;
+// export type EmployeeFlatWithSupervisor = Employee & Pick<Recommendation, "supervisor">;
+export type EmployeeFlatWithSupervisor = Employee & {
+  supervisorName: string;
+  assignment?: string;
+  learningApplicationPlan?: boolean;
+  benchmarkParticipants?: string;
+};
 
 export type EmployeeWithSupervisor = EmployeeWithStatus &
   Pick<Recommendation, "supervisor"> & { isOneDayTraining?: boolean };

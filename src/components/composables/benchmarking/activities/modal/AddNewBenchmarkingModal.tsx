@@ -5,32 +5,35 @@ import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/vi
 import { useAddBenchmarkingModalStore, useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { AddParticipants } from "../pages/AddParticipants";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
-import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { useState } from "react";
-import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { useBenchmarking } from "@lms/hooks/use-benchmarking";
 import { Storage } from "appwrite";
 import { v4 as uuidv4 } from "uuid";
+import { useBenchmarkingToastOptions } from "../data-table/BenchmarkingDataTable";
+import { AddBenchmarkingDetailsSummary } from "../pages/AddBenchmarkingDetailsSummary";
 
 export const AddNewBenchmarkingModal = () => {
   const queryClient = useQueryClient();
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
   const page = useAddBenchmarkingModalStore((state) => state.page);
   const modalIsOpen = useAddBenchmarkingModalStore((state) => state.modalIsOpen);
   const filesToUpload = useBenchmarkingStore((state) => state.filesToUpload);
   const participants = useBenchmarkingStore((state) => state.participants);
+  const hasFetchedParticipants = useBenchmarkingStore((state) => state.hasFetchedParticipants);
+  const id = useBenchmarkingStore((state) => state.id);
+  const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
+  const setHasFetchedParticipants = useBenchmarkingStore((state) => state.setHasFetchedParticipants);
   const reset = useBenchmarkingStore((state) => state.reset);
+
   const setPage = useAddBenchmarkingModalStore((state) => state.setPage);
   const resetModal = useAddBenchmarkingModalStore((state) => state.resetModal);
   const setModalIsOpen = useAddBenchmarkingModalStore((state) => state.setModalIsOpen);
   const benchmarking = useBenchmarkingStore();
   const client = useBenchmarking();
+  const { setToastOptions } = useBenchmarkingToastOptions();
 
   const onClose = () => {
     setModalIsOpen(false);
@@ -43,18 +46,14 @@ export const AddNewBenchmarkingModal = () => {
       setToastOptions("danger", "Error", "You have not uploaded anything.");
     } else if (page === 3 && participants.length < 1) {
       setToastOptions("danger", "Error", "You have not added any participant.");
-    } else if (page === 3 && participants.length > 0) await addBenchmarkingMutation.mutateAsync();
+    } else if (page === 3 && participants.length > 0) setPage(page + 1);
+    else if (page === 4) await addBenchmarkingMutation.mutateAsync();
     else setPage(page + 1);
-  };
-
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
   };
 
   const addBenchmarkingMutation = useMutation({
     mutationFn: async () => {
-      const { title, dateStarted, dateEnd, location, participants, partner, filesToUpload } = benchmarking;
+      const { title, dateFrom, dateTo, location, participants, partner, filesToUpload } = benchmarking;
 
       const storage = new Storage(client!);
 
@@ -62,8 +61,8 @@ export const AddNewBenchmarkingModal = () => {
       const benchmarkCreationResponse = await axios.post(`${url}/benchmark`, {
         title,
         partner,
-        dateStarted,
-        dateEnd,
+        dateFrom,
+        dateTo,
         location,
         participants: participants.map((participant) => {
           return { employeeId: participant.employeeId };
@@ -95,6 +94,7 @@ export const AddNewBenchmarkingModal = () => {
       setToastOptions("success", "Success", "You have successfully added a benchmarking activity.");
       setModalIsOpen(false);
       reset();
+      resetModal();
       const getUpdatedBenchmarkings = await axios.get(`${url}/benchmark?page=1&limit=1000`);
       queryClient.setQueryData(["benchmarking-activities"], getUpdatedBenchmarkings.data.items);
     },
@@ -142,6 +142,28 @@ export const AddNewBenchmarkingModal = () => {
     },
   });
 
+  // fetch participants
+  useQuery({
+    queryKey: ["new-assignable-participants"],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/benchmark/assignable/participant`);
+
+      return data;
+    },
+    onSuccess: (data) => {
+      setParticipantsPool(data);
+      setHasFetchedParticipants(true);
+    },
+    onError: () => {
+      setParticipantsPool([]);
+    },
+    enabled: modalIsOpen !== false && hasFetchedParticipants === false,
+    staleTime: 2,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <>
       <Modal
@@ -158,6 +180,7 @@ export const AddNewBenchmarkingModal = () => {
           onClick={() => {
             setModalIsOpen(true);
           }}
+          className="mb-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -174,8 +197,9 @@ export const AddNewBenchmarkingModal = () => {
 
         <ModalContent>
           <ModalContent.Title>
-            <header className="pl-2">
+            <header className="pl-2 flex gap-2 items-center">
               <h3 className="text-lg font-semibold text-gray-600">New Benchmarking Activity</h3>
+              <span className="bg-green-200 text-green-600 px-1 py-0.5 text-xs rounded font-medium">New</span>
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
@@ -183,6 +207,7 @@ export const AddNewBenchmarkingModal = () => {
               {page === 1 && <UploadActivityAttachment />}
               {page === 2 && <ActivityDetails />}
               {page === 3 && <AddParticipants />}
+              {page === 4 && <AddBenchmarkingDetailsSummary />}
             </main>
           </ModalContent.Body>
           <ModalContent.Footer>
@@ -203,6 +228,12 @@ export const AddNewBenchmarkingModal = () => {
                     Previous
                   </Button>
                 )}
+                {page === 4 && (
+                  <Button variant="white" className="w-[5rem]" onClick={() => setPage(3)}>
+                    Previous
+                  </Button>
+                )}
+
                 {page === 1 && (
                   <Button className="w-[5rem]" onClick={onNext}>
                     Next
@@ -213,13 +244,27 @@ export const AddNewBenchmarkingModal = () => {
                     Next
                   </Button>
                 )}
+
                 {page === 3 && (
+                  <Button className="w-[5rem]" type="button" onClick={onNext}>
+                    Next
+                  </Button>
+                )}
+
+                {page === 4 && (
                   <Button
-                    className="w-[5rem] disabled:bg-indigo-300 disabled:cursor-not-allowed"
+                    className="min-w-[5rem] disabled:bg-indigo-300 disabled:cursor-not-allowed"
                     onClick={onNext}
                     disabled={addBenchmarkingMutation.isLoading ? true : false}
                   >
-                    {addBenchmarkingMutation.isLoading ? <Spinner size="xs" /> : null} Submit
+                    <div className="flex gap-1 px-1 ">
+                      {addBenchmarkingMutation.isLoading ? (
+                        <div className="w-full">
+                          <Spinner size="xs" />
+                        </div>
+                      ) : null}{" "}
+                      <div>Submit</div>
+                    </div>
                   </Button>
                 )}
               </div>
@@ -227,15 +272,6 @@ export const AddNewBenchmarkingModal = () => {
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
-
-      <Toast
-        duration={toastType.color === "danger" ? 2000 : 1500}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

@@ -164,54 +164,6 @@ export const RecentDataTable: FunctionComponent = () => {
     },
   });
 
-  // useQuery({
-  //   queryKey: ["training-details-requirements", id],
-  //   queryFn: async () => {
-  //     const requirements = await axios.get(`${url}/training/${id}/requirements`);
-  //     console.log(requirements.data);
-  //   },
-  //   enabled: !!id && hasFetchedBatches === false,
-  // });
-
-  // // this is to check the status if it already has batching and fetch the batches
-  // useQuery({
-  //   queryKey: ["training-details-nominees-batches", id],
-  //   enabled: !!id && hasFetchedBatches === false,
-  //   staleTime: 2,
-  //   refetchOnReconnect: false,
-  //   refetchOnMount: false,
-  //   refetchOnWindowFocus: false,
-  //   queryFn: async () => {
-  //     const { data } = await axios.get(`${url}/training/${id}/batch`);
-  //     // const { data } = await axios.get(`${url}/training/${id}/requirements`);
-
-  //     let updatedSelectedEmployees: BatchEmployee[] = [];
-  //     const fetchedBatches = data.map((batch: Batch) => {
-  //       if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
-  //       return {
-  //         batchNumber: batch.batchNumber,
-
-  //         trainingDate: {
-  //           from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
-  //           to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
-  //         },
-  //         isOneDayTraining:
-  //           dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
-  //         employees: batch.employees,
-  //       };
-  //     });
-
-  //     // set fetched batches to true
-  //     setHasFetchedBatches(true);
-  //     setBatches(fetchedBatches);
-
-  //     // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
-  //     // setEmployeePool([]);
-
-  //     return batches;
-  //   },
-  // });
-
   // this is to check the status if it already has batching and fetch the batches
   useQuery({
     queryKey: ["training-details-nominees-batches", id],

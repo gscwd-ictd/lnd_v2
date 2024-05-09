@@ -23,6 +23,11 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
+type MeetingDetails = {
+  id: string;
+  name: string;
+};
+
 const colStartClasses = ["", "col-start-2", "col-start-3", "col-start-4", "col-start-5", "col-start-6", "col-start-7"];
 
 export const TrainingCalendar: FunctionComponent = () => {
@@ -52,7 +57,7 @@ export const TrainingCalendar: FunctionComponent = () => {
     setCurrentMonth(format(firstDayOfMonth, "MMM-yyyy"));
   };
 
-  const selectedDayMeetings = [];
+  const selectedDayMeetings: Array<MeetingDetails> = [];
 
   return (
     <div className="relative">
@@ -72,7 +77,9 @@ export const TrainingCalendar: FunctionComponent = () => {
           </h2>
           <ol className="mt-4 space-y-1 text-sm leading-6 text-gray-500">
             {selectedDayMeetings && selectedDayMeetings.length > 0 ? (
-              selectedDayMeetings.map((meeting) => <Meeting meeting={meeting} key={meeting.id} />)
+              selectedDayMeetings.map((meeting: MeetingDetails) => (
+                <Meeting id={meeting.id} name={meeting.name} key={meeting.id} />
+              ))
             ) : (
               <p>No events today.</p>
             )}
@@ -158,12 +165,15 @@ export const TrainingCalendar: FunctionComponent = () => {
   );
 };
 
-const Meeting: FunctionComponent = ({ meeting }: any) => {
+const Meeting: FunctionComponent<MeetingDetails> = ({ id, name }) => {
   return (
-    <li className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100">
+    <li
+      className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100"
+      key={id}
+    >
       <img src={gscwdlogo.src} alt="" className="flex-none w-10 h-10 rounded-full" />
       <div className="flex-auto">
-        <p className="text-gray-900">{meeting.name}</p>
+        <p className="text-gray-900">{name}</p>
         {/* <p className="mt-0.5">
           <time dateTime={meeting.startDatetime}>
             {format(startDateTime, 'h:mm a')}

@@ -221,7 +221,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
       }
 
       if (initialCourseTitle !== courseTitle) {
-        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/rename`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd/rename`, {
           id: trainingNoticeId!,
           name: courseTitle,
         });
@@ -257,7 +257,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         }),
 
         trainingRequirements,
-        bucketFiles,
       });
 
       return response.data;
@@ -275,7 +274,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-        console.log(data);
+
         // INTERNAL
         setCourseContent(data.courseContent);
         setTrainingRequirements(data.trainingRequirements);

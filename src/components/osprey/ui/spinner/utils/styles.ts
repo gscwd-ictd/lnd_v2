@@ -17,7 +17,7 @@ export const styles = {
         "border-indigo-200 border-r-white": color === "light",
         "w-7 h-7": size === "xs",
         "w-10 h-10": size === "small",
-        "w-15 h-15": size === "medium",
+        "w-16 h-16": size === "medium",
         "w-20 h-20": size === "large",
       },
       className

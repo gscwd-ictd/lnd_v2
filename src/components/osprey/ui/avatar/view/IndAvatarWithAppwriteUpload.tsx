@@ -9,8 +9,9 @@ import {
   useLspDetailsStore,
   useLspSourceStore,
 } from "@lms/utilities/stores/lsp-details-store";
+import { useIndSlideOver } from "@lms/components/composables/lsp-data-table/IndividualLspDataTable";
 
-export const AvatarWithAppwriteUpload: FunctionComponent<AvatarProps> = ({
+export const IndAvatarWithAppwriteUpload: FunctionComponent<AvatarProps> = ({
   source,
   alt = "avatar",
   size = "md",
@@ -20,8 +21,9 @@ export const AvatarWithAppwriteUpload: FunctionComponent<AvatarProps> = ({
 }) => {
   const photoToUploadUrl = useLspDetailsStore((state) => state.photoToUploadUrl);
   const photoUrl = useLspDetailsStore((state) => state.photoUrl);
-  const setEditUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
-  const setAddUploadAlertIsOpen = useAddLspModalStore((state) => state.setUploadAlertIsOpen);
+  // const setEditUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
+  // const setAddUploadAlertIsOpen = useAddLspModalStore((state) => state.setUploadAlertIsOpen);
+  const { setUploadAlertIsOpen } = useIndSlideOver();
   const lspAction = useLspDetailsStore((state) => state.lspAction);
 
   // useEffect(() => console.log(uploadedPhoto));
@@ -33,8 +35,9 @@ export const AvatarWithAppwriteUpload: FunctionComponent<AvatarProps> = ({
       <button
         className="absolute bottom-0 left-10"
         onClick={() => {
-          if (lspAction === "create") setAddUploadAlertIsOpen(true);
-          if (lspAction === "update") setEditUploadAlertIsOpen(true);
+          // if (lspAction === "create") setAddUploadAlertIsOpen(true);
+          // if (lspAction === "update") setEditUploadAlertIsOpen(true);
+          setUploadAlertIsOpen(true);
         }}
       >
         <svg

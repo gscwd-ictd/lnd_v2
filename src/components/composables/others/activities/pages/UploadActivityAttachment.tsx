@@ -1,9 +1,8 @@
 import { FileThumbnail } from "@lms/components/features/Thumbnail";
-import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
-import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { useOthersStore } from "@lms/utilities/stores/others-store";
 import convertSize from "convert-size";
 import { FunctionComponent, MutableRefObject, createContext, useContext, useRef, useState } from "react";
+import { useOthersToastOptions } from "../data-table/OthersDataTable";
 
 type FileToUploadCardProps = {
   file: File;
@@ -16,22 +15,11 @@ type FilesToUploadContextState = {
 
 const FilesToUploadContext = createContext({} as FilesToUploadContextState);
 
-// hook for the toast
-const useToastOptions = () => {
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-  return { toastIsOpen, setToastIsOpen, toastType, setToastOptions };
-};
-
 export const UploadActivityAttachment: FunctionComponent = () => {
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
   const setFilesToUpload = useOthersStore((state) => state.setFilesToUpload);
-  const { setToastIsOpen, setToastOptions, toastIsOpen, toastType } = useToastOptions();
+  const { setToastOptions } = useOthersToastOptions();
 
   return (
     <>
@@ -66,6 +54,7 @@ export const UploadActivityAttachment: FunctionComponent = () => {
               />
               <button
                 className="w-full border-2 bg-gray-50  border-dashed rounded-md h-[8rem]"
+                type="button"
                 onClick={() => inputRef?.current.click()}
               >
                 <section className="flex flex-col items-center justify-center w-full">
@@ -108,15 +97,6 @@ export const UploadActivityAttachment: FunctionComponent = () => {
           )}
         </div>
       </div>
-
-      <Toast
-        duration={toastType.color === "danger" ? 2000 : 1500}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

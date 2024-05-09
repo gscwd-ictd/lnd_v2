@@ -10,29 +10,34 @@ import {
 import { useEditLspModalStore, useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
 import { FunctionComponent, MutableRefObject, useContext, useRef, useState } from "react";
 import defaultPhoto from "../../../../../public/images/placeholders/user-placeholder-gray.png";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Storage } from "appwrite";
 import { useLspExternal } from "@lms/hooks/use-lsp-external";
 import { LspToastContext } from "../../lsp-tabs/LspTabs";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
+import { useIndSlideOver } from "../../lsp-data-table/IndividualLspDataTable";
 
 export const EditUploadPhotoAlert: FunctionComponent = () => {
   const client = useLspExternal();
+  const queryClient = useQueryClient();
   const [tempPhotoToUpload, setTempPhotoToUpload] = useState<File | null>(null);
   const [tempPhotoToUploadUrl, setTempPhotoToUploadUrl] = useState<string | null>(null);
 
+  const { id } = useIndSlideOver();
+
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const name = useLspDetailsStore((state) => state.name);
-  const lspId = useLspDetailsStore((state) => state.id);
+  // const lspId = useLspDetailsStore((state) => state.id);
   const photoUrl = useLspDetailsStore((state) => state.photoUrl);
   const photoToUpload = useLspDetailsStore((state) => state.photoToUpload);
   const setPhotoToUpload = useLspDetailsStore((state) => state.setPhotoToUpload);
   const photoToUploadUrl = useLspDetailsStore((state) => state.photoToUploadUrl);
   const setPhotoToUploadUrl = useLspDetailsStore((state) => state.setPhotoToUploadUrl);
-  const uploadAlertIsOpen = useEditLspModalStore((state) => state.uploadAlertIsOpen);
-  const setUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
+  // const uploadAlertIsOpen = useEditLspModalStore((state) => state.uploadAlertIsOpen);
+  // const setUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
+  const { uploadAlertIsOpen, setUploadAlertIsOpen } = useIndSlideOver();
   const setPhotoUrl = useLspDetailsStore((state) => state.setPhotoUrl);
   const { setToastOptions } = useContext(LspToastContext);
   const photoId = useLspDetailsStore((state) => state.photoId);
@@ -57,7 +62,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
 
       // lsp/upload/photo
       const updatePhotoDetails = await axios.patch(`${url}/lsp/upload/photo`, {
-        lspId: lspId,
+        lspId: id,
         photoId: uploadedFile.$id,
         photoUrl: filePreview.href,
       });
@@ -68,6 +73,9 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
       setPhotoId(data.photoId);
       setPhotoUrl(data.photoUrl);
       setUploadAlertIsOpen(false);
+
+      queryClient.setQueryData(["lsp-individual-details", id], data);
+
       setToastOptions("success", "Success", "You have successfully uploaded a photo!");
     },
     onError: () => {
@@ -100,7 +108,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
 
       // lsp/upload/photo
       const updatePhotoDetails = await axios.patch(`${url}/lsp/upload/photo`, {
-        lspId: lspId,
+        lspId: id,
         photoId: uploadedFile.$id,
         photoUrl: filePreview.href,
       });
@@ -111,6 +119,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
       setPhotoUrl(data.photoUrl);
       setPhotoId(data.photoId);
       setToastOptions("success", "Success", "You have successfully changed the photo!");
+      queryClient.setQueryData(["lsp-individual-details", id], data);
       setUploadAlertIsOpen(false);
     },
   });
@@ -143,6 +152,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
               />
             </div>
           </AlertDialogDescription>
+          {photoUrl}
           <div className="flex justify-end py-4 px-2 space-x-2">
             {photoToUploadUrl === null ? (
               <>
