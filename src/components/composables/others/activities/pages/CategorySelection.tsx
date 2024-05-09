@@ -19,33 +19,6 @@ export const OtherCategorySelection: FunctionComponent = () => {
           <p className="text-xs text-gray-500">Select from the list of other activities </p>
         </RadioGroup.Label>
       </div>
-      {/* Meeting */}
-      <RadioGroup.Option value={OthersCategory.MEETING} as={Fragment}>
-        {({ checked }) => {
-          checked = category === OthersCategory.MEETING;
-          return (
-            <div
-              className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
-              } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
-              onClick={() => {
-                setCategory(OthersCategory.MEETING);
-              }}
-            >
-              <p>Meeting</p>
-              {checked && (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                  <path
-                    fillRule="evenodd"
-                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </div>
-          );
-        }}
-      </RadioGroup.Option>
 
       {/* Conference */}
       <RadioGroup.Option value={OthersCategory.CONFERENCE} as={Fragment}>
@@ -75,20 +48,104 @@ export const OtherCategorySelection: FunctionComponent = () => {
         }}
       </RadioGroup.Option>
 
-      {/* Workshop */}
-      <RadioGroup.Option value={OthersCategory.WORKSHOP} as={Fragment}>
+      {/* Convention */}
+      <RadioGroup.Option value={OthersCategory.CONVENTION} as={Fragment}>
         {({ checked }) => {
-          checked = category === OthersCategory.WORKSHOP;
+          checked = category === OthersCategory.CONVENTION;
           return (
             <div
               className={`${
                 checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
-                setCategory(OthersCategory.WORKSHOP);
+                setCategory(OthersCategory.CONVENTION);
               }}
             >
-              <p>Workshop</p>
+              <p>Convention</p>
+              {checked && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                  <path
+                    fillRule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+          );
+        }}
+      </RadioGroup.Option>
+
+      {/* Meeting */}
+      <RadioGroup.Option value={OthersCategory.MEETING} as={Fragment}>
+        {({ checked }) => {
+          checked = category === OthersCategory.MEETING;
+          return (
+            <div
+              className={`${
+                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+              } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
+              onClick={() => {
+                setCategory(OthersCategory.MEETING);
+              }}
+            >
+              <p>Meeting</p>
+              {checked && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                  <path
+                    fillRule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+          );
+        }}
+      </RadioGroup.Option>
+
+      {/* Orientation */}
+      <RadioGroup.Option value={OthersCategory.ORIENTATION} as={Fragment}>
+        {({ checked }) => {
+          checked = category === OthersCategory.ORIENTATION;
+          return (
+            <div
+              className={`${
+                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+              } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
+              onClick={() => {
+                setCategory(OthersCategory.ORIENTATION);
+              }}
+            >
+              <p>Orientation</p>
+              {checked && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                  <path
+                    fillRule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+          );
+        }}
+      </RadioGroup.Option>
+
+      {/* Seminar */}
+      <RadioGroup.Option value={OthersCategory.SEMINAR} as={Fragment}>
+        {({ checked }) => {
+          checked = category === OthersCategory.SEMINAR;
+          return (
+            <div
+              className={`${
+                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+              } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
+              onClick={() => {
+                setCategory(OthersCategory.SEMINAR);
+              }}
+            >
+              <p>Seminar</p>
               {checked && (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                   <path
@@ -131,20 +188,20 @@ export const OtherCategorySelection: FunctionComponent = () => {
         }}
       </RadioGroup.Option>
 
-      {/* Seminar */}
-      <RadioGroup.Option value={OthersCategory.SEMINAR} as={Fragment}>
+      {/* Workshop */}
+      <RadioGroup.Option value={OthersCategory.WORKSHOP} as={Fragment}>
         {({ checked }) => {
-          checked = category === OthersCategory.SEMINAR;
+          checked = category === OthersCategory.WORKSHOP;
           return (
             <div
               className={`${
                 checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
-                setCategory(OthersCategory.SEMINAR);
+                setCategory(OthersCategory.WORKSHOP);
               }}
             >
-              <p>Seminar</p>
+              <p>Workshop</p>
               {checked && (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                   <path

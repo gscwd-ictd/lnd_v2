@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { OthersCategory } from "../types/others";
 import { BucketFile } from "./training-notice-store";
+import { EmployeeFlatWithSupervisor } from "../types/training";
 
 export type OthersModalStore = {
   page: number;
@@ -18,10 +19,22 @@ export type OthersCategoryState = {
 export type OthersState = {
   id: string;
   setId: (id: string) => void;
+  initialTitle: string;
+  setInitialTitle: (initialTitle: string) => void;
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
   bucketFiles: Array<BucketFile>;
-  setBucketFIles: (bucketFiles: Array<BucketFile>) => void;
+  setBucketFiles: (bucketFiles: Array<BucketFile>) => void;
+  filesToDelete: Array<BucketFile>;
+  setFilesToDelete: (filesToDelete: Array<BucketFile>) => void;
+  participants: Array<EmployeeFlatWithSupervisor>;
+  setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
+  participantsPool: Array<EmployeeFlatWithSupervisor>;
+  setParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
+  hasFetchedParticipants: boolean;
+  setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
+  hasFetchedFiles: boolean;
+  setHasFetchedFiles: (hasFetchedFiles: boolean) => void;
   title: string;
   setTitle: (title: string) => void;
   dateFrom: string;
@@ -35,7 +48,7 @@ export type OthersState = {
   reset: () => void;
 };
 
-export const useOthersModalStore = create<OthersModalStore>((set) => ({
+export const useAddOthersModalStore = create<OthersModalStore>((set) => ({
   page: 1,
   setPage: (page: number) => set({ page }),
   modalIsOpen: false,
@@ -46,6 +59,28 @@ export const useOthersModalStore = create<OthersModalStore>((set) => ({
       page: 1,
     });
   },
+}));
+
+export const useEditOthersModalStore = create<OthersModalStore>((set) => ({
+  page: 1,
+  setPage: (page: number) => set({ page }),
+  modalIsOpen: false,
+  setModalIsOpen: (modalIsOpen: boolean) => set({ modalIsOpen }),
+  resetModal: () => {
+    set({
+      modalIsOpen: false,
+      page: 1,
+    });
+  },
+}));
+
+type DeleteOthersModalStore = {
+  modalIsOpen: boolean;
+  setModalIsOpen: (modalIsOpen: boolean) => void;
+};
+export const useDeleteOthersModalStore = create<DeleteOthersModalStore>((set) => ({
+  modalIsOpen: false,
+  setModalIsOpen: (modalIsOpen: boolean) => set({ modalIsOpen }),
 }));
 
 export const useOthersCategoryStore = create<OthersCategoryState>((set) => ({
@@ -60,16 +95,28 @@ export const useOthersStore = create<OthersState>((set) => ({
   setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
   title: "",
   setTitle: (title) => set({ title }),
+  initialTitle: "",
+  setInitialTitle: (initialTitle) => set({ initialTitle }),
+  filesToDelete: [],
+  setFilesToDelete: (filesToDelete) => set({ filesToDelete }),
   dateFrom: "",
   setDateFrom: (dateFrom) => set({ dateFrom }),
   dateTo: "",
   setDateTo: (dateTo) => set({ dateTo }),
+  participants: [],
+  setParticipants: (participants) => set({ participants }),
+  participantsPool: [],
+  setParticipantsPool: (participantsPool) => set({ participantsPool }),
   location: "",
   setLocation: (location) => set({ location }),
   bucketFiles: [],
-  setBucketFIles: (bucketFiles) => set({ bucketFiles }),
+  setBucketFiles: (bucketFiles) => set({ bucketFiles }),
   action: undefined,
   setAction: (action) => set({ action }),
+  hasFetchedFiles: false,
+  setHasFetchedFiles: (hasFetchedFiles) => set({ hasFetchedFiles }),
+  hasFetchedParticipants: false,
+  setHasFetchedParticipants: (hasFetchedParticipants) => set({ hasFetchedParticipants }),
   reset: () =>
     set({
       action: undefined,
@@ -79,6 +126,11 @@ export const useOthersStore = create<OthersState>((set) => ({
       dateTo: "",
       location: "",
       bucketFiles: [],
+      filesToDelete: [],
+      participants: [],
+      participantsPool: [],
+      hasFetchedFiles: false,
+      hasFetchedParticipants: false,
       id: "",
     }),
 }));

@@ -5,45 +5,45 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@lms/components/osprey/ui/overlays/alert-dialog/view/AlertDialog";
-import { useBenchmarkingStore, useDeleteBenchmarkingModalStore } from "@lms/utilities/stores/benchmarking-store";
 import { trainingDesignUrl, url } from "@lms/utilities/url/api-url";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { useBenchmarkingToastOptions } from "../data-table/BenchmarkingDataTable";
+import { useOthersToastOptions } from "../data-table/OthersDataTable";
+import { useDeleteOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
 
-export const DeleteBenchmarkingModal = () => {
-  const id = useBenchmarkingStore((state) => state.id);
-  const setId = useBenchmarkingStore((state) => state.setId);
-  const title = useBenchmarkingStore((state) => state.title);
-  const modalIsOpen = useDeleteBenchmarkingModalStore((state) => state.modalIsOpen);
-  const setModalIsOpen = useDeleteBenchmarkingModalStore((state) => state.setModalIsOpen);
-  const { setToastOptions } = useBenchmarkingToastOptions();
-  const reset = useBenchmarkingStore((state) => state.reset);
+export const DeleteOthersModal = () => {
+  const id = useOthersStore((state) => state.id);
+  const setId = useOthersStore((state) => state.setId);
+  const title = useOthersStore((state) => state.title);
+  const modalIsOpen = useDeleteOthersModalStore((state) => state.modalIsOpen);
+  const setModalIsOpen = useDeleteOthersModalStore((state) => state.setModalIsOpen);
+  const { setToastOptions } = useOthersToastOptions();
+  const reset = useOthersStore((state) => state.reset);
   const queryClient = useQueryClient();
 
-  const deleteBenchmarkingMutation = useMutation({
+  const deleteOtherTrainingsMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.delete(`${url}/benchmark/${id}`, { withCredentials: true });
+      const response = await axios.delete(`${url}/other/trainings/${id}`, { withCredentials: true });
 
       // call delete bucket by id
-      await axios.delete(`${trainingDesignUrl}/api/bucket/benchmarking/${id}`);
+      await axios.delete(`${trainingDesignUrl}/api/bucket/others/${id}`);
 
       return response.data;
     },
     onError: (error: AxiosError<{ message: string }>) =>
       setToastOptions("danger", "Error", error.response?.data.message!),
     onSuccess: async () => {
-      const getUpdatedBenchmarkings = await axios.get(`${url}/benchmark?page=1&limit=1000`);
-      queryClient.setQueryData(["benchmarking-activities"], getUpdatedBenchmarkings.data.items);
+      const getUpdatedBenchmarkings = await axios.get(`${url}/other/trainings?page=1&limit=1000`);
+      queryClient.setQueryData(["other-activities"], getUpdatedBenchmarkings.data.items);
       setId("");
       reset();
       setModalIsOpen(false);
-      setToastOptions("success", "Success", `You have deleted a benchmarking activity with the title ${title}`);
+      setToastOptions("success", "Success", `You have deleted a other training activity with the title ${title}`);
     },
   });
 
   const mutateFunction = () => {
-    deleteBenchmarkingMutation.mutate();
+    deleteOtherTrainingsMutation.mutate();
   };
 
   return (

@@ -13,6 +13,141 @@ import gscwd_logo from "../../../../public/images/document/gscwd_logo.png";
 import iso_logo from "../../../../public/images/document/iso_logo.jpg";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useUserDetails } from "@lms/hooks/use-userdetails";
+import { Document, PDFViewer, Page, Text, StyleSheet, View } from "@react-pdf/renderer";
+import Header from "./printables/Header";
+
+const styles = StyleSheet.create({
+  page: {
+    fontFamily: "Helvetica",
+    backgroundColor: "#ffffff",
+    paddingTop: 10,
+    paddingBottom: 25,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    marginTop: 5,
+  },
+  bodyBorder: {
+    marginHorizontal: 50,
+  },
+
+  // line
+  line: {
+    borderBottom: "2px solid #0000",
+  },
+
+  // Table Styles
+  rowContainerTable: {
+    flexDirection: "row",
+    alignItems: "stretch",
+  },
+  tHeadFirstLevel: {
+    padding: "4 0 0 4",
+  },
+  tHeadSecondLevel: {
+    // fontFamily: 'CalibriRegularBold',
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+    padding: "4 0 0 4",
+    textAlign: "center",
+  },
+  tData: {
+    padding: "4 0 0 4",
+  },
+
+  // Border Styles
+  borderAll: {
+    border: "1px solid #000000",
+  },
+  borderTop: {
+    borderTop: "1px solid #000000",
+  },
+  borderRight: {
+    borderRight: "1px solid #000000",
+  },
+  borderLeft: {
+    borderLeft: "1px solid #000000",
+  },
+  borderBottom: {
+    borderBottom: "1px solid #000000",
+  },
+
+  // Field Styles
+  documentTitle: {
+    // fontFamily: 'CalibriRegularBold',
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+
+  content: {
+    fontFamily: "Helvetica",
+    fontSize: 10,
+    textAlign: "left",
+    marginBottom: 10,
+  },
+
+  contentTitle: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 11,
+    textAlign: "left",
+    marginBottom: 5,
+  },
+
+  headerText: {
+    // fontFamily: 'CalibriRegularBold',
+    fontFamily: "Helvetica-Bold",
+    textDecoration: "underline",
+    fontSize: 12,
+    marginTop: 15,
+    marginBottom: 4,
+  },
+  bodyText: {
+    // fontFamily: 'CalibriRegular',
+    fontFamily: "Helvetica",
+    fontSize: 12,
+  },
+  bodyTextBold: {
+    // fontFamily: 'CalibriRegularBold',
+    fontFamily: "Helvetica-Bold",
+    fontSize: 12,
+  },
+  upperCase: {
+    textTransform: "uppercase",
+  },
+  signatoryName: {
+    // fontFamily: 'CalibriRegularBold',
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    paddingTop: 3,
+  },
+
+  verticalCenter: { margin: "auto 0" },
+  horizontalCenter: { textAlign: "center" },
+  signature: {
+    width: 100,
+    marginHorizontal: "auto",
+  },
+
+  // Width Styles
+  w100: { width: "100%" },
+  w75: { width: "75%" },
+  w70: { width: "70%" },
+  w60: { width: "60%" },
+  w50: { width: "50%" },
+  w40: { width: "40%" },
+  w33_33: { width: "33.33%" },
+  w30: { width: "30%" },
+  w26: { width: "26%" },
+  w20: { width: "20%" },
+  w16: { width: "16%" },
+  w15: { width: "15%" },
+  w14: { width: "14%" },
+  w10: { width: "10%" },
+  w5: { width: "5%" },
+});
 
 export const PrintTrainingDesign = () => {
   const trainingDesignToPrintRef = useRef(null);
@@ -37,7 +172,7 @@ export const PrintTrainingDesign = () => {
   const [recognition, setRecognition] = useState<string | JSONContent | null>("");
   const id = params.id.toString();
 
-  useQuery({
+  const { data: td, isLoading } = useQuery({
     queryKey: ["training-design", id],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training/designs/${id}`);
@@ -55,6 +190,11 @@ export const PrintTrainingDesign = () => {
     },
     enabled: !!id,
   });
+
+  const renderRationale = () => {
+    const content = td ? td.rationale : "";
+    return content;
+  };
 
   return (
     <>
@@ -199,6 +339,36 @@ export const PrintTrainingDesign = () => {
           </div>
         </div>
       </div>
+
+      {/* <div className="flex justify-center w-full h-full m-1 shadow-xl  px-20 py-10 bg-white text-sm">
+        <PDFViewer width={"100%"} height={"100%"} showToolbar={false}>
+          <Document>
+            <Page size="A4">
+              <View style={{ marginTop: "20px" }}></View>
+              <Header />
+
+              <View style={[styles.bodyBorder]}>
+                <View style={[styles.line, { marginBottom: "10px" }]}></View>
+
+                <View style={[styles.documentTitle]}>
+                  <Text>TRAINING DESIGN</Text>
+                </View>
+
+                <Text style={{ fontSize: 11, fontFamily: "Helvetica-Bold", marginBottom: 10 }}>
+                  Course Title: {courseTitle}
+                </Text>
+
+                <View style={[styles.contentTitle]}>
+                  <Text>I. Rationale</Text>
+                </View>
+                <View style={[styles.content]}>
+                  <Text>{td ? JSON.stringify(td.rationale) : ""}</Text>
+                </View>
+              </View>
+            </Page>
+          </Document>
+        </PDFViewer>
+      </div> */}
     </>
   );
 };

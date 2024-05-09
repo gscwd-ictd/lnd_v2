@@ -53,7 +53,7 @@ export const AddNewBenchmarkingModal = () => {
 
   const addBenchmarkingMutation = useMutation({
     mutationFn: async () => {
-      const { title, dateStarted, dateEnd, location, participants, partner, filesToUpload } = benchmarking;
+      const { title, dateFrom, dateTo, location, participants, partner, filesToUpload } = benchmarking;
 
       const storage = new Storage(client!);
 
@@ -61,8 +61,8 @@ export const AddNewBenchmarkingModal = () => {
       const benchmarkCreationResponse = await axios.post(`${url}/benchmark`, {
         title,
         partner,
-        dateStarted,
-        dateEnd,
+        dateFrom,
+        dateTo,
         location,
         participants: participants.map((participant) => {
           return { employeeId: participant.employeeId };
@@ -157,7 +157,7 @@ export const AddNewBenchmarkingModal = () => {
     onError: () => {
       setParticipantsPool([]);
     },
-    enabled: hasFetchedParticipants === false,
+    enabled: modalIsOpen !== false && hasFetchedParticipants === false,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,

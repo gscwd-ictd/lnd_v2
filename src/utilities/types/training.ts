@@ -69,7 +69,7 @@ export type EmployeeWithStatus = {
 export type EmployeeFlatWithSupervisor = Employee & {
   supervisorName: string;
   assignment?: string;
-  learningApplicationPlan: boolean;
+  learningApplicationPlan?: boolean;
   benchmarkParticipants?: string;
 };
 

@@ -28,8 +28,8 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
   const action = useBenchmarkingStore((state) => state.action);
   const title = useBenchmarkingStore((state) => state.title);
   const partner = useBenchmarkingStore((state) => state.partner);
-  const dateEnd = useBenchmarkingStore((state) => state.dateEnd);
-  const dateStarted = useBenchmarkingStore((state) => state.dateStarted);
+  const dateTo = useBenchmarkingStore((state) => state.dateTo);
+  const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
   const initialTitle = useBenchmarkingStore((state) => state.initialTitle);
   const location = useBenchmarkingStore((state) => state.location);
   const hasFetchedParticipants = useBenchmarkingStore((state) => state.hasFetchedParticipants);
@@ -45,8 +45,8 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
   const setInitialTitle = useBenchmarkingStore((state) => state.setInitialTitle);
   const setTitle = useBenchmarkingStore((state) => state.setTitle);
   const setPartner = useBenchmarkingStore((state) => state.setPartner);
-  const setDateStarted = useBenchmarkingStore((state) => state.setDateStarted);
-  const setDateEnd = useBenchmarkingStore((state) => state.setDateEnd);
+  const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
+  const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
   const setLocation = useBenchmarkingStore((state) => state.setLocation);
   const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
   const reset = useBenchmarkingStore((state) => state.reset);
@@ -82,8 +82,8 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
     onSuccess: (data) => {
       setTitle(data.title);
       setPartner(data.partner);
-      setDateStarted(data.dateStarted);
-      setDateEnd(data.dateEnd);
+      setDateFrom(data.dateFrom);
+      setDateTo(data.dateTo);
       setLocation(data.location);
       setParticipants(data.participants);
       setInitialTitle(data.title);
@@ -110,7 +110,7 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
     onError: () => {
       setParticipantsPool([]);
     },
-    enabled: hasFetchedParticipants === false && !!id,
+    enabled: modalIsOpen !== false && hasFetchedParticipants === false && !!id,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -149,7 +149,6 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
     },
     onSuccess: async (data) => {
       setBucketFiles(data!);
-      setToastOptions("success", "Success", "Successfully fetched the files from server!");
       setHasFetchedFiles(true);
     },
     onError: () => {
@@ -200,7 +199,7 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
 
       // rename the bucket name if title is changed
       if (initialTitle !== title) {
-        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/lnd/rename`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_LND_FE_URL}/api/bucket/benchmarking/rename`, {
           id: id!,
           name: title,
         });
@@ -212,8 +211,8 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
         {
           title,
           partner,
-          dateStarted,
-          dateEnd,
+          dateFrom,
+          dateTo,
           location,
           participants: participants.map((participant) => {
             return { employeeId: participant.employeeId, learningApplicationPlan: false };
@@ -253,7 +252,7 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
   const onNext = async () => {
     // update
     if (page === 1 && bucketFiles.length === 0 && filesToUpload.length === 0)
-      setToastOptions("danger", "Error", "You have no files to upload nor existing files.");
+      setToastOptions("danger", "Error", "You have no files to upload nor existing uploaded files.");
     else if (page === 3 && participants.length === 0)
       setToastOptions("danger", "Error", "You have no existing participant.");
     else if (page === 3 && participants.length === 0) setPage(page + 1);

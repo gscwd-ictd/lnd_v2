@@ -22,12 +22,6 @@ import { url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspIndividualModalBody } from "./LspIndividualModalBody";
-import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
-import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/AvatarWithAppwriteUpload";
-import { EditUploadPhotoAlert } from "./EditUploadPhotoAlert";
-import { useLspExternal } from "@lms/hooks/use-lsp-external";
-import { Storage } from "appwrite";
 import { LspToastContext } from "../../lsp-tabs/LspTabs";
 
 type EditLspIndividualModalProps = {
@@ -145,7 +139,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp/${id}`);
-        console.log(data);
+
         if (lspSource === "internal") {
           setTin(data.tin);
           setContactNumber(data.contactNumber);
@@ -335,7 +329,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
         <ModalContent>
           <ModalContent.Title>
             <div className="px-2 flex gap-2">
-              {photoUrl && lspSource === LspSource.EXTERNAL ? (
+              {/* {photoUrl && lspSource === LspSource.EXTERNAL ? (
                 <AvatarWithAppwriteUpload source={photoUrl} size="xl" />
               ) : photoUrl && lspSource === LspSource.INTERNAL ? (
                 <Avatar source={photoUrl} size="xl" />
@@ -343,7 +337,8 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
                 <Avatar source={defaultPhoto.src} size="xl" />
               ) : (
                 <AvatarWithAppwriteUpload source={defaultPhoto.src} size="xl" />
-              )}
+              )} */}
+              <Avatar source={photoUrl ? photoUrl : defaultPhoto.src} size="xl" />
             </div>
             <header className="px-2 mt-1">
               <p className="text-xs font-medium text-indigo-500">{page} of 11</p>
@@ -544,7 +539,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
           </ModalContent.Footer>
         </ModalContent>
       </Modal>
-      <EditUploadPhotoAlert />
+      {/* <EditUploadPhotoAlert /> */}
       {/* <Toast
         duration={2000}
         open={toastIsOpen}

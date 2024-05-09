@@ -17,4 +17,6 @@ export enum OthersCategory {
   WORKSHOP = "workshop",
   SYMPOSIUM = "symposium",
   SEMINAR = "seminar",
+  CONVENTION = "convention",
+  ORIENTATION = "orientation",
 }

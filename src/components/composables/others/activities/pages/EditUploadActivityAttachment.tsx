@@ -1,8 +1,12 @@
 import { FileThumbnail } from "@lms/components/features/Thumbnail";
-import { useOthersStore } from "@lms/utilities/stores/others-store";
+import { useQueryClient } from "@tanstack/react-query";
 import convertSize from "convert-size";
-import { FunctionComponent, MutableRefObject, createContext, useContext, useRef, useState } from "react";
-import { useOthersToastOptions } from "../data-table/OthersDataTable";
+import { FunctionComponent, MutableRefObject, createContext, useContext, useRef } from "react";
+import { BucketFile } from "@lms/utilities/stores/training-notice-store";
+import Link from "next/link";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { AlertNotification } from "@lms/components/osprey/ui/alert-notification/view/AlertNotification";
+import { useOthersStore } from "@lms/utilities/stores/others-store";
 
 type FileToUploadCardProps = {
   file: File;
@@ -13,24 +17,63 @@ type FilesToUploadContextState = {
   inputRef: MutableRefObject<HTMLInputElement>;
 };
 
+type UploadedFileProps = {
+  file: BucketFile;
+};
+
 const FilesToUploadContext = createContext({} as FilesToUploadContextState);
 
-export const UploadActivityAttachment: FunctionComponent = () => {
+export const EditUploadActivityAttachment: FunctionComponent = () => {
+  const id = useOthersStore((state) => state.id);
+  const bucketFiles = useOthersStore((state) => state.bucketFiles);
+  const action = useOthersStore((state) => state.action);
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
   const setFilesToUpload = useOthersStore((state) => state.setFilesToUpload);
-  const { setToastOptions } = useOthersToastOptions();
+  // const { setToastOptions } = useBenchmarkingToastOptions();
+  const queryClient = useQueryClient();
+
+  const uploadedFilesData = queryClient.getQueryState(["uploaded-other-training-files", id]);
 
   return (
     <>
       <div className="pt-5">
         <div className="flex flex-col">
           <span className=" font-normal">Attachment</span>
-          <span className=" text-xs text-gray-500">Upload an activity attachment</span>
+          <span className=" text-xs text-gray-500">Upload other activities letter</span>
         </div>
         {/* <UploadBtn /> */}
 
         <div className="w-full rounded-lg ">
+          {(!uploadedFilesData ||
+            uploadedFilesData?.status === "loading" ||
+            uploadedFilesData?.fetchStatus === "fetching") &&
+          action === "update" &&
+          uploadedFilesData?.status !== "error" ? (
+            <div className="flex flex-col">
+              <div className="flex items-center justify-center w-full h-full">
+                <Spinner size="medium" />
+              </div>
+              <div className="flex items-center justify-center w-full h-full font-sans tracking-widest animate-pulse">
+                Loading...
+              </div>
+            </div>
+          ) : uploadedFilesData?.status === "error" ? (
+            <AlertNotification alertType="error" notifMessage="Attachment not found" />
+          ) : (
+            <>
+              {bucketFiles && bucketFiles.length > 0 && (
+                <div className="px-4 py-4  space-y-2 border-2 rounded ">
+                  <span className="items-center text-gray-700 text-md">
+                    Uploaded Files <span className="text-xs">(Click file name to preview the file)</span>
+                  </span>
+
+                  {bucketFiles && bucketFiles.map((file, index) => <UploadedCard key={index} file={file} />)}
+                </div>
+              )}
+            </>
+          )}
+
           <div className="flex flex-col gap-5 mt-5">
             <div className="w-full mb-2">
               <input
@@ -47,7 +90,7 @@ export const UploadActivityAttachment: FunctionComponent = () => {
                     const files = [...filesToUpload];
                     files.push(e.target.files[0]);
 
-                    setToastOptions("success", "Success!", `You have attached the file ${e.target.files[0].name}`);
+                    // setToastOptions("success", "Success!", `You have attached the file ${e.target.files[0].name}`);
                     setFilesToUpload(files);
                   }
                 }}
@@ -137,6 +180,59 @@ const FileToUploadCard: FunctionComponent<FileToUploadCardProps> = ({ file }) =>
               height="2em"
               viewBox="0 0 24 24"
               className="dark:text-zinc-500 dark:hover:text-zinc-200"
+            >
+              <g fill="none" stroke="currentColor" strokeWidth="1">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path strokeLinecap="round" d="m14.5 9.5l-5 5m0-5l5 5"></path>
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const UploadedCard: FunctionComponent<UploadedFileProps> = ({ file }) => {
+  const bucketFiles = useOthersStore((state) => state.bucketFiles);
+  const filesToDelete = useOthersStore((state) => state.filesToDelete);
+  const setBucketFiles = useOthersStore((state) => state.setBucketFiles);
+  const setFilesToDelete = useOthersStore((state) => state.setFilesToDelete);
+
+  return (
+    <>
+      <div className="flex items-center w-full gap-2 p-2 bg-gray-200 border-2 rounded-lg">
+        <div className="w-[10%]">
+          <FileThumbnail mimeType={file.mimeType} />
+        </div>
+
+        <div className="flex items-center justify-between truncate w-[80%]">
+          <div className="truncate">
+            {/* <h3 className="text-sm font-semibold text-gray-700 truncate ">{file?.name}</h3> */}
+            <Link href={file.href} target="_blank">
+              <span className="text-sm font-medium text-zinc-800">{file.name}</span>
+            </Link>
+            <p className="text-sm font-medium truncate dark:text-zinc-500">{file?.sizeOriginal}</p>
+          </div>
+        </div>
+
+        <div className="flex justify-items-center w-[10%]">
+          <button
+            onClick={() => {
+              const index = bucketFiles.findIndex((element) => element.id === file?.id);
+              const updatedFiles = [...bucketFiles];
+              setFilesToDelete([...filesToDelete, file]);
+              updatedFiles.splice(index, 1);
+
+              setBucketFiles(updatedFiles);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="2em"
+              height="2em"
+              viewBox="0 0 24 24"
+              className="text-zinc-400 hover:text-zinc-600"
             >
               <g fill="none" stroke="currentColor" strokeWidth="1">
                 <circle cx="12" cy="12" r="10"></circle>

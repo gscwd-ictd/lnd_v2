@@ -58,7 +58,7 @@ export const RecentRequirementsModal: FunctionComponent = () => {
       <Modal
         isOpen={batchAttendanceIsOpen}
         setIsOpen={setBatchAttendanceIsOpen}
-        size={requirements.length > 5 ? "xl" : "lg"}
+        size={requirements.filter((req) => req.isSelected !== null).length >= 5 ? "xl" : "lg"}
         onClose={() => {
           setHasFetchedBatches(false);
         }}

@@ -23,6 +23,10 @@ const nextConfig = {
         protocol: "http",
         hostname: "172.20.110.45",
       },
+      {
+        protocol: "http",
+        hostname: "172.20.110.60",
+      },
     ],
   },
   redirects: async () => {

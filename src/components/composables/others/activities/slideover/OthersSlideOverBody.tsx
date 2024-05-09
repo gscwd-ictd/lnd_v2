@@ -1,34 +1,31 @@
 import { Disclosure } from "@headlessui/react";
-import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import dayjs from "dayjs";
 import { FunctionComponent } from "react";
-import { useBenchmarkingSlideOver } from "../data-table/BenchmarkingDataTable";
+import { useOthersSlideOver } from "../data-table/OthersDataTable";
+import { useOthersCategoryStore, useOthersStore } from "@lms/utilities/stores/others-store";
+import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
-export const BenchmarkingSlideOverBody: FunctionComponent = () => {
-  const id = useBenchmarkingStore((state) => state.id);
-  const title = useBenchmarkingStore((state) => state.title);
-  const partner = useBenchmarkingStore((state) => state.partner);
-  const location = useBenchmarkingStore((state) => state.location);
-  const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
-  const dateTo = useBenchmarkingStore((state) => state.dateTo);
-  const participants = useBenchmarkingStore((state) => state.participants);
-  const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
+export const OthersSlideOverBody: FunctionComponent = () => {
+  const id = useOthersStore((state) => state.id);
+  const title = useOthersStore((state) => state.title);
+  const category = useOthersCategoryStore((state) => state.category);
+  const location = useOthersStore((state) => state.location);
+  const dateFrom = useOthersStore((state) => state.dateFrom);
+  const dateTo = useOthersStore((state) => state.dateTo);
+  const participants = useOthersStore((state) => state.participants);
+  const setParticipants = useOthersStore((state) => state.setParticipants);
+  const { slideOverIsOpen, setParticipantsModalIsOpen, hasFetchedParticipants, setHasFetchedParticipants } =
+    useOthersSlideOver();
 
-  const { setParticipantsModalIsOpen, slideOverIsOpen } = useBenchmarkingSlideOver();
-
-  const { data, isLoading, isFetching, isError, isSuccess } = useQuery({
-    queryKey: ["view-benchmarking-details", id],
+  const { data, isLoading, isFetching, isError } = useQuery({
+    queryKey: ["view-other-details", id],
     enabled: !!id && slideOverIsOpen !== false,
-    // staleTime: 0,
-    // refetchOnReconnect: false,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/benchmark/${id}`);
+      const { data } = await axios.get(`${url}/other/trainings/${id}`);
       return data;
     },
     onSuccess: (data) => {
@@ -39,13 +36,14 @@ export const BenchmarkingSlideOverBody: FunctionComponent = () => {
   return (
     <>
       <div className="flex w-full ">
-        <button
+        {/* <button
           className="w-full border-2 border-gray-200 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700  mx-[15%] h-[3rem] rounded-b-full -mt-1"
           onClick={() => setParticipantsModalIsOpen(true)}
         >
           <span className="text-white uppercase tracking-widest">Requirements</span>
-        </button>
+        </button> */}
       </div>
+
       <div className="flex flex-col gap-5 px-8 py-10">
         {/* Title */}
         <div>
@@ -55,8 +53,8 @@ export const BenchmarkingSlideOverBody: FunctionComponent = () => {
 
         {/* Partner */}
         <div>
-          <div className="font-semibold text-left text-lg text-zinc-600 ">Partner</div>
-          <div className="text-md font-normal text-left text-gray-700 ">{partner}</div>
+          <div className="font-semibold text-left text-lg text-zinc-600 ">Category</div>
+          <div className="text-md font-normal text-left text-gray-700 ">{getActivityCategoryBadgePill(category)}</div>
         </div>
 
         {/* Location */}
@@ -83,17 +81,18 @@ export const BenchmarkingSlideOverBody: FunctionComponent = () => {
             <div className="flex items-center justify-center w-full h-full">
               <Spinner size="small" />
             </div>
-            <div className="flex items-center justify-center w-full h-full text-sm font-sans tracking-widest animate-pulse">
+            <div className="flex items-center justify-center text-sm w-full h-full font-sans tracking-widest animate-pulse">
               Fetching Participants...
             </div>
           </div>
         ) : isError ? (
           <div className="flex justify-center items-center h-full text-red-600 text-lg pt-5">
-            Error in fetching benchmarking activity
+            Error in fetching participants
           </div>
         ) : data ? (
           <div>
             <div className="font-semibold text-left text-lg text-zinc-600 ">Total No. of Participants</div>
+            {/* <div className="text-md font-normal text-left text-gray-700 ">{participants.length}</div> */}
 
             <Disclosure>
               {({ open }) => (

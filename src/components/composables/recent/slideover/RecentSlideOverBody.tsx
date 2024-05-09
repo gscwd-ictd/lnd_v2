@@ -24,6 +24,16 @@ export const RecentSlideOverBody = () => {
 
   return (
     <>
+      <div className="flex w-full">
+        <button
+          onClick={() => {
+            setRequirementsModalIsOpen(true);
+          }}
+          className="w-full border-2 border-gray-200 mx-[15%]  -mt-1 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 rounded-b-full h-[3rem]"
+        >
+          <span className="text-white uppercase tracking-widest">Requirements Summary</span>
+        </button>
+      </div>
       <div className="flex flex-col gap-5 px-8 py-10">
         {/* Course Title */}
         <div>
@@ -122,17 +132,6 @@ export const RecentSlideOverBody = () => {
         <div>
           <div className="pb-2 font-semibold text-left text-md text-zinc-600">Total No. of Participants</div>
           <div className="text-sm font-normal text-left text-gray-700 ">{participants}</div>
-        </div>
-
-        <div className="flex w-full rounded ">
-          <button
-            onClick={() => {
-              setRequirementsModalIsOpen(true);
-            }}
-            className="w-full border-2 border-gray-200 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 rounded-md h-[4rem]"
-          >
-            <span className="text-white uppercase">Requirements Summary</span>
-          </button>
         </div>
 
         <Suspense

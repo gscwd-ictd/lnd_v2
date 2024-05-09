@@ -28,10 +28,10 @@ export type BenchmarkingState = {
   setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   location: string;
   setLocation: (location: string) => void;
-  dateStarted: string;
-  setDateStarted: (dateFrom: string) => void;
-  dateEnd: string;
-  setDateEnd: (dateTo: string) => void;
+  dateFrom: string;
+  setDateFrom: (dateFrom: string) => void;
+  dateTo: string;
+  setDateTo: (dateTo: string) => void;
   filesToUpload: Array<File>;
   setFilesToUpload: (filesToUpload: Array<File>) => void;
   bucketFiles: Array<BucketFile>;
@@ -91,10 +91,10 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   setParticipants: (participants) => set({ participants }),
   location: "",
   setLocation: (location) => set({ location }),
-  dateStarted: "",
-  setDateStarted: (dateStarted) => set({ dateStarted }),
-  dateEnd: "",
-  setDateEnd: (dateEnd) => set({ dateEnd }),
+  dateFrom: "",
+  setDateFrom: (dateFrom) => set({ dateFrom }),
+  dateTo: "",
+  setDateTo: (dateTo) => set({ dateTo }),
   filesToUpload: [],
   setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
   bucketFiles: [],
@@ -114,8 +114,8 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
       title: "",
       participants: [],
       partner: "",
-      dateStarted: "",
-      dateEnd: "",
+      dateFrom: "",
+      dateTo: "",
       filesToUpload: [],
       action: undefined,
       initialTitle: "",

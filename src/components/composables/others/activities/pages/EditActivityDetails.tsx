@@ -3,7 +3,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
 import { Input } from "@lms/components/osprey/ui/input/view/Input";
-import { useAddOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
+import { useAddOthersModalStore, useEditOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { FunctionComponent, useEffect, useState } from "react";
@@ -41,7 +41,7 @@ const schema = yup.object({
   location: yup.string().label("Location").required("Please input location"),
 });
 
-export const ActivityDetails: FunctionComponent = () => {
+export const EditActivityDetails: FunctionComponent = () => {
   const {
     register,
     formState: { errors },
@@ -58,7 +58,7 @@ export const ActivityDetails: FunctionComponent = () => {
   const setDateTo = useOthersStore((state) => state.setDateTo);
   const setDateFrom = useOthersStore((state) => state.setDateFrom);
   const setLocation = useOthersStore((state) => state.setLocation);
-  const setPage = useAddOthersModalStore((state) => state.setPage);
+  const setPage = useEditOthersModalStore((state) => state.setPage);
 
   const onSubmit = () => {
     setPage(4);
@@ -87,14 +87,14 @@ export const ActivityDetails: FunctionComponent = () => {
           />
         </div>
 
-        <div className="pb-2">
+        <div className="mb-2">
           <label htmlFor="from" className="block text-xs font-medium text-gray-700">
             Inclusive dates
           </label>
           <p className="text-xs text-gray-500">The specific timeframe during which the activity would take place.</p>
         </div>
 
-        <div className="flex gap-2 ">
+        <div className="flex items-center gap-2 ">
           <section className="w-full">
             <div className="flex justify-between gap-2">
               <label htmlFor="from" className="block pl-1 text-xs font-medium text-indigo-700">
@@ -110,7 +110,8 @@ export const ActivityDetails: FunctionComponent = () => {
                 },
               })}
               type="date"
-              className={` w-full placeholder:text-gray-400  ${
+              // className="w-full text-sm text-gray-700 border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500"
+              className={`w-full placeholder:text-gray-400  ${
                 errors.dateFrom
                   ? "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
@@ -130,10 +131,10 @@ export const ActivityDetails: FunctionComponent = () => {
               id="to"
               {...register("dateTo", { value: dateTo, onChange: (e) => setDateTo(e.target.value) })}
               type="date"
-              className={` w-full placeholder:text-gray-400  ${
+              className={`w-full placeholder:text-gray-400  ${
                 errors.dateTo
-                  ? " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
-                  : " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
+                  ? "placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
+                  : "placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
             />
             <span className="text-xs text-red-600">{!isEmpty(errors.dateTo) ? errors.dateTo?.message : undefined}</span>

@@ -9,17 +9,17 @@ import * as yup from "yup";
 
 const schema = yup.object({
   title: yup.string().label("Title").required(),
-  dateStarted: yup
+  dateFrom: yup
     .string()
     .label("Date start")
     .trim()
-    .notRequired()
+    .required()
     .test("DS", "Date is not permissible", (value) => {
       if (!isEmpty(value)) {
         return dayjs().diff(dayjs(value), "day") <= 0;
       } else return true;
     }),
-  dateEnd: yup
+  dateTo: yup
     .string()
     .label("Date end")
     .test({
@@ -29,11 +29,11 @@ const schema = yup.object({
       message: "Date is not permissible",
       test: function (value) {
         if (!isEmpty(value)) {
-          return value! >= this.parent.dateStarted && dayjs().diff(dayjs(value), "day") <= 0;
+          return value! >= this.parent.dateFrom && dayjs().diff(dayjs(value), "day") <= 0;
         } else return true;
       },
     })
-    .notRequired(),
+    .required(),
   partner: yup.string().label("Partner").required(),
   location: yup.string().label("Location").required("Please input location"),
 });
@@ -46,16 +46,16 @@ export const EditActivityDetails: FunctionComponent = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const title = useBenchmarkingStore((state) => state.title);
-  const dateEnd = useBenchmarkingStore((state) => state.dateEnd);
+  const dateTo = useBenchmarkingStore((state) => state.dateTo);
   const location = useBenchmarkingStore((state) => state.location);
-  const dateStarted = useBenchmarkingStore((state) => state.dateStarted);
+  const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
   const partner = useBenchmarkingStore((state) => state.partner);
   const setPartner = useBenchmarkingStore((state) => state.setPartner);
   const setPage = useEditBenchmarkingModalStore((state) => state.setPage);
   const setTitle = useBenchmarkingStore((state) => state.setTitle);
-  const setDateEnd = useBenchmarkingStore((state) => state.setDateEnd);
+  const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
   const setLocation = useBenchmarkingStore((state) => state.setLocation);
-  const setDateStarted = useBenchmarkingStore((state) => state.setDateStarted);
+  const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
   const modalIsOpen = useEditBenchmarkingModalStore((state) => state.modalIsOpen);
 
   const onSubmit = () => {
@@ -110,57 +110,55 @@ export const EditActivityDetails: FunctionComponent = () => {
           <p className="text-xs text-gray-500">The specific timeframe which the benchmarking would take place.</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="w-full pb-2 ">
+        <div className="flex items-center gap-2 ">
+          <section className="w-full">
             <div className="flex justify-between gap-2">
               <label htmlFor="from" className="block pl-1 text-xs font-medium text-indigo-700">
                 From <span className="text-red-600 text-md">*</span>
               </label>
-              <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateStarted) ? errors.dateStarted?.message : undefined}
-              </span>
             </div>
             <input
               id="from"
-              {...register("dateStarted", {
-                value: dateStarted,
+              {...register("dateFrom", {
+                value: dateFrom,
                 onChange: (e) => {
-                  setDateStarted(e.target.value);
+                  setDateFrom(e.target.value);
                 },
               })}
               type="date"
               // className="w-full text-sm text-gray-700 border-gray-200 rounded focus:border-indigo-500 focus:ring-indigo-500"
-              className={`block w-full placeholder:text-gray-400  ${
-                errors.dateStarted
+              className={` w-full placeholder:text-gray-400  ${
+                errors.dateFrom
                   ? "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
                   : "outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
             />
-          </div>
-          <div className="w-full pb-2">
+            <span className="text-xs text-red-600">
+              {!isEmpty(errors.dateFrom) ? errors.dateFrom?.message : undefined}
+            </span>
+          </section>
+          <section className="w-full">
             <div className="flex justify-between gap-2">
               <label htmlFor="to" className="block pl-1 text-xs font-medium text-indigo-700">
                 To <span className="text-red-600 text-md">*</span>
               </label>
-              <span className="text-xs text-red-600">
-                {!isEmpty(errors.dateEnd) ? errors.dateEnd?.message : undefined}
-              </span>
             </div>
             <input
               id="to"
-              {...register("dateEnd", { value: dateEnd, onChange: (e) => setDateEnd(e.target.value) })}
+              {...register("dateTo", { value: dateTo, onChange: (e) => setDateTo(e.target.value) })}
               type="date"
-              className={`mb-1 ${
-                errors.dateEnd
-                  ? "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
-                  : "block w-full placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
+              className={`w-full placeholder:text-gray-400  ${
+                errors.dateTo
+                  ? " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-red-400 focus:border-red-500 focus:ring-red-100 hover:border-red-500"
+                  : " placeholder:text-gray-400 outline-none border focus:ring-2 rounded text-sm transition-colors py-2 px-3 border-gray-200 focus:border-indigo-400 focus:ring-indigo-100 hover:border-indigo-400"
               }`}
             />
-          </div>
+            <span className="text-xs text-red-600">{!isEmpty(errors.dateTo) ? errors.dateTo?.message : undefined}</span>
+          </section>
         </div>
 
-        <div className="mt-1">
-          <div className="items-center mt-2">
+        <div>
+          <div className="items-center  pt-4">
             <label htmlFor="location" className="block text-xs font-medium text-gray-700">
               Location <span className="text-red-600 text-md">*</span>
             </label>

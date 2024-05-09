@@ -49,6 +49,11 @@ export const BenchmarkingDataTable: FunctionComponent = () => {
   const [participantsWithRequirements, setParticipantsWithRequirements] = useState<Array<EmployeeFlatWithSupervisor>>(
     []
   );
+  const setTitle = useBenchmarkingStore((state) => state.setTitle);
+  const setPartner = useBenchmarkingStore((state) => state.setPartner);
+  const setLocation = useBenchmarkingStore((state) => state.setLocation);
+  const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
+  const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
 
   const [hasFetchedParticipantsWithRequirements, setHasFetchedParticipantsWithRequirements] = useState<boolean>(false);
 
@@ -82,6 +87,11 @@ export const BenchmarkingDataTable: FunctionComponent = () => {
             subtitle="List of all benchmarking activities "
             onRowClick={(row) => {
               setId(row.original.id);
+              setTitle(row.original.title);
+              setPartner(row.original.partner);
+              setLocation(row.original.location);
+              setDateFrom(row.original.dateFrom);
+              setDateTo(row.original.dateTo);
               setSlideOverIsOpen(true);
             }}
           />

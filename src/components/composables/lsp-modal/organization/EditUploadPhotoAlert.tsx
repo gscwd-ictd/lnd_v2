@@ -17,15 +17,13 @@ import { LspToastContext } from "../../lsp-tabs/LspTabs";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
-import { useIndSlideOver } from "../../lsp-data-table/IndividualLspDataTable";
+import { useOrgSlideOver } from "../../lsp-data-table/OrganizationLspDataTable";
 
 export const EditUploadPhotoAlert: FunctionComponent = () => {
   const client = useLspExternal();
   const queryClient = useQueryClient();
   const [tempPhotoToUpload, setTempPhotoToUpload] = useState<File | null>(null);
   const [tempPhotoToUploadUrl, setTempPhotoToUploadUrl] = useState<string | null>(null);
-
-  const { id } = useIndSlideOver();
 
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const name = useLspDetailsStore((state) => state.name);
@@ -37,7 +35,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
   const setPhotoToUploadUrl = useLspDetailsStore((state) => state.setPhotoToUploadUrl);
   // const uploadAlertIsOpen = useEditLspModalStore((state) => state.uploadAlertIsOpen);
   // const setUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
-  const { uploadAlertIsOpen, setUploadAlertIsOpen } = useIndSlideOver();
+  const { uploadAlertIsOpen, setUploadAlertIsOpen, id } = useOrgSlideOver();
   const setPhotoUrl = useLspDetailsStore((state) => state.setPhotoUrl);
   const { setToastOptions } = useContext(LspToastContext);
   const photoId = useLspDetailsStore((state) => state.photoId);
@@ -73,9 +71,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
       setPhotoId(data.photoId);
       setPhotoUrl(data.photoUrl);
       setUploadAlertIsOpen(false);
-
-      queryClient.setQueryData(["lsp-individual-details", id], data);
-
+      queryClient.setQueryData(["lsp-organization-details", id], data);
       setToastOptions("success", "Success", "You have successfully uploaded a photo!");
     },
     onError: () => {
@@ -118,8 +114,8 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
     onSuccess: async (data) => {
       setPhotoUrl(data.photoUrl);
       setPhotoId(data.photoId);
+      queryClient.setQueryData(["lsp-organization-details", id], data);
       setToastOptions("success", "Success", "You have successfully changed the photo!");
-      queryClient.setQueryData(["lsp-individual-details", id], data);
       setUploadAlertIsOpen(false);
     },
   });

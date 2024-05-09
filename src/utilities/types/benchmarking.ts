@@ -5,8 +5,8 @@ export type Benchmarking = {
   id: string;
   title: string;
   location: string;
-  dateStarted: string;
-  dateEnd: string;
+  dateFrom: string;
+  dateTo: string;
   partner: string;
   status: BenchmarkingStatus | undefined;
 };

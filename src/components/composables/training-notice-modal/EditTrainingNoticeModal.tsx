@@ -227,38 +227,6 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
         });
       }
 
-      console.log({
-        id: trainingNoticeId,
-        source: { id: selectedTrainingSource.id },
-        courseTitle,
-        type: selectedTrainingType,
-        courseContent,
-        trainingLspDetails: selectedFacilitators.map((faci) => {
-          return { id: faci.id };
-        }),
-        location,
-        slotDistribution: slotDistribution.map((slot) => {
-          const employees = slot.employees.map((emp) => {
-            return { employeeId: emp.employeeId };
-          });
-
-          return {
-            supervisor: { supervisorId: slot.supervisor.supervisorId },
-            numberOfSlots: slot.numberOfSlots,
-            employees,
-          };
-        }),
-        trainingStart: new Date(training.trainingStart).toISOString(),
-        trainingEnd: new Date(training.trainingEnd).toISOString(),
-        numberOfHours,
-        numberOfParticipants,
-        trainingTags: selectedTags.map((tag) => {
-          return { id: tag.id };
-        }),
-
-        trainingRequirements,
-      });
-
       const response = await axios.put(`${url}/training/external`, {
         id: trainingNoticeId,
         source: { id: selectedTrainingSource.id },
@@ -306,7 +274,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-        console.log(data);
+
         // INTERNAL
         setCourseContent(data.courseContent);
         setTrainingRequirements(data.trainingRequirements);

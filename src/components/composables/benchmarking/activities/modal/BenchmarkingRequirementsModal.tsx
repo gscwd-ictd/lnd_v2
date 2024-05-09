@@ -15,8 +15,8 @@ import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
 
 export const BenchmarkingRequirementsModal: FunctionComponent = () => {
   const title = useBenchmarkingStore((state) => state.title);
-  const dateStarted = useBenchmarkingStore((state) => state.dateStarted);
-  const dateEnd = useBenchmarkingStore((state) => state.dateEnd);
+  const dateFrom = useBenchmarkingStore((state) => state.dateFrom);
+  const dateTo = useBenchmarkingStore((state) => state.dateTo);
   const id = useBenchmarkingStore((state) => state.id);
   const [participantsCompleteCount, setParticipantsCompleteCount] = useState<number>(0);
   const [checkAll, setCheckAll] = useState<boolean>(false);
@@ -54,7 +54,6 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
       });
 
       setParticipantsCompleteCount(count);
-
       setParticipantsWithRequirements(data);
       setHasFetchedParticipantsWithRequirements(true);
     },
@@ -153,10 +152,11 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
       <Modal
         isOpen={participantsModalIsOpen}
         setIsOpen={setParticipantsModalIsOpen}
-        size="lg"
+        size="3md"
         isStatic
         animate={false}
         onClose={() => {
+          setCheckAll(false);
           setHasFetchedParticipantsWithRequirements(false);
         }}
       >
@@ -165,11 +165,11 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
             <header className="pl-2">
               <h3 className="text-lg font-semibold text-gray-600">{title}</h3>
               <div className="flex gap-2">
-                {dayjs(dateStarted).isSame(dayjs(dateEnd), "day") === true ? (
-                  <span className="text-sm text-gray-600">{dayjs(dateStarted).format("MMM DD, YYYY")}</span>
-                ) : dayjs(dateStarted).isSame(dayjs(dateEnd), "day") === false ? (
+                {dayjs(dateFrom).isSame(dayjs(dateTo), "day") === true ? (
+                  <span className="text-sm text-gray-600">{dayjs(dateFrom).format("MMM DD, YYYY")}</span>
+                ) : dayjs(dateFrom).isSame(dayjs(dateTo), "day") === false ? (
                   <span className="text-sm text-gray-600">
-                    {dayjs(dateStarted).format("MMM DD, YYYY")}-{dayjs(dateEnd).format("MMM DD, YYYY")}
+                    {dayjs(dateFrom).format("MMM DD, YYYY")}-{dayjs(dateTo).format("MMM DD, YYYY")}
                   </span>
                 ) : (
                   ""
@@ -210,11 +210,11 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
                 <></>
               ) : isFetched ? (
                 <>
-                  <div className="flex w-full justify-end text- px-2">
+                  <div className="flex w-full px-2 justify-end">
                     <div>
                       <label
                         htmlFor="checkbox-lap-all"
-                        className="text-xs pr-2 select-none cursor-pointer text-gray-700 "
+                        className="text-xs pr-2 select-none cursor-pointer text-gray-700 w-[5rem] "
                       >
                         {checkAll ? "Undo" : "Check all"}
                       </label>
@@ -243,21 +243,23 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
                               <tr
                                 className={`hover:cursor-pointer ${
                                   employee.learningApplicationPlan === true
-                                    ? "bg-emerald-300 hover:bg-emerald-100 "
+                                    ? "bg-emerald-200 hover:bg-emerald-100 "
                                     : "even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80 "
                                 }`}
                                 onClick={() => onChangeRequirements(emp_idx)}
                                 key={employee.employeeId}
                               >
-                                <td className={`p-2 font-light border text-center `}>
+                                <td className={`p-2 font-light border border-gray-300 text-center `}>
                                   <span className="text-xs ">{emp_idx + 1}</span>
                                 </td>
-                                <td className={`p-2 text-sm font-light text-gray-900 border text-left  `}>
+                                <td
+                                  className={`p-2 text-sm font-light text-gray-900 border border-gray-300  text-left px-2  `}
+                                >
                                   {employee.name}
                                 </td>
 
                                 <td
-                                  className={`p-2 text-sm font-light  text-center items-center border `}
+                                  className={`p-2 text-sm font-light  text-center items-center border border-gray-300  `}
                                   key={employee.employeeId}
                                 >
                                   <Checkbox
