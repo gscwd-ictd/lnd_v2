@@ -135,7 +135,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
 
   // per lsp query
   useQuery({
-    queryKey: ["lsp-details", lspId],
+    queryKey: ["lsp-details", id],
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp/${id}`);
@@ -216,7 +216,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
         return error;
       }
     },
-    enabled: !!lspId,
+    enabled: !!id && !!edit,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -310,11 +310,11 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     },
   });
 
-  useEffect(() => {
-    if (isEmpty(lspId) && !isEmpty(id)) {
-      setId(id);
-    }
-  }, [id, lspId]);
+  // useEffect(() => {
+  //   if (isEmpty(lspId) && !isEmpty(id)) {
+  //     setId(id);
+  //   }
+  // }, [id, lspId]);
 
   return (
     <>

@@ -195,7 +195,7 @@ export const BatchModal: FunctionComponent = () => {
       const { data: acceptedNominees } = await axios.get(`${url}/training/${id}/nominees/accepted`, {
         withCredentials: true,
       });
-      console.log(acceptedNominees);
+
       setEmployeePool(acceptedNominees);
       setTotalSelectedEmployees([]);
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 type TrainingByLsp = {
   id: string;
-  title: string;
+  courseTitle: string;
   from: string;
   to: string;
   rating: number;
@@ -14,7 +14,7 @@ export const useLspTrainingsDataTable = () => {
   const helper = createColumnHelper<TrainingByLsp>();
 
   const columns = [
-    helper.accessor("title", {
+    helper.accessor("courseTitle", {
       header: "Title",
       cell: (info) => info.getValue(),
     }),

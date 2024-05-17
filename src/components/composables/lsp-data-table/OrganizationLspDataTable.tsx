@@ -13,11 +13,10 @@ import Image from "next/image";
 import defaultPhoto from "../../../../public/images/placeholders/user-placeholder-gray.png";
 import { Disclosure } from "@headlessui/react";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
-import { ViewTrainingsByLspModal } from "../trainings-by-lsp/modal/ViewTrainingsByLspModal";
-import { TrainingLspRatingContext } from "./IndividualLspDataTable";
-import { ViewTrainingRatingModal } from "../trainings-by-lsp/modal/ViewTrainingRatingModal";
 import { OrganizationSlideOver } from "./slideover/OrganizationSlideOver";
 import { EditUploadPhotoAlert } from "../lsp-modal/organization/EditUploadPhotoAlert";
+import { ViewOrgTrainingRatingModal } from "../trainings-by-lsp/modal/ViewOrgTrainingRatingModal";
+import { ViewOrgTrainingsByLspModal } from "../trainings-by-lsp/modal/ViewOrgTrainingsByLspModal";
 
 type TrainingState = {
   trainingIsOpen: boolean;
@@ -32,7 +31,15 @@ type TrainingState = {
   setUploadAlertIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
+type ViewRatingsState = {
+  ratingIsOpen: boolean;
+  setRatingIsOpen: Dispatch<SetStateAction<boolean>>;
+  rating: number;
+  setRating: Dispatch<SetStateAction<number>>;
+};
+
 export const TrainingOrgLspContext = createContext({} as TrainingState);
+export const TrainingOrgLspRatingContext = createContext({} as ViewRatingsState);
 
 export const OrganizationDataTable: FunctionComponent = () => {
   const { columns, edit, lspId, setEdit, remove, setRemove, trainingIsOpen, setTrainingIsOpen } =
@@ -70,7 +77,7 @@ export const OrganizationDataTable: FunctionComponent = () => {
           setUploadAlertIsOpen,
         }}
       >
-        <TrainingLspRatingContext.Provider value={{ rating, ratingIsOpen, setRating, setRatingIsOpen }}>
+        <TrainingOrgLspRatingContext.Provider value={{ rating, ratingIsOpen, setRating, setRatingIsOpen }}>
           <OrganizationSlideOver />
           <DataTable
             title="Learning Service Providers"
@@ -87,9 +94,13 @@ export const OrganizationDataTable: FunctionComponent = () => {
           <EditUploadPhotoAlert />
           <DeleteLspOrganizationAlertDialog id={lspId} remove={remove} setRemove={setRemove} />
           <EditLspOrganizationModal edit={edit} id={lspId} setEdit={setEdit} />
-          <ViewTrainingsByLspModal id={lspId} trainingIsOpen={trainingIsOpen} setTrainingIsOpen={setTrainingIsOpen} />
-          <ViewTrainingRatingModal />
-        </TrainingLspRatingContext.Provider>
+          <ViewOrgTrainingsByLspModal
+            id={lspId}
+            trainingIsOpen={trainingIsOpen}
+            setTrainingIsOpen={setTrainingIsOpen}
+          />
+          <ViewOrgTrainingRatingModal />
+        </TrainingOrgLspRatingContext.Provider>
       </TrainingOrgLspContext.Provider>
     </>
   );

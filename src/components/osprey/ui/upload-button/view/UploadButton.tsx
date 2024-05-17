@@ -43,10 +43,6 @@ export default function UploadButton() {
       });
   };
 
-  useEffect(() => {
-    console.log(files);
-  }, [files]);
-
   return (
     <div>
       <label htmlFor="uploader">Upload</label>

@@ -20,7 +20,6 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspOrganizationModalBody } from "./LspOrganizationModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/IndAvatarWithAppwriteUpload";
 import { EditUploadPhotoAlert } from "../individual/EditUploadPhotoAlert";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 
@@ -153,7 +152,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     error: errorLspDetails,
     isLoading,
   } = useQuery({
-    queryKey: ["lsp-details", lspId],
+    queryKey: ["lsp-details", id],
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/lsp/${id}`)) as any;
@@ -184,7 +183,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         return error;
       }
     },
-    enabled: !!lspId,
+    enabled: !!id && !!edit,
     // staleTime: 10000,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -233,11 +232,11 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     },
   });
 
-  useEffect(() => {
-    if (isEmpty(lspId) && !isEmpty(id)) {
-      setId(id);
-    }
-  }, [id, lspId]);
+  // useEffect(() => {
+  //   if (isEmpty(lspId) && !isEmpty(id)) {
+  //     setId(id);
+  //   }
+  // }, [id, lspId]);
 
   return (
     <>

@@ -10,13 +10,13 @@ type DataTablePaginationProps<T extends unknown> = {
 export const DataTablePagination = <T extends unknown>({ table }: DataTablePaginationProps<T>) => {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex gap-1">
+      <div className="flex gap-0">
         <button
           onClick={() => table.setPageIndex(0)}
           disabled={!table.getCanPreviousPage()}
           className={`${
             !table.getCanPreviousPage() ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 text-gray-600"
-          } h-8 w-8 rounded flex items-center justify-center transition-colors`}
+          } sm:h-4 sm:w-4 md:w-4 md:h-4 lg:h-8 lg:w-8 rounded flex items-center justify-center transition-colors`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="">
             <path
@@ -31,7 +31,7 @@ export const DataTablePagination = <T extends unknown>({ table }: DataTablePagin
           disabled={!table.getCanPreviousPage()}
           className={`${
             !table.getCanPreviousPage() ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 text-gray-600"
-          } h-8 w-8 rounded flex items-center justify-center transition-colors`}
+          }sm:h-4 sm:w-4 md:w-4 md:h-4 lg:h-8 lg:w-8 rounded flex items-center justify-center transition-colors`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -45,7 +45,7 @@ export const DataTablePagination = <T extends unknown>({ table }: DataTablePagin
           disabled={!table.getCanNextPage()}
           className={`${
             !table.getCanNextPage() ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 text-gray-600"
-          } h-8 w-8 rounded flex items-center justify-center transition-colors`}
+          } sm:h-4 sm:w-4 md:w-4 md:h-4 lg:h-8 lg:w-8 rounded flex items-center justify-center transition-colors`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -59,7 +59,7 @@ export const DataTablePagination = <T extends unknown>({ table }: DataTablePagin
           disabled={!table.getCanNextPage()}
           className={`${
             !table.getCanNextPage() ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100 text-gray-600"
-          } h-8 w-8 rounded flex items-center justify-center transition-colors`}
+          } sm:h-4 sm:w-4 md:w-4 md:h-4 lg:h-8 lg:w-8 rounded flex items-center justify-center transition-colors`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -78,7 +78,7 @@ export const DataTablePagination = <T extends unknown>({ table }: DataTablePagin
       </span>
 
       <div className="inset-y-0 mr-2 text-xs">
-        <div className="flex">
+        <div className="flex max-w-[15rem] ">
           <input
             type="number"
             placeholder="Go to page..."
@@ -87,16 +87,16 @@ export const DataTablePagination = <T extends unknown>({ table }: DataTablePagin
               const page = e.target.value ? Number(e.target.value) - 1 : 0;
               table.setPageIndex(page);
             }}
-            className="block w-56 px-4 py-3 pr-20 transition-colors border-transparent rounded-md placeholder:text-gray-400 group-hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex placeholder:lg:text-sm placeholder:md:text-xs placeholder:sm:text-xs w-full px-4 py-3 text-right transition-colors border-transparent rounded-md placeholder:text-gray-400 group-hover:bg-gray-50 focus:z-10 focus:border-indigo-500 focus:ring-indigo-500"
           />
 
-          <div className="flex items-center text-gray-500 ">
+          <div className="flex items-center text-gray-500 max-w-[5rem]">
             <select
               value={table.getState().pagination.pageSize}
               onChange={(e) => {
                 table.setPageSize(Number(e.target.value));
               }}
-              className="block w-full transition-colors border-transparent rounded-md group-hover:bg-gray-50 focus:ring-indigo-600 focus:border-indigo-600"
+              className="flex w-auto flex-shrink  transition-colors border-transparent rounded-md group-hover:bg-gray-50 focus:ring-indigo-600 focus:border-indigo-600"
             >
               {[10, 20, 30, 40, 50].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>

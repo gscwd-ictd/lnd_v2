@@ -50,7 +50,7 @@ export const ViewTrainingNoticeModal: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-      console.log(data);
+
       // setCourseContent(data.courseContent);
       if (data.source.name === "Internal") {
         setId(data.id);

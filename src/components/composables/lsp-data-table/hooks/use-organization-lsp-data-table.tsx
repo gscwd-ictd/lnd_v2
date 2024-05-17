@@ -84,7 +84,8 @@ export const useOrganizationLspDataTable = () => {
             <button
               className="text-gray-800 transition-colors rounded"
               onClick={(e) => {
-                setLspId(info.getValue()!);
+                // setLspId(info.row.original.id!);
+                setId(info.row.original.id!);
                 setName(info.row.original.name);
                 setTrainingIsOpen(true);
                 e.stopPropagation();
@@ -145,5 +146,5 @@ export const useOrganizationLspDataTable = () => {
     }),
   ];
 
-  return { columns, edit, lspId, setEdit, remove, setRemove, setTrainingIsOpen, trainingIsOpen };
+  return { columns, edit, lspId, setLspId, setEdit, remove, setRemove, setTrainingIsOpen, trainingIsOpen };
 };

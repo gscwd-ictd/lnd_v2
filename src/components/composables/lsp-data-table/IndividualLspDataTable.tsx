@@ -14,11 +14,11 @@ import { Disclosure } from "@headlessui/react";
 import Image from "next/image";
 import defaultPhoto from "../../../../public/images/placeholders/user-placeholder-gray.png";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
-import { ViewTrainingsByLspModal } from "../trainings-by-lsp/modal/ViewTrainingsByLspModal";
-import { ViewTrainingRatingModal } from "../trainings-by-lsp/modal/ViewTrainingRatingModal";
+import { ViewIndTrainingsByLspModal } from "../trainings-by-lsp/modal/ViewIndTrainingsByLspModal";
 import { EditUploadPhotoAlert } from "../lsp-modal/individual/EditUploadPhotoAlert";
 import { IndividualLspSlideOver } from "./slideover/IndividualLspSlideOver";
 import { LspSource, useLspSourceStore } from "@lms/utilities/stores/lsp-details-store";
+import { ViewIndTrainingRatingModal } from "../trainings-by-lsp/modal/ViewIndTrainingRatingModal";
 
 type TrainingState = {
   trainingIsOpen: boolean;
@@ -41,7 +41,7 @@ type ViewRatingsState = {
 };
 
 export const TrainingLspContext = createContext({} as TrainingState);
-export const TrainingLspRatingContext = createContext({} as ViewRatingsState);
+export const TrainingIndLspRatingContext = createContext({} as ViewRatingsState);
 
 export const IndividualLspDataTable: FunctionComponent = () => {
   const { columns, edit, remove, lspId, trainingIsOpen, setTrainingIsOpen, setEdit, setRemove } =
@@ -71,7 +71,7 @@ export const IndividualLspDataTable: FunctionComponent = () => {
           setUploadAlertIsOpen,
         }}
       >
-        <TrainingLspRatingContext.Provider value={{ ratingIsOpen, setRatingIsOpen, rating, setRating }}>
+        <TrainingIndLspRatingContext.Provider value={{ ratingIsOpen, setRatingIsOpen, rating, setRating }}>
           <DataTable<LearningServiceProvider>
             // datasource={`${url}/lsp-details/individual?page=1&limit=40`}
             datasource={`${url}/lsp/q?type=individual&page=1&limit=40`}
@@ -89,9 +89,13 @@ export const IndividualLspDataTable: FunctionComponent = () => {
           <EditUploadPhotoAlert />
           <DeleteLspIndividualAlertDialog id={lspId} remove={remove} setRemove={setRemove} />
           <EditLspIndividualModal edit={edit} id={lspId} setEdit={setEdit} />
-          <ViewTrainingsByLspModal id={lspId} trainingIsOpen={trainingIsOpen} setTrainingIsOpen={setTrainingIsOpen} />
-          <ViewTrainingRatingModal />
-        </TrainingLspRatingContext.Provider>
+          <ViewIndTrainingsByLspModal
+            id={lspId}
+            trainingIsOpen={trainingIsOpen}
+            setTrainingIsOpen={setTrainingIsOpen}
+          />
+          <ViewIndTrainingRatingModal />
+        </TrainingIndLspRatingContext.Provider>
       </TrainingLspContext.Provider>
     </>
   );

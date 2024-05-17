@@ -31,7 +31,6 @@ export const OthersSlideOver: FunctionComponent = () => {
         setLocation("");
         setDateFrom("");
         setDateTo("");
-        console.log("CLEAR");
       }}
     >
       <SlideOver.Body>

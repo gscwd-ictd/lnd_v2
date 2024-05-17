@@ -5,14 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Dispatch, FunctionComponent, SetStateAction, useContext, useEffect, useState } from "react";
 import { ViewTrainingDetails } from "../ViewTrainingDetails";
-import { TrainingLspRatingContext } from "../../lsp-data-table/IndividualLspDataTable";
+import { TrainingIndLspRatingContext } from "../../lsp-data-table/IndividualLspDataTable";
+import { TrainingOrgLspRatingContext } from "../../lsp-data-table/OrganizationLspDataTable";
 
 type ViewTrainingRatingModalProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const ViewTrainingRatingModal: FunctionComponent = () => {
+export const ViewOrgTrainingRatingModal: FunctionComponent = () => {
   const id = useTrainingNoticeStore((state) => state.id);
   const setLocation = useTrainingNoticeStore((state) => state.setLocation);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
@@ -25,7 +26,7 @@ export const ViewTrainingRatingModal: FunctionComponent = () => {
   const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
   const setSelectedFacilitators = useTrainingNoticeStore((state) => state.setSelectedFacilitators);
   const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
-  const { ratingIsOpen, setRatingIsOpen, rating, setRating } = useContext(TrainingLspRatingContext);
+  const { ratingIsOpen, setRatingIsOpen, rating, setRating } = useContext(TrainingOrgLspRatingContext);
   const [initialRating, setInitialRating] = useState<number>(0);
   const [ratingIsClicked, setRatingIsClicked] = useState<boolean>(false);
 
@@ -75,6 +76,7 @@ export const ViewTrainingRatingModal: FunctionComponent = () => {
           <ModalContent.Title></ModalContent.Title>
           <ModalContent.Body>
             <main className="px-2 py-8">
+              {JSON.stringify(id)}
               <div className="flex grid-cols-2 w-full px-3">
                 <div className="w-[40%] font-sans px-2">
                   <ViewTrainingDetails />

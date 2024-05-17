@@ -38,6 +38,7 @@ export type DataTableProps<T extends unknown> = {
   children?: ReactNode;
   enableGlobalFilter?: boolean;
   withCredentials?: boolean;
+  fullWidthSearch?: boolean;
 };
 
 type DataTableContextState<T> = {
@@ -55,6 +56,7 @@ export const DataTable = <T extends unknown>({
   subtitle,
   enableGlobalFilter = true,
   withCredentials = true,
+  fullWidthSearch = false,
   children,
 }: DataTableProps<T>): ReactElement => {
   // initialize state for table sorting
@@ -117,7 +119,13 @@ export const DataTable = <T extends unknown>({
 
   return (
     <div className="border shadow-md shadow-gray-50">
-      <DataTableHeader<T> title={title} subtitle={subtitle} table={table} enableGlobalFilter={enableGlobalFilter} />
+      <DataTableHeader<T>
+        title={title}
+        subtitle={subtitle}
+        table={table}
+        enableGlobalFilter={enableGlobalFilter}
+        fullWidthSearch={fullWidthSearch}
+      />
 
       <DataTableContext.Provider value={{ table } as DataTableContextState<T>}>
         <AnimatePresence>

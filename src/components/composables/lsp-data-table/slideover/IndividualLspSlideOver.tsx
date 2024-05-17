@@ -50,7 +50,6 @@ export const IndividualLspSlideOver = () => {
     >
       <SlideOver.Body>
         <div className="px-10 py-2 pt-5">
-          {isLoading.toString()}
           {source === "internal" ? (
             <Avatar source={allLsp?.photoUrl ? allLsp?.photoUrl : defaultPhoto.src} size="9xl" />
           ) : source === "external" && isLoading ? (
