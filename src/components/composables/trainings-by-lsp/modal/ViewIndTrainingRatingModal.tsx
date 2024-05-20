@@ -1,54 +1,51 @@
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import { url } from "@lms/utilities/url/api-url";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Dispatch, FunctionComponent, SetStateAction, useContext, useEffect, useState } from "react";
 import { ViewTrainingDetails } from "../ViewTrainingDetails";
-import { TrainingLspRatingContext } from "../../lsp-data-table/IndividualLspDataTable";
+import { TrainingIndLspRatingContext } from "../../lsp-data-table/IndividualLspDataTable";
+import { useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
+import { useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
+import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { HiOutlineX, HiOutlineXCircle, HiXCircle } from "react-icons/hi";
 
 type ViewTrainingRatingModalProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const ViewTrainingRatingModal: FunctionComponent = () => {
-  const id = useTrainingNoticeStore((state) => state.id);
-  const setLocation = useTrainingNoticeStore((state) => state.setLocation);
-  const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
+export const ViewIndTrainingRatingModal: FunctionComponent = () => {
+  const queryClient = useQueryClient();
+  const trainingId = useTrainingNoticeStore((state) => state.id);
+  const lspId = useLspDetailsStore((state) => state.id);
   const reset = useTrainingNoticeStore((state) => state.reset);
-  const setSelectedTags = useTrainingNoticeStore((state) => state.setSelectedTags);
-  const setNumberOfHours = useTrainingNoticeStore((state) => state.setNumberOfHours);
-  const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
-  const setTrainingNoticeId = useTrainingNoticeStore((state) => state.setId);
-  const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
-  const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
-  const setSelectedFacilitators = useTrainingNoticeStore((state) => state.setSelectedFacilitators);
-  const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
-  const { ratingIsOpen, setRatingIsOpen, rating, setRating } = useContext(TrainingLspRatingContext);
+  const { setToastOptions } = useLspTabsToastOptions();
+  const { ratingIsOpen, setRatingIsOpen, rating, setRating } = useContext(TrainingIndLspRatingContext);
   const [initialRating, setInitialRating] = useState<number>(0);
   const [ratingIsClicked, setRatingIsClicked] = useState<boolean>(false);
 
-  // this is to fetch the training details
-  const { isLoading, isFetching, data, isError } = useQuery({
-    queryKey: ["training-details", id],
-    enabled: !!id && ratingIsOpen !== false,
-    staleTime: 2,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    queryFn: async () => {
-      const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-      setNumberOfParticipants(data.numberOfParticipants);
-      setCourseTitle(data.courseTitle);
-      setTrainingStart(data.trainingStart);
-      setTrainingEnd(data.trainingEnd);
-      setNumberOfHours(data.numberOfHours);
-      setSelectedTags(data.trainingTags);
-      setLocation(data.location);
-      setSelectedTrainingType(data.type);
-      setSelectedFacilitators(data.trainingLspDetails);
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await axios.patch(`${url}/lsp/rating`, {
+        id: trainingId,
+        rating,
+      });
+
       return data;
+    },
+    onSuccess: async () => {
+      const getUpdatedTrainingsWithRatings = await axios.get(`${url}/lsp/${lspId}/rating`);
+      queryClient.setQueryData(["lsp-trainings", lspId], getUpdatedTrainingsWithRatings.data.items);
+      setToastOptions("success", "Success", "Successfully updated the rating!");
+      setRatingIsClicked(false);
+      setRatingIsOpen(false);
+      setInitialRating(0);
+      reset();
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try again in a few seconds.");
     },
   });
 
@@ -65,16 +62,29 @@ export const ViewTrainingRatingModal: FunctionComponent = () => {
         setIsOpen={setRatingIsOpen}
         size="lg"
         isStatic
-        onClose={() => {
-          setRatingIsOpen(false);
-          setRating(0);
-          reset();
-        }}
+        animate={false}
+        // onClose={() => {
+        //   setRatingIsClicked(false);
+        //   setRatingIsOpen(false);
+        //   setRating(0);
+        //   reset();
+        // }}
       >
         <ModalContent>
-          <ModalContent.Title></ModalContent.Title>
           <ModalContent.Body>
-            <main className="px-2 py-8">
+            <main className="px-2 py-8 relative">
+              <button
+                className="absolute top-2 -right-3 w-6 h-6 "
+                onClick={() => {
+                  setRatingIsClicked(false);
+                  setRatingIsOpen(false);
+                  setInitialRating(0);
+                  setRating(0);
+                  reset();
+                }}
+              >
+                <HiOutlineX />
+              </button>
               <div className="flex grid-cols-2 w-full px-3">
                 <div className="w-[40%] font-sans px-2">
                   <ViewTrainingDetails />
@@ -213,7 +223,17 @@ export const ViewTrainingRatingModal: FunctionComponent = () => {
                   </div>
                   {ratingIsClicked === true && (
                     <div className="w-full flex flex-col items-center gap-1">
-                      <button className="px-3 rounded py-2 bg-indigo-500 text-white w-[50%]">Submit</button>
+                      <button
+                        className="px-3 rounded py-2 bg-indigo-500 text-white w-[50%] disabled:cursor-not-allowed"
+                        type="button"
+                        onClick={() => submitMutation.mutateAsync()}
+                        disabled={submitMutation.isLoading ? true : false}
+                      >
+                        <span className="flex gap-1 justify-center items-center">
+                          Submit
+                          {submitMutation.isLoading && <Spinner color="indigo" size="xs" />}
+                        </span>
+                      </button>
                       <button className="px-3 rounded py-2 bg-transparent text-gray-500 w-[50%]">No Thanks</button>
                     </div>
                   )}

@@ -116,7 +116,7 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
         columns={columns}
         title="Notice of Training"
         subtitle="Training outline and other details for the upcoming training programs."
-        onRowClick={(row) => console.log(row.original.id)}
+        // onRowClick={(row) => console.log(row.original.id)}
       />
 
       <TrainingNoticeContext.Provider

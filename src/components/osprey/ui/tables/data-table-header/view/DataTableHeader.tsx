@@ -8,6 +8,7 @@ type DataTableHeaderProps<T extends unknown> = {
   subtitle?: string;
   enableGlobalFilter?: boolean;
   table: Table<T>;
+  fullWidthSearch?: boolean;
 };
 
 export const DataTableHeader = <T extends unknown>({
@@ -15,15 +16,26 @@ export const DataTableHeader = <T extends unknown>({
   subtitle,
   table,
   enableGlobalFilter,
+  fullWidthSearch = false,
 }: DataTableHeaderProps<T>) => {
   return (
-    <div className="px-6 py-3 flex justify-between bg-white">
+    <div
+      className={`px-6 py-3 flex ${
+        (title || subtitle) && enableGlobalFilter && fullWidthSearch
+          ? "flex-col justify-between"
+          : (title || subtitle) && enableGlobalFilter && !fullWidthSearch
+          ? "justify-between"
+          : ""
+      } bg-white`}
+    >
       <header>
         <h3 className="text-gray-700 text-lg font-medium">{title}</h3>
         <p className="text-xs text-gray-500">{subtitle}</p>
       </header>
 
-      <div>{enableGlobalFilter && <DataTableGlobalSearch table={table} />}</div>
+      <div className={fullWidthSearch && enableGlobalFilter ? "w-full" : "w-auto"}>
+        {enableGlobalFilter && <DataTableGlobalSearch table={table} />}
+      </div>
     </div>
   );
 };

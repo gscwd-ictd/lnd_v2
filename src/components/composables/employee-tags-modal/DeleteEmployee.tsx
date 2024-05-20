@@ -85,7 +85,7 @@ export const DeleteEmployee: FunctionComponent<DeleteEmployeeProp> = ({ employee
             <p className="text-sm text-gray-400">Delete a tag</p>
           </ModalContent.Title>
           <ModalContent.Body>
-            <label className="text-sm font-medium text-gray-700">Are you sure you want to delete this tag?</label>
+            <label className="text-sm font-medium text-gray-700">Are you sure you want to delete this employee?</label>
           </ModalContent.Body>
           <ModalContent.Footer>
             <div className="flex items-center justify-end py-1">

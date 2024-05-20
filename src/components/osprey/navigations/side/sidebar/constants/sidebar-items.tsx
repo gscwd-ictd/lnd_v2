@@ -556,7 +556,7 @@ export const sidebarItems: SidebarItems = [
       },
       {
         path: "/settings/tags",
-        label: "Tags",
+        label: "Training Tags",
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -575,9 +575,30 @@ export const sidebarItems: SidebarItems = [
           </svg>
         ),
       },
+      // {
+      //   path: "",
+      //   label: "Employees Tags",
+
+      //   icon: (
+      //     <svg
+      //       xmlns="http://www.w3.org/2000/svg"
+      //       fill="none"
+      //       viewBox="0 0 24 24"
+      //       strokeWidth="1.5"
+      //       stroke="currentColor"
+      //       className="w-5 h-5 text-zinc-700"
+      //     >
+      //       <path
+      //         strokeLinecap="round"
+      //         strokeLinejoin="round"
+      //         d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+      //       />
+      //     </svg>
+      //   ),
+      // },
       {
-        path: "/settings/employee-tags",
-        label: "Employee Tags",
+        path: "/settings/employees-with-tags",
+        label: "Employees with Tags",
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -591,6 +612,26 @@ export const sidebarItems: SidebarItems = [
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+            />
+          </svg>
+        ),
+      },
+      {
+        path: "/settings/tags-with-employees",
+        label: "Tags with Employees",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            className="w-5 h-5 text-zinc-700"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"
             />
           </svg>
         ),

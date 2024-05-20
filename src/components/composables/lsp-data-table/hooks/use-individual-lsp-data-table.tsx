@@ -79,7 +79,8 @@ export const useIndividualLspDataTable = () => {
             <button
               className="text-gray-800 transition-colors rounded"
               onClick={(e) => {
-                setLspId(info.getValue()!);
+                // setLspId(info.getValue()!);
+                setId(info.row.original.id!);
                 setName(info.row.original.name);
                 setTrainingIsOpen(true);
                 e.stopPropagation();
@@ -146,6 +147,7 @@ export const useIndividualLspDataTable = () => {
     edit,
     remove,
     lspId,
+    setLspId,
     setEdit,
     setRemove,
     trainingIsOpen,

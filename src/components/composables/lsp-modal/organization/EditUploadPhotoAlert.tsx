@@ -7,13 +7,13 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@lms/components/osprey/ui/overlays/alert-dialog/view/AlertDialog";
-import { useEditLspModalStore, useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
-import { FunctionComponent, MutableRefObject, useContext, useRef, useState } from "react";
+import { useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
+import { FunctionComponent, MutableRefObject, useRef, useState } from "react";
 import defaultPhoto from "../../../../../public/images/placeholders/user-placeholder-gray.png";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Storage } from "appwrite";
 import { useLspExternal } from "@lms/hooks/use-lsp-external";
-import { LspToastContext } from "../../lsp-tabs/LspTabs";
+import { useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
@@ -37,7 +37,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
   // const setUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
   const { uploadAlertIsOpen, setUploadAlertIsOpen, id } = useOrgSlideOver();
   const setPhotoUrl = useLspDetailsStore((state) => state.setPhotoUrl);
-  const { setToastOptions } = useContext(LspToastContext);
+  const { setToastOptions } = useLspTabsToastOptions();
   const photoId = useLspDetailsStore((state) => state.photoId);
   const setPhotoId = useLspDetailsStore((state) => state.setPhotoId);
 

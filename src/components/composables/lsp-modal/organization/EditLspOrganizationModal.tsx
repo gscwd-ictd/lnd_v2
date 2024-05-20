@@ -20,9 +20,9 @@ import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspOrganizationModalBody } from "./LspOrganizationModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
-import { AvatarWithAppwriteUpload } from "@lms/components/osprey/ui/avatar/view/IndAvatarWithAppwriteUpload";
 import { EditUploadPhotoAlert } from "../individual/EditUploadPhotoAlert";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
+import { useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
 
 type EditLspOrganizationModalProps = {
   edit: boolean;
@@ -30,21 +30,8 @@ type EditLspOrganizationModalProps = {
   id: string;
 };
 
-type ToastType = {
-  color: "success" | "warning" | "info" | "default" | "danger";
-  title: string;
-  content: string;
-};
-
 export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModalProps> = ({ edit, setEdit, id }) => {
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-
+  const { setToastOptions } = useLspTabsToastOptions();
   const { page, setPage } = useEditLspModalStore((state) => ({ page: state.page, setPage: state.setPage }));
 
   const {
@@ -153,7 +140,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     error: errorLspDetails,
     isLoading,
   } = useQuery({
-    queryKey: ["lsp-details", lspId],
+    queryKey: ["lsp-details", id],
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/lsp/${id}`)) as any;
@@ -184,7 +171,7 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         return error;
       }
     },
-    enabled: !!lspId,
+    enabled: !!id && !!edit,
     // staleTime: 10000,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -233,11 +220,11 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
     },
   });
 
-  useEffect(() => {
-    if (isEmpty(lspId) && !isEmpty(id)) {
-      setId(id);
-    }
-  }, [id, lspId]);
+  // useEffect(() => {
+  //   if (isEmpty(lspId) && !isEmpty(id)) {
+  //     setId(id);
+  //   }
+  // }, [id, lspId]);
 
   return (
     <>
@@ -372,14 +359,6 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         </ModalContent>
       </Modal>
       <EditUploadPhotoAlert />
-      <Toast
-        duration={2000}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

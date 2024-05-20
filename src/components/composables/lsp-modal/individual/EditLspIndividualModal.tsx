@@ -22,7 +22,7 @@ import { url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspIndividualModalBody } from "./LspIndividualModalBody";
-import { LspToastContext } from "../../lsp-tabs/LspTabs";
+import { LspToastContext, useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
 
 type EditLspIndividualModalProps = {
   edit: boolean;
@@ -38,7 +38,7 @@ type ToastType = {
 
 export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalProps> = ({ edit, setEdit, id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { setToastOptions } = useContext(LspToastContext);
+  const { setToastOptions } = useLspTabsToastOptions();
   const { page, setPage } = useEditLspModalStore((state) => ({ page: state.page, setPage: state.setPage }));
 
   const {
@@ -135,7 +135,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
 
   // per lsp query
   useQuery({
-    queryKey: ["lsp-details", lspId],
+    queryKey: ["lsp-details", id],
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/lsp/${id}`);
@@ -216,7 +216,7 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
         return error;
       }
     },
-    enabled: !!lspId,
+    enabled: !!id && !!edit,
     staleTime: 2,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -310,11 +310,11 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
     },
   });
 
-  useEffect(() => {
-    if (isEmpty(lspId) && !isEmpty(id)) {
-      setId(id);
-    }
-  }, [id, lspId]);
+  // useEffect(() => {
+  //   if (isEmpty(lspId) && !isEmpty(id)) {
+  //     setId(id);
+  //   }
+  // }, [id, lspId]);
 
   return (
     <>
