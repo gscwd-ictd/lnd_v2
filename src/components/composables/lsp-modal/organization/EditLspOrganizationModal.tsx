@@ -22,6 +22,7 @@ import { LspOrganizationModalBody } from "./LspOrganizationModalBody";
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { EditUploadPhotoAlert } from "../individual/EditUploadPhotoAlert";
 import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
+import { useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
 
 type EditLspOrganizationModalProps = {
   edit: boolean;
@@ -29,21 +30,8 @@ type EditLspOrganizationModalProps = {
   id: string;
 };
 
-type ToastType = {
-  color: "success" | "warning" | "info" | "default" | "danger";
-  title: string;
-  content: string;
-};
-
 export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModalProps> = ({ edit, setEdit, id }) => {
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-
+  const { setToastOptions } = useLspTabsToastOptions();
   const { page, setPage } = useEditLspModalStore((state) => ({ page: state.page, setPage: state.setPage }));
 
   const {
@@ -371,14 +359,6 @@ export const EditLspOrganizationModal: FunctionComponent<EditLspOrganizationModa
         </ModalContent>
       </Modal>
       <EditUploadPhotoAlert />
-      <Toast
-        duration={2000}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

@@ -3,13 +3,14 @@ import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/vi
 import { Dispatch, FunctionComponent, SetStateAction, createContext, useContext, useState } from "react";
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
 import { useLspTrainingsDataTable } from "../hooks/use-lsp-trainings-data-table";
-import { useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
+import { LspSource, useLspDetailsStore } from "@lms/utilities/stores/lsp-details-store";
 import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 import { TrainingOrgLspRatingContext } from "../../lsp-data-table/OrganizationLspDataTable";
 import { url } from "@lms/utilities/url/api-url";
 import { isEmpty } from "lodash";
 import { useOrganizationLspDataTable } from "../../lsp-data-table/hooks/use-organization-lsp-data-table";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import dayjs from "dayjs";
 
 type ViewTrainingsByLspModalProps = {
   id: string;
@@ -27,6 +28,18 @@ export const ViewOrgTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
   const id = useLspDetailsStore((state) => state.id);
   const setId = useLspDetailsStore((state) => state.setId);
   const setTrainingId = useTrainingNoticeStore((state) => state.setId);
+  const setLocation = useTrainingNoticeStore((state) => state.setLocation);
+  const reset = useTrainingNoticeStore((state) => state.reset);
+  const setSelectedTags = useTrainingNoticeStore((state) => state.setSelectedTags);
+  const setNumberOfHours = useTrainingNoticeStore((state) => state.setNumberOfHours);
+  const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
+  const setTrainingEnd = useTrainingNoticeStore((state) => state.setTrainingEnd);
+  const setTrainingStart = useTrainingNoticeStore((state) => state.setTrainingStart);
+  const setSelectedFacilitators = useTrainingNoticeStore((state) => state.setSelectedFacilitators);
+  const setNumberOfParticipants = useTrainingNoticeStore((state) => state.setNumberOfParticipants);
+  const setCourseContent = useTrainingNoticeStore((state) => state.setCourseContent);
+  const setStatus = useTrainingNoticeStore((state) => state.setStatus);
+  const setLspSource = useTrainingNoticeStore((state) => state.setLspSource);
 
   return (
     <>
@@ -39,6 +52,7 @@ export const ViewOrgTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
         onClose={() => {
           // setId(null);
           setId("");
+          reset();
         }}
       >
         <ModalContent>
@@ -62,6 +76,18 @@ export const ViewOrgTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
                 setTrainingId(row.original.id);
                 setRatingIsOpen(true);
                 setRating(row.original.rating ?? 0);
+
+                setCourseContent(row.original.courseContent);
+                setLocation(row.original.location);
+                setNumberOfHours(row.original.numberOfHours);
+                setCourseTitle(row.original.courseTitle);
+                setNumberOfParticipants(row.original.numberOfParticipants);
+                setStatus(row.original.status);
+                setTrainingEnd(dayjs(row.original.trainingEnd).format("YYYY-MM-DD"));
+                setSelectedTags(row.original.trainingTags);
+                setSelectedFacilitators(row.original.trainingLspDetails);
+                setTrainingStart(dayjs(row.original.trainingStart).format("YYYY-MM-DD"));
+                setLspSource(row.original.source === "External" ? LspSource.EXTERNAL : LspSource.INTERNAL);
               }}
             />
           ) : (

@@ -1,3 +1,4 @@
+import { getTrainingSourceBadgePill } from "@lms/utilities/functions/getTrainingSourceBadgePill";
 import { getCapitalizedTrainingType } from "@lms/utilities/functions/getTrainingTypeFromString";
 import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import dayjs from "dayjs";
@@ -14,11 +15,15 @@ export const ViewTrainingDetails: FunctionComponent = () => {
   const selectedTrainingType = useTrainingTypesStore((state) => state.selectedTrainingType);
   const selectedTags = useTrainingNoticeStore((state) => state.selectedTags);
   const selectedFacilitators = useTrainingNoticeStore((state) => state.selectedFacilitators);
+  const lspSource = useTrainingNoticeStore((state) => state.lspSource);
 
   return (
     <div className="flex flex-col gap-1  ">
-      <div className="flex items-start gap-2">
-        <h3 className="text-2xl font-sans font-bold text-gray-600 ">{courseTitle}</h3>
+      <div className="flex">
+        <div className="-rotate-45 -ml-5 -mr-5">{getTrainingSourceBadgePill(lspSource)}</div>
+        <div className="flex items-start gap-2">
+          <h3 className="text-2xl font-sans font-bold text-gray-600 ">{courseTitle}</h3>
+        </div>
       </div>
 
       {/* Date */}
@@ -55,21 +60,23 @@ export const ViewTrainingDetails: FunctionComponent = () => {
 
       {/* Location */}
       <div className="flex items-center justify-start gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-          />
-        </svg>
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+            />
+          </svg>
+        </div>
         <span className="text-gray-600">{location}</span>
       </div>
 
@@ -159,7 +166,7 @@ export const ViewTrainingDetails: FunctionComponent = () => {
       </div>
 
       {/* Facilitators */}
-      <div className="flex items-center justify-start gap-2">
+      {/* <div className="flex items-center justify-start gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -174,14 +181,15 @@ export const ViewTrainingDetails: FunctionComponent = () => {
             d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
           />
         </svg>
-        {selectedFacilitators.map((faci) => {
-          return (
-            <span key={faci.id} className="px-2 text-white rounded bg-zinc-500">
-              {faci.name}
-            </span>
-          );
-        })}
-      </div>
+        {selectedFacilitators &&
+          selectedFacilitators.map((faci) => {
+            return (
+              <span key={faci.id} className="px-2 text-white rounded bg-zinc-500">
+                {faci.name}
+              </span>
+            );
+          })}
+      </div> */}
     </div>
   );
 };

@@ -19,12 +19,12 @@ export default function EmployeeTags() {
             </ul>
           </div>
         </div>
-        <div className="flex sm:flex-col lg:flex-row  gap-3 ">
+        <div className="flex sm:flex-col lg:flex-row  gap-3 h-full ">
           <div className="flex sm:w-full lg:w-1/3">
             {/* <EmployeeTagTabs /> */}
             <TagsWithEmployeesLeft />
           </div>
-          <div className="flex sm:w-full lg:w-2/3 p-3 bg-white">
+          <div className="flex sm:w-full lg:w-2/3 p-3 bg-white ">
             {/* <EmployeeTagList /> */}
             <TagsWithEmployeesList />
           </div>

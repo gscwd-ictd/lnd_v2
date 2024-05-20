@@ -27,6 +27,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Spinner } from "../../../spinner/view/Spinner";
+import { HiExclamationCircle } from "react-icons/hi";
 
 export type DataTableProps<T extends unknown> = {
   datasource: string;
@@ -109,7 +110,13 @@ export const DataTable = <T extends unknown>({
     onRowSelectionChange: setRowSelection,
   });
 
-  if (error) return <>Cannot fetch table data</>;
+  if (error)
+    return (
+      <div className="w-full flex gap-2 justify-center items-center">
+        <HiExclamationCircle className="h-10 w-10 text-rose-600" />
+        <span>Cannot fetch table data.</span>
+      </div>
+    );
   if (isLoading)
     return (
       <div className="flex justify-center w-full h-full">

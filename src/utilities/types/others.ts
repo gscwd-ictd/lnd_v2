@@ -9,6 +9,7 @@ export type Others = {
   dateTo: string;
   category: OthersCategory;
   orientationId: string;
+  status: OthersStatus;
 };
 
 export enum OthersCategory {
@@ -19,4 +20,9 @@ export enum OthersCategory {
   SEMINAR = "seminar",
   CONVENTION = "convention",
   ORIENTATION = "orientation",
+}
+
+export enum OthersStatus {
+  PENDING = "pending",
+  DONE = "done",
 }

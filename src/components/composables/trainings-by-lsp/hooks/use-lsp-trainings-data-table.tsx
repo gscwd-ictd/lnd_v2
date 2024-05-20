@@ -1,3 +1,5 @@
+import { TrainingFacilitatorWithType } from "@lms/utilities/stores/training-notice-store";
+import { TrainingNotice } from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -10,19 +12,25 @@ type TrainingByLsp = {
   rating: number;
 };
 
+type TrainingWithRating = TrainingNotice & {
+  rating: number;
+  trainingTags: Array<{ id: string; name: string }>;
+  trainingLspDetails: Array<TrainingFacilitatorWithType>;
+};
+
 export const useLspTrainingsDataTable = () => {
-  const helper = createColumnHelper<TrainingByLsp>();
+  const helper = createColumnHelper<TrainingWithRating>();
 
   const columns = [
     helper.accessor("courseTitle", {
       header: "Title",
       cell: (info) => info.getValue(),
     }),
-    helper.accessor("from", {
+    helper.accessor("trainingStart", {
       header: "Date From",
       cell: (info) => dayjs(info.getValue()).format("MMMM DD, YYYY"),
     }),
-    helper.accessor("to", {
+    helper.accessor("trainingEnd", {
       header: "Date To",
       cell: (info) => dayjs(info.getValue()).format("MMMM DD, YYYY"),
     }),

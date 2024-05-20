@@ -22,7 +22,7 @@ import { url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { LspIndividualModalBody } from "./LspIndividualModalBody";
-import { LspToastContext } from "../../lsp-tabs/LspTabs";
+import { LspToastContext, useLspTabsToastOptions } from "../../lsp-tabs/LspTabs";
 
 type EditLspIndividualModalProps = {
   edit: boolean;
@@ -38,7 +38,7 @@ type ToastType = {
 
 export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalProps> = ({ edit, setEdit, id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { setToastOptions } = useContext(LspToastContext);
+  const { setToastOptions } = useLspTabsToastOptions();
   const { page, setPage } = useEditLspModalStore((state) => ({ page: state.page, setPage: state.setPage }));
 
   const {

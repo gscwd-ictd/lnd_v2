@@ -164,15 +164,17 @@ export default function EmployeeWithTagsLeft() {
               )}
             </div>
 
-            <div className="absolute inset-y-0 mt-1 right-0 z-20 flex items-center pr-8 ">
-              <button
-                onClick={() => {
-                  setSelectedEmployee({ employeeId: "", fullName: "", positionTitle: "" });
-                }}
-              >
-                <HiXCircle className="w-5 h-5 text-gray-400 hover:text-gray-500 active:text-gray-600" />
-              </button>
-            </div>
+            {selectedEmployee?.employeeId ? (
+              <div className="absolute inset-y-0 mt-1 right-0 z-20 flex items-center pr-8 ">
+                <button
+                  onClick={() => {
+                    setSelectedEmployee({ employeeId: "", fullName: "", positionTitle: "" });
+                  }}
+                >
+                  <HiXCircle className="w-5 h-5 text-gray-400 hover:text-gray-500 active:text-gray-600" />
+                </button>
+              </div>
+            ) : null}
 
             <Combobox.Options className="absolute w-full p-1 space-y-1 overflow-auto bg-white rounded-sm max-h-60">
               {employees.length === 0 && query !== "" ? (

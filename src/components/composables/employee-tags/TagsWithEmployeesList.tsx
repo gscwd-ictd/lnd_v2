@@ -275,7 +275,7 @@ export default function TagsWithEmployeesList() {
                       </li>
                     ))}
                   </ul>
-                  <div className="flex justify-end text-sm">Total Employee: {employees?.length}</div>
+                  <div className="flex justify-end text-sm">Total Employees: {employees?.length}</div>
                 </>
               )}
             </>

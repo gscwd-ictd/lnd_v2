@@ -47,16 +47,11 @@ import defaultPhoto from "../../../../public/images/placeholders/user-placeholde
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { AddUploadPhotoAlert } from "./individual/AddUploadPhotoAlert";
 import { useLspExternal } from "@lms/hooks/use-lsp-external";
+import { useLspTabsToastOptions } from "../lsp-tabs/LspTabs";
 
 export const AddNewLspModal: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
-  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string | undefined) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
-
+  const { setToastOptions } = useLspTabsToastOptions();
   const client = useLspExternal();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -740,14 +735,6 @@ export const AddNewLspModal: FunctionComponent = () => {
         </ModalContent>
       </Modal>
       <AddUploadPhotoAlert />
-      <Toast
-        duration={2000}
-        open={toastIsOpen}
-        setOpen={setToastIsOpen}
-        color={toastType.color}
-        title={toastType.title}
-        content={toastType.content}
-      />
     </>
   );
 };

@@ -62,7 +62,6 @@ export const useBenchmarkingDataTable = () => {
         <div className="flex items-center gap-2">
           {props.row.original.status === BenchmarkingStatus.PENDING ? (
             <>
-              {" "}
               <Tooltip content="Update" withArrow>
                 <button
                   className="text-gray-800 transition-colors rounded"
