@@ -1,7 +1,7 @@
-import EmployeeTagList from "@lms/components/composables/employee-tags/EmployeeTagList";
-import EmployeeTagTabs from "@lms/components/composables/employee-tags/EmployeeTagTabs";
+import { EmployeeTagsArrow } from "@lms/components/composables/employee-tags/EmployeeTagsArrow";
 import TagsWithEmployeesLeft from "@lms/components/composables/employee-tags/TagsWithEmployeesLeft";
 import TagsWithEmployeesList from "@lms/components/composables/employee-tags/TagsWithEmployeesList";
+import UseWindowDimensions from "@lms/utilities/functions/WindowDimensions";
 import Link from "next/link";
 
 export default function EmployeeTags() {
@@ -19,12 +19,17 @@ export default function EmployeeTags() {
             </ul>
           </div>
         </div>
-        <div className="flex sm:flex-col lg:flex-row  gap-3 h-full ">
-          <div className="flex sm:w-full lg:w-1/3">
+        <div className="flex sm:flex-col lg:flex-row  gap-3 h-full">
+          <div className="flex sm:w-full lg:w-5/12">
             {/* <EmployeeTagTabs /> */}
             <TagsWithEmployeesLeft />
           </div>
-          <div className="flex sm:w-full lg:w-2/3 p-3 bg-white ">
+          <div className="flex sm:w-full lg:w-1/12">
+            <div className="place-items-center flex justify-center w-full">
+              <EmployeeTagsArrow />
+            </div>
+          </div>
+          <div className="flex sm:w-full lg:w-7/12 p-3 bg-white ">
             {/* <EmployeeTagList /> */}
             <TagsWithEmployeesList />
           </div>

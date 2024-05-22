@@ -4,6 +4,7 @@ import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props"
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { useTabStore } from "@lms/utilities/stores/employee-tags-store";
 import { url } from "@lms/utilities/url/api-url";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { FunctionComponent, useState } from "react";
 
@@ -14,30 +15,39 @@ type DeleteEmployeeTagProp = {
 
 export const DeleteEmployeeTag: FunctionComponent<DeleteEmployeeTagProp> = ({ tagId, employeeId }) => {
   const [open, setOpen] = useState(false);
+
+  const queryClient = useQueryClient();
+  const setSearchEmployeeTag = useTabStore((state) => state.setSearchEmployeeTag);
   const setEmployeeTags = useTabStore((state) => state.setEmployeeTags);
+  const setFilteredEmployeeTags = useTabStore((state) => state.setFilteredEmployeeTags);
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-
-  const deleteEmployeeTag = async (data: DeleteEmployeeTagProp) => {
-    var employeeId = data.employeeId;
-
-    try {
-      const result = await axios.delete(`${url}/hrms/employee-tags/`, { data });
-
-      if (result) {
-        setToastOptions("success", "Success", "You have successfully deleted a training tag from an employee!");
-        const employeeTags = await axios.get(`${url}/hrms/employee-tags/employee/${employeeId}`);
-        setEmployeeTags(employeeTags.data);
-      }
-    } catch {
-      setToastOptions("danger", "Something went wrong!", "Failed to delete, please contact your administrator.");
-    }
-  };
 
   // this function opens the toast with the following attributes
   const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
     setToastType({ color, title, content });
     setToastIsOpen(true);
+  };
+
+  const deleteEmployeeTag = async (data: DeleteEmployeeTagProp) => {
+    const employeeId = data.employeeId;
+
+    try {
+      const result = await axios.delete(`${url}/hrms/employees/tags/`, { data });
+
+      if (result) {
+        setToastOptions("success", "Success", "You have successfully deleted a training tag from an employee!");
+        // const employeeTags = await axios.get(`${url}/hrms/employee-tags/employee/${employeeId}`);
+        const updatedEmployeeTags = await axios.get(`${url}/hrms/employees/${employeeId}/tags`);
+
+        queryClient.setQueryData(["getTagsByEmployeeId", employeeId], updatedEmployeeTags);
+        setEmployeeTags(updatedEmployeeTags.data);
+        setFilteredEmployeeTags(updatedEmployeeTags.data);
+        setSearchEmployeeTag("");
+      }
+    } catch {
+      setToastOptions("danger", "Something went wrong!", "Failed to delete, please contact your administrator.");
+    }
   };
 
   return (

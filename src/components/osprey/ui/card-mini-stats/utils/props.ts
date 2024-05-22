@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLAttributes, ReactElement, ReactNode } from "react";
 
 export type CardProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
   variant?: "default" | "outlined" | undefined;
@@ -6,7 +6,8 @@ export type CardProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
   icon?: ReactNode | ReactNode[];
   title?: string;
   subtitle?: string;
-  content?: ReactNode | ReactNode[];
+  cardContent?: ReactNode | ReactNode[];
+  contentIsValue?: boolean;
 };
 
 export type CardHeaderProps = HTMLAttributes<HTMLDivElement> & {

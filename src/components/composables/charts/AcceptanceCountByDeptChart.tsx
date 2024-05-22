@@ -100,8 +100,8 @@ export const AcceptanceCountByDeptChart = () => {
   const [chartData, setChartData] = useState<ChartData>({ datasets: [], labels: ["test"] } as ChartData);
   const [chartOptions, setChartOptions] = useState({});
 
-  useQuery({
-    queryKey: ["test"],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["count-accepted-nominees"],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/stats/nominees/count/accepted`);
       return data;
@@ -171,6 +171,9 @@ export const AcceptanceCountByDeptChart = () => {
       });
     },
   });
+
+  if (isLoading) return <Spinner size="large" borderSize={4} />;
+  if (isError) return <>ERROR FETCHING</>;
 
   return <Bar options={chartOptions} data={chartData} />;
 };

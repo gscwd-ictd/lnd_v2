@@ -4,6 +4,7 @@ import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props"
 import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 import { Employee, useTabStore } from "@lms/utilities/stores/employee-tags-store";
 import { url } from "@lms/utilities/url/api-url";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { FunctionComponent, useState } from "react";
 
@@ -12,15 +13,12 @@ type DeleteEmployeeProp = {
   tagId: string;
 };
 
-type Employee2Props = {
-  employeeFullName: string;
-  employeeId: string;
-  positionTitle: string;
-};
-
 export const DeleteEmployee: FunctionComponent<DeleteEmployeeProp> = ({ employeeId, tagId }) => {
   const [open, setOpen] = useState(false);
   const setEmployees = useTabStore((state) => state.setEmployees);
+  const setFilteredEmployees = useTabStore((state) => state.setFilteredEmployees);
+  const setSearchEmployee = useTabStore((state) => state.setSearchTagEmployee);
+  const queryClient = useQueryClient();
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
 
@@ -28,21 +26,24 @@ export const DeleteEmployee: FunctionComponent<DeleteEmployeeProp> = ({ employee
     const tagId = data.tagId;
 
     try {
-      const result = await axios.delete(`${url}/hrms/employee-tags/`, { data });
+      const result = await axios.delete(`${url}/hrms/employees/tags/`, { data });
 
       if (result) {
         setToastOptions("success", "Success", "You have successfully deleted an employee from a tag!");
-        const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${tagId}`);
+        const updatedEmployeesFromTag = await axios.get(`${url}/hrms/employees/tags/${tagId}`);
 
         var employeesFromTag: Array<Employee> = [];
 
-        data.forEach((test: any) => {
+        updatedEmployeesFromTag.data.forEach((test: any) => {
           test.employees.forEach((emp: Employee) => {
             employeesFromTag.push(emp);
           });
         });
 
+        queryClient.setQueryData(["getEmployeeByTagId", tagId], updatedEmployeesFromTag.data);
         setEmployees(employeesFromTag);
+        setFilteredEmployees(employeesFromTag);
+        setSearchEmployee("");
       }
     } catch {
       setToastOptions("danger", "Something went wrong!", "Failed to delete, please contact your administrator.");
