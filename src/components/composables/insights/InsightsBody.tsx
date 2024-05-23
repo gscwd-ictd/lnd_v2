@@ -30,11 +30,9 @@ export const InsightsBody: FunctionComponent = () => {
       <div className="gap-4 lg:flex lg:flex-row md:flex md:flex-col sm:flex sm:flex-col p-6">
         <section className="sm:w-full md:w-full lg:w-[30%] flex flex-col gap-4">
           <CardEmployee />
-          <Card className="flex min-h-[20rem] p-7 ">
-            <span className="text-slate-700 font-medium tracking-wide">Calendar of Trainings</span>
-            {/* <div className="items-center flex h-full justify-center text-gray-500 uppercase">
-              No data to be displayed
-            </div> */}
+          <Card className="flex h-[23.2rem] p-7 bg-white">
+            <span className="text-slate-700 font-medium tracking-wide text-center w-full">Calendar of Trainings</span>
+
             <TrainingCalendar />
             {/* <CalendarChart /> */}
           </Card>
@@ -47,7 +45,7 @@ export const InsightsBody: FunctionComponent = () => {
               value={allTrainings?.data ? allTrainings?.data.otherTraining : <Spinner size="xs" />}
             />
           </div>
-          <Card className="flex items-center justify-center min-h-[20rem] max-h-[33rem]  p-10">
+          <Card className="flex items-center justify-center h-[33rem] p-10 bg-white">
             <span className="text-gray-600 font-sans tracking-wide">Accepted Trainings by Department</span>
             <AcceptanceCountByDeptChart />
           </Card>

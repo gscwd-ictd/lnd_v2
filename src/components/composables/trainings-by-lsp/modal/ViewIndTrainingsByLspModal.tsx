@@ -72,7 +72,7 @@ export const ViewIndTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
             <header className="px-2">
               <h3 className="font-sans text-xl font-medium">Trainings by {name}</h3>
               {averageRating?.data?.average !== null ? (
-                <div className="px-7 flex justify-start">
+                <div className="flex justify-start">
                   <div className="font-medium text-gray-500">
                     Average Rating:{" "}
                     <span
@@ -95,7 +95,7 @@ export const ViewIndTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
                   </div>
                 </div>
               ) : (
-                <div className="px-5 flex justify-end">
+                <div className="flex justify-start">
                   <div className="font-medium text-gray-800">No trainings done</div>
                 </div>
               )}

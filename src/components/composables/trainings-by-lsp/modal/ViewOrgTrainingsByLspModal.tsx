@@ -94,7 +94,7 @@ export const ViewOrgTrainingsByLspModal: FunctionComponent<ViewTrainingsByLspMod
                   </div>
                 </div>
               ) : (
-                <div className="px-5 flex justify-end">
+                <div className=" flex justify-start">
                   <div className="font-medium text-gray-800">No trainings done</div>
                 </div>
               )}

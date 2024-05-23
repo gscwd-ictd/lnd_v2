@@ -9,7 +9,7 @@ type CardClassName = Pick<HTMLAttributes<HTMLDivElement>, "className">;
 export const styles = {
   card: ({ className, variant }: CardVariant) =>
     cls(
-      "flex flex-col bg-white rounded-lg",
+      "flex flex-col rounded-lg",
       {
         "border shadow-md ": variant === "default",
         "border-2": variant === "outlined",

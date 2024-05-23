@@ -16,17 +16,17 @@ export default function DashboardInsights() {
       <InsightsBody />
 
       <div className="grid sm:grid-rows-2 lg:grid-cols-3 w-full gap-4 px-6">
-        <Card className="flex items-center justify-center h-[30rem] px-8 py-10">
-          <span className="text-gray-600 font-sans tracking-wide  ">LSP Rankings</span>
+        <Card className="flex items-center justify-center h-[30rem] px-6 py-6 bg-white">
+          <span className="text-gray-600 font-sans tracking-wide">Learning Service Provider Ranking</span>
           <LspRankings />
         </Card>
 
-        <Card className="flex items-center justify-center h-[30rem] p-10 ">
+        <Card className="flex items-center justify-center h-[30rem] px-10 py-8 bg-white">
           <span className="text-gray-600 font-sans tracking-wide">Trainings Conducted</span>
           <TrainingStatusComparisonChart />
         </Card>
 
-        <Card className="flex items-center justify-center h-[30rem] p-10">
+        <Card className="flex items-center justify-center h-[30rem] px-10 py-8 bg-white">
           <span className="text-gray-600 font-sans tracking-wide">Employee Acceptance Rate</span>
           <AcceptanceDeclineRateChart />
         </Card>

@@ -111,7 +111,7 @@ export const TrainingCalendar: FunctionComponent = () => {
                 <HiOutlineChevronRight className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="grid grid-cols-7 mt-10 text-xs text-center text-gray-500">
+            <div className="grid grid-cols-7 mt-5 text-xs text-center text-gray-500">
               <div className="text-red-600">SUN</div>
               <div>MON</div>
               <div>TUE</div>
