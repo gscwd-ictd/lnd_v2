@@ -4,7 +4,7 @@ import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";
 import { FunctionComponent, useState } from "react";

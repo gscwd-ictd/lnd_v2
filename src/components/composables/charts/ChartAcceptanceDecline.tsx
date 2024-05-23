@@ -76,7 +76,7 @@ export const AcceptanceDeclineRateChart = () => {
     },
   });
 
-  if (isLoading) return <Spinner size="large" borderSize={4} />;
+  if (isLoading) return <Spinner size="large" borderSize={2} />;
   if (isError) return <>ERROR FETCHING</>;
 
   return <Pie options={chartOptions} data={chartData} />;

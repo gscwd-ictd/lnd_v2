@@ -7,16 +7,18 @@ import { LspRankings } from "@lms/components/composables/insights/LspRankings";
 
 export default function DashboardInsights() {
   return (
-    <div className="w-full p-2 sm:px-0 md:px-0">
-      <div className="p-5">
+    <div className="w-full p-2 sm:px-2 md:px-2 lg:px-6 gap-2 flex flex-col">
+      <section className="p-6">
         <div className="flex justify-end items-center  text-sm">
           <BreadCrumbs crumbs={[{ layerText: "Dashboard", path: "" }]} />
         </div>
-      </div>
+      </section>
+
+      {/* Top part */}
       <InsightsBody />
 
-      <div className="grid sm:grid-rows-2 lg:grid-cols-3 w-full gap-4 px-6">
-        <Card className="flex items-center justify-center h-[30rem] px-6 py-6 bg-white">
+      <section className="grid sm:grid-rows-2 lg:grid-cols-3 w-full gap-2">
+        <Card className="flex items-center justify-center h-[30rem]  p-6 bg-white">
           <span className="text-gray-600 font-sans tracking-wide">Learning Service Provider Ranking</span>
           <LspRankings />
         </Card>
@@ -30,7 +32,7 @@ export default function DashboardInsights() {
           <span className="text-gray-600 font-sans tracking-wide">Employee Acceptance Rate</span>
           <AcceptanceDeclineRateChart />
         </Card>
-      </div>
+      </section>
     </div>
   );
 }

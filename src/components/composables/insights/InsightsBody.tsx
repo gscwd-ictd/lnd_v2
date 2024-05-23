@@ -12,14 +12,9 @@ import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
-type TrainingStats = {
-  training: number;
-  benchmark: number;
-  otherTraining: number;
-};
-
 export const InsightsBody: FunctionComponent = () => {
   const { data: allTrainings } = useQuery({
+    queryKey: ["get-all-trainings-done"],
     queryFn: async () => {
       const getAllTrainings = await axios.get(`${url}/stats/count/all`, { withCredentials: true });
       return getAllTrainings;
@@ -27,18 +22,16 @@ export const InsightsBody: FunctionComponent = () => {
   });
   return (
     <>
-      <div className="gap-4 lg:flex lg:flex-row md:flex md:flex-col sm:flex sm:flex-col p-6">
-        <section className="sm:w-full md:w-full lg:w-[30%] flex flex-col gap-4">
+      <div className="gap-2 lg:flex lg:flex-row md:flex md:flex-col sm:flex sm:flex-col w-full flex">
+        <section className="sm:w-full md:w-full lg:w-1/3 flex flex-col gap-2">
           <CardEmployee />
-          <Card className="flex h-[23.2rem] p-7 bg-white">
+          <Card className="h-[23.2rem] p-7 bg-white ">
             <span className="text-slate-700 font-medium tracking-wide text-center w-full">Calendar of Trainings</span>
-
             <TrainingCalendar />
-            {/* <CalendarChart /> */}
           </Card>
         </section>
-        <section className="flex flex-col gap-4 sm:w-full lg:w-[70%] h-full">
-          <div className="w-full grid-cols-3 gap-4 sm:flex sm:flex-col lg:flex lg:flex-row">
+        <section className="flex flex-col gap-2 sm:w-full lg:w-2/3 h-full">
+          <div className="w-full grid-cols-3 gap-2 sm:flex sm:flex-col lg:flex lg:flex-row">
             <CardTrainingsDone value={allTrainings?.data ? allTrainings?.data.training : <Spinner size="xs" />} />
             <CardDoneBenchmarking value={allTrainings?.data ? allTrainings?.data.benchmark : <Spinner size="xs" />} />
             <CardDoneOtherTraining

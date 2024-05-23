@@ -22,12 +22,12 @@ export const LspRankingsTable = () => {
   const open = useRankingStore((state) => state.modalIsOpen);
   const setOpen = useRankingStore((state) => state.setModalIsOpen);
 
-  if (isLoading) return <Spinner size="large" />;
+  if (isLoading) return <Spinner size="large" borderSize={2} />;
   if (isError) return <>ERROR FETCHING</>;
 
   return (
     <div className="flex flex-col pt-2 items-start h-full w-full justify-between relative overflow-x-auto">
-      <div className=" w-full rounded  h-full flex flex-col justify-between  border">
+      <div className="w-full rounded h-full flex flex-col justify-between ">
         <section>
           {/* Header */}
           <div className="w-full flex p-2 pt-4 ">
@@ -81,7 +81,7 @@ export const LspRankingsTable = () => {
         {/* Button */}
         <div className="flex w-full justify-end p-4 ">
           <button
-            className="text-xs border-2 border-indigo-400 bg-white px-3 py-2 rounded w-full text-indigo-500 font-medium font-sans tracking-widest uppercase"
+            className="text-xs border-2 border-teal-400 bg-white px-3 py-2 rounded w-full text-teal-500 hover:bg-teal-100 active:bg-teal-200  font-sans tracking-widest uppercase"
             onClick={() => setOpen(true)}
           >
             View more
