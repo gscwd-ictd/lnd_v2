@@ -2,9 +2,12 @@ import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
 import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
 import { FunctionComponent, createContext, useContext, useEffect, useState } from "react";
-import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
+import {
+  TrainingNoticeContext,
+  useTrainingNoticeToastOptions,
+} from "../../training-notice-data-table/TrainingNoticeDataTable";
 import { EmployeeWithSupervisor } from "@lms/utilities/types/training";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import Select from "react-select";
 import axios from "axios";
@@ -39,6 +42,10 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
   const [acceptedEmployees, setAcceptedEmployees] = useState<number>(0);
   const [nominatedEmployees, setNominatedEmployees] = useState<number>(0);
   const [declinedEmployees, setDeclinedEmployees] = useState<number>(0);
+  const [availableSlots, setAvailableSlots] = useState<number>(0);
+  const [totalSlots, setTotalSlots] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
   const [selectedStandInTrainee, setSelectedStandInTrainee] = useState<SelectProps>({} as SelectProps);
 
@@ -60,17 +67,22 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     useContext(TrainingNoticeContext);
   const trainingId = useTrainingNoticeStore((state) => state.id);
 
-  // per training notice query
-  const { isLoading, isFetching, data } = useQuery({
-    queryKey: ["training-nominees", trainingId],
-    enabled: !!trainingId && nomineeStatusIsOpen !== false,
-    staleTime: 2,
+  const { setToastOptions } = useTrainingNoticeToastOptions();
 
+  // per training notice query
+  const {
+    isLoading,
+    isFetching,
+    data: trainingData,
+  } = useQuery({
+    queryKey: ["training-nominees", trainingId],
+    enabled: nomineeStatusIsOpen !== false,
+    staleTime: 2,
+    refetchOnMount: "always",
     refetchOnWindowFocus: false,
 
     queryFn: async () => {
       const { data } = await axios.get(`${url}/training/${id}/nominees`);
-      console.log(data);
       return data;
     },
     onSuccess: (data) => {
@@ -86,12 +98,79 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     },
   });
 
+  // find stand in nominees by distribution id
+  useQuery({
+    enabled: !!auxModalIsOpen && !!supervisor.distributionId,
+    queryKey: ["standin-nominees", supervisor.distributionId],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/training/distributions/${supervisor.distributionId}/standin`);
+      return data;
+    },
+    onSuccess: (data) => {
+      setTotalSlots(data.slots);
+      setAvailableSlots(data.availableSlots);
+      setStandInTrainees(data.standin);
+    },
+    onError: () => {
+      setTotalSlots(0);
+      setAvailableSlots(0);
+      setStandInTrainees([]);
+    },
+  });
+
+  // submit stand in
+  const standInMutation = useMutation({
+    mutationFn: async () => {
+      const newNomineeFromStandin = await axios.post(
+        `${url}/training/distributions/standin`,
+        {
+          nomineeId: nominee.nomineeId,
+          standinId: selectedStandInTrainee.value,
+        },
+        { withCredentials: true }
+      );
+
+      return newNomineeFromStandin;
+    },
+    onSuccess: async () => {
+      setToastOptions("success", "Success", "You have swapped an auxiliary to a nominee.");
+
+      // fetch the updated table of nominees per training
+      const getUpdatedViewNominees = await axios.get(`${url}/training/${id}/nominees`);
+      setAcceptedEmployees(getUpdatedViewNominees.data.countStatus.accepted);
+      setDeclinedEmployees(getUpdatedViewNominees.data.countStatus.declined);
+      setNominatedEmployees(getUpdatedViewNominees.data.countStatus.pending);
+      setCountEmployees(getUpdatedViewNominees.data.nominees.length);
+      queryClient.setQueryData(["training-nominees", trainingId], getUpdatedViewNominees.data.nominees);
+
+      const getUpdatedStandinNominees = await axios.get(
+        `${url}/training/distributions/${supervisor.distributionId}/standin`
+      );
+      // queryClient.setQueryData(['standin-nominees',supervisor.distributionId],getUpdatedStandinNominees.data)
+      setStandInTrainees(getUpdatedStandinNominees.data.standin);
+      setLoading(true);
+
+      setAuxModalIsOpen(false);
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "A problem has been encountered. Please try again in a few seconds.");
+    },
+  });
+
   // set the training notice id only on one instance upon opening the modal
   useEffect(() => {
     if (isEmpty(trainingId) && !isEmpty(id)) {
       setTrainingId(id);
     }
   }, [id, trainingId]);
+
+  useEffect(() => {
+    if (loading) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
+    }
+  }, [loading]);
 
   return (
     <>
@@ -180,20 +259,33 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                       </div>
                     </div>
 
-                    <div className="text-sm text-gray-700">
-                      <span className="font-medium text-md ">
-                        {acceptedEmployees} out of {countEmployees} accepted
-                      </span>
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm text-gray-700">
+                        <span className="font-medium text-md ">
+                          {acceptedEmployees} out of {countEmployees} accepted
+                        </span>
+                      </div>
+                      <div className="flex justify-end">
+                        <button className="px-3 py-2 bg-indigo-600 rounded text-white text-sm hidden">
+                          Redistribution
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="rounded border">
-                    <ViewNomineesDataTable
-                      columns={columns}
-                      datasource={`${url}/training/${id}/nominees`}
-                      queryKey={["view-nominees-status", trainingId!]}
-                    />
-                  </div>
+                  {loading ? (
+                    <div>
+                      <Spinner color="green" size="small" />
+                    </div>
+                  ) : (
+                    <div className="rounded border">
+                      <ViewNomineesDataTable
+                        columns={columns}
+                        datasource={`${url}/training/${id}/nominees`}
+                        queryKey={["view-nominees-status", trainingId!]}
+                      />
+                    </div>
+                  )}
                 </main>
               )}
             </ModalContent.Body>
@@ -232,6 +324,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
             setReason("");
             setNominee({} as Nominee);
             setSupervisor({} as Supervisor);
+            setSelectedStandInTrainee({ label: "", value: "" } as SelectProps);
           }}
         >
           <ModalContent>
@@ -249,9 +342,10 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                   <span className="text-gray-600">❝ {reason} ❞</span>
                 </div>
 
-                <div className="pt-5">
+                <div className="pt-5 pb-2">
                   Pick an auxiliary trainee under <span className=" font-semibold">{supervisor.name}</span>
                 </div>
+
                 <div className="flex w-full gap-2">
                   <div className="flex-1">
                     <Select
@@ -261,12 +355,8 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                       value={selectedStandInTrainee}
                       onChange={(nominee) => {
                         setSelectedStandInTrainee({ label: nominee?.label!, value: nominee?.value! });
+                        setAvailableSlots((slots) => slots - 1);
                       }}
-                      // onChange={(value)=>{
-                      //   setSelectedStandInTrainee(value.map((employee)=>{
-                      //     return {value: employee.value, label: employee.label}
-                      //   }))
-                      // }}
                       closeMenuOnSelect={false}
                       options={standInTrainees.map((nominee) => {
                         return { value: nominee.nomineeId, label: nominee.name };
@@ -274,12 +364,26 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                     />
                   </div>
                 </div>
+
+                <div className="pt-2">
+                  <div className="flex flex-col border rounded px-3 py-2 border-gray-300">
+                    <div className="text-sm text-gray-600">
+                      Total Assigned Slots: <span className="text-gray-800 font-medium">{totalSlots}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Remaining Slots: <span className="text-gray-800 font-medium">{availableSlots}</span>
+                    </div>
+                  </div>
+                </div>
               </main>
             </ModalContent.Body>
             <ModalContent.Footer>
               <footer>
                 <div className="flex w-full justify-end px-1 py-2">
-                  <button className="w-[5rem] bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white rounded px-3 py-2 text-sm">
+                  <button
+                    className="w-[5rem] bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white rounded px-3 py-2 text-sm"
+                    onClick={() => standInMutation.mutateAsync()}
+                  >
                     Submit
                   </button>
                 </div>

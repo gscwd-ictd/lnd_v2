@@ -63,6 +63,7 @@ export type EmployeeWithStatus = {
   name: string;
   status?: TrainingNomineeStatus;
   remarks?: string | null;
+  isReplacedBy?: boolean;
 };
 
 // export type EmployeeFlatWithSupervisor = Employee & Pick<Recommendation, "supervisor">;

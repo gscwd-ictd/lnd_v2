@@ -68,7 +68,7 @@ export const useViewNomineesStatusDataTable = () => {
       header: "Action",
       cell: (info) => (
         <div className="flex w-full justify-center">
-          {info.row.original.status === "declined" ? (
+          {info.row.original.status === "declined" && info.row.original.isReplacedBy === false ? (
             <button
               className="border p-2 rounded flex justify-center w-full bg-gray-100 active:bg-gray-300 hover:bg-gray-200"
               onClick={() => {
