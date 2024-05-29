@@ -25,6 +25,8 @@ export const AddNewBenchmarkingModal = () => {
   const hasFetchedParticipants = useBenchmarkingStore((state) => state.hasFetchedParticipants);
   const id = useBenchmarkingStore((state) => state.id);
   const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useBenchmarkingStore((state) => state.setFilteredParticipantsPool);
+
   const setHasFetchedParticipants = useBenchmarkingStore((state) => state.setHasFetchedParticipants);
   const reset = useBenchmarkingStore((state) => state.reset);
 
@@ -152,10 +154,12 @@ export const AddNewBenchmarkingModal = () => {
     },
     onSuccess: (data) => {
       setParticipantsPool(data);
+      setFilteredParticipantsPool(data);
       setHasFetchedParticipants(true);
     },
     onError: () => {
       setParticipantsPool([]);
+      setFilteredParticipantsPool([]);
     },
     enabled: modalIsOpen !== false && hasFetchedParticipants === false,
     staleTime: 2,

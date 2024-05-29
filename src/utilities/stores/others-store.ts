@@ -31,6 +31,8 @@ export type OthersState = {
   setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
   participantsPool: Array<EmployeeFlatWithSupervisor>;
   setParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
+  filteredParticipantsPool: Array<EmployeeFlatWithSupervisor>;
+  setFilteredParticipantsPool: (filteredParticipantsPool: Array<EmployeeFlatWithSupervisor>) => void;
   hasFetchedParticipants: boolean;
   setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   hasFetchedFiles: boolean;
@@ -107,6 +109,8 @@ export const useOthersStore = create<OthersState>((set) => ({
   setParticipants: (participants) => set({ participants }),
   participantsPool: [],
   setParticipantsPool: (participantsPool) => set({ participantsPool }),
+  filteredParticipantsPool: [],
+  setFilteredParticipantsPool: (filteredParticipantsPool) => set({ filteredParticipantsPool }),
   location: "",
   setLocation: (location) => set({ location }),
   bucketFiles: [],
@@ -129,6 +133,7 @@ export const useOthersStore = create<OthersState>((set) => ({
       filesToDelete: [],
       participants: [],
       participantsPool: [],
+      filteredParticipantsPool: [],
       hasFetchedFiles: false,
       hasFetchedParticipants: false,
       id: "",

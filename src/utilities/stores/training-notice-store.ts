@@ -78,6 +78,7 @@ export type Recommendation = {
   supervisor: {
     supervisorId: string;
     name: string;
+    distributionId?: string;
   };
   employees: { employeeId: string; name?: string; positionTitle?: string }[];
   numberOfSlots: number;

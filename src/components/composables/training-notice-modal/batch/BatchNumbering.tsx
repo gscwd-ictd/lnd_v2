@@ -45,7 +45,6 @@ export const BatchNumbering: FunctionComponent = () => {
           } rounded-md`}
           // role="button"
           onClick={(e) => {
-            console.log(employeePool);
             e.stopPropagation();
           }}
         >

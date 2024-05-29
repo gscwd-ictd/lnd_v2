@@ -48,7 +48,7 @@ type DataTableContextState<T> = {
 
 export const DataTableContext = createContext({} as DataTableContextState<any>);
 
-export const DataTable = <T extends unknown>({
+export const ViewNomineesDataTable = <T extends unknown>({
   datasource,
   columns,
   queryKey,
@@ -82,7 +82,7 @@ export const DataTable = <T extends unknown>({
     queryKey,
     queryFn: async () => {
       const { data } = await axios.get(datasource, { withCredentials });
-      return data.items as T[];
+      return data.nominees as T[];
     },
   });
 
@@ -125,7 +125,7 @@ export const DataTable = <T extends unknown>({
     );
 
   return (
-    <div className="border shadow-md shadow-gray-50">
+    <div className="border rounded">
       <DataTableHeader<T>
         title={title}
         subtitle={subtitle}

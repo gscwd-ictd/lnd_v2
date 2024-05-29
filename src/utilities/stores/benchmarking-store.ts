@@ -24,6 +24,8 @@ export type BenchmarkingState = {
   setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
   participantsPool: Array<EmployeeFlatWithSupervisor>;
   setParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
+  filteredParticipantsPool: Array<EmployeeFlatWithSupervisor>;
+  setFilteredParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
   hasFetchedParticipants: boolean;
   setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   location: string;
@@ -103,6 +105,8 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   setFilesToDelete: (filesToDelete) => set({ filesToDelete }),
   participantsPool: [],
   setParticipantsPool: (participantsPool) => set({ participantsPool }),
+  filteredParticipantsPool: [],
+  setFilteredParticipantsPool: (filteredParticipantsPool) => set({ filteredParticipantsPool }),
   hasFetchedParticipants: false,
   setHasFetchedParticipants: (hasFetchedParticipants) => set({ hasFetchedParticipants }),
   status: undefined,
@@ -120,6 +124,7 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
       action: undefined,
       initialTitle: "",
       participantsPool: [],
+      filteredParticipantsPool: [],
       hasFetchedParticipants: false,
     });
   },

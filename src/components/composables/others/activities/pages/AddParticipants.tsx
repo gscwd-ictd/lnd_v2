@@ -3,6 +3,7 @@ import { Input } from "@lms/components/osprey/ui/input/view/Input";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useOthersStore } from "@lms/utilities/stores/others-store";
 import { useQueryClient } from "@tanstack/react-query";
+import { isEmpty } from "lodash";
 import React from "react";
 import { FunctionComponent, useState } from "react";
 
@@ -13,6 +14,9 @@ export const AddParticipants: FunctionComponent = () => {
   const setParticipants = useOthersStore((state) => state.setParticipants);
   const participantsPool = useOthersStore((state) => state.participantsPool);
   const setParticipantsPool = useOthersStore((state) => state.setParticipantsPool);
+  const filteredParticipantsPool = useOthersStore((state) => state.filteredParticipantsPool);
+  const setFilteredParticipantsPool = useOthersStore((state) => state.setFilteredParticipantsPool);
+
   const hasFetchedParticipants = useOthersStore((state) => state.hasFetchedParticipants);
   const setHasFetchedParticipants = useOthersStore((state) => state.setHasFetchedParticipants);
   const id = useOthersStore((state) => state.id);
@@ -25,12 +29,12 @@ export const AddParticipants: FunctionComponent = () => {
   const participantsData = queryClient.getQueryState(["new-assignable-other-participants"]);
 
   // filtered facilitators
-  const filteredParticipants =
-    searchParticipant === ""
-      ? participantsPool
-      : participantsPool?.filter((participant) =>
-          participant.name.toLowerCase().includes(searchParticipant.toLowerCase())
-        );
+  // const filteredParticipants =
+  //   searchParticipant === ""
+  //     ? participantsPool
+  //     : participantsPool?.filter((participant) =>
+  //         participant.name.toLowerCase().includes(searchParticipant.toLowerCase())
+  //       );
 
   return (
     <>
@@ -80,6 +84,8 @@ export const AddParticipants: FunctionComponent = () => {
                   // setSelectedParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
                   setParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
                   setParticipantsPool(newValues);
+                  setFilteredParticipantsPool(newValues);
+                  setSearchParticipant("");
                 }}
               >
                 <Combobox.Input as={React.Fragment}>
@@ -92,7 +98,14 @@ export const AddParticipants: FunctionComponent = () => {
                         e.preventDefault();
                       }
                     }}
-                    onChange={(e) => setSearchParticipant(e.target.value)}
+                    onChange={(e) => {
+                      setSearchParticipant(e.target.value);
+                      if (isEmpty(e.target.value)) setFilteredParticipantsPool(participantsPool);
+                      else if (!isEmpty(searchParticipant))
+                        setFilteredParticipantsPool(
+                          participantsPool.filter((x) => x.name.toLowerCase().includes(searchParticipant.toLowerCase()))
+                        );
+                    }}
                     size="small"
                     placeholder="Search for participant"
                     className="placeholder:text-xs"
@@ -100,10 +113,10 @@ export const AddParticipants: FunctionComponent = () => {
                 </Combobox.Input>
 
                 <Combobox.Options className="absolute z-[80] max-h-60 overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
-                  {filteredParticipants?.length === 0 ? (
+                  {filteredParticipantsPool?.length === 0 ? (
                     <div className="flex items-center justify-center py-10">No results found</div>
                   ) : (
-                    filteredParticipants.map((participant, index) => {
+                    filteredParticipantsPool.map((participant, index) => {
                       return (
                         <Combobox.Option key={index} value={participant}>
                           {({ active, selected }) => {

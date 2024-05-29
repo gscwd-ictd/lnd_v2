@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRankingStore } from "@lms/utilities/stores/ranking-store";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { LspDetails } from "./data-table/use-rankings-data-table";
+import { Avatar } from "@lms/components/osprey/ui/avatar/view/Avatar";
 
 export const LspRankingsTable = () => {
   const { data, isLoading, isError } = useQuery({
@@ -14,7 +15,7 @@ export const LspRankingsTable = () => {
     queryKey: ["top-5-lsp-rating-ranking"],
     queryFn: async () => {
       const getUpdatedLspRankings = await axios.get(`${url}/stats/lsp/rating`);
-      console.log(getUpdatedLspRankings.data.items);
+
       return getUpdatedLspRankings;
     },
   });
@@ -41,7 +42,7 @@ export const LspRankingsTable = () => {
           <div className="w-full px-2">
             {data?.data?.items?.slice(0, 5).map((lsp: LspDetails, index: number) => {
               return (
-                <div key={lsp.lspId} className="items-center py-4 bg-white w-full flex border-b last:border-none ">
+                <div key={lsp.lspId} className="items-center py-2.5 bg-white w-full flex border-b last:border-none ">
                   <div className="w-[10%] text-gray-700 text-center font-medium items-center  flex justify-center">
                     <span
                       className={`${
@@ -59,17 +60,18 @@ export const LspRankingsTable = () => {
                   </div>
                   <div className="w-[70%] text-sm text-gray-800 text-start font-semibold flex gap-2 items-center">
                     {lsp.photoUrl === null || lsp.photoUrl === "" || lsp.photoUrl == undefined ? (
-                      <HiUserCircle className="w-6 h-6 text-slate-500" />
+                      <HiUserCircle className="w-8 h-8 text-slate-500" />
                     ) : (
-                      <Image src={lsp.photoUrl} alt="user-image" className="w-6 h-6" />
+                      // <Image src={lsp.photoUrl} alt="user-image" width={24} height={20} />
+                      <Avatar source={lsp.photoUrl} size="sm" />
                     )}
                     {lsp.name}
                   </div>
                   <div className="w-[20%] text-gray-600 text-center text-lg gap-1 flex justify-center ">
                     <span>{lsp.average}</span>
-                    <div>
+                    {/* <div>
                       <HiStar className="w-6 h-6 text-amber-500" />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               );

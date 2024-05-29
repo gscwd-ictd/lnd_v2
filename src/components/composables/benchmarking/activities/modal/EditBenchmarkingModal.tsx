@@ -40,6 +40,8 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
   const status = useBenchmarkingStore((state) => state.status);
   const setBucketFiles = useBenchmarkingStore((state) => state.setBucketFiles);
   const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useBenchmarkingStore((state) => state.setFilteredParticipantsPool);
+
   const setHasFetchedParticipants = useBenchmarkingStore((state) => state.setHasFetchedParticipants);
   const setId = useBenchmarkingStore((state) => state.setId);
   const setInitialTitle = useBenchmarkingStore((state) => state.setInitialTitle);
@@ -105,10 +107,12 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
     },
     onSuccess: (data) => {
       setParticipantsPool(data);
+      setFilteredParticipantsPool(data);
       setHasFetchedParticipants(true);
     },
     onError: () => {
       setParticipantsPool([]);
+      setFilteredParticipantsPool([]);
     },
     enabled: modalIsOpen !== false && hasFetchedParticipants === false && !!id,
     staleTime: 2,

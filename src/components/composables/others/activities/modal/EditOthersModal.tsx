@@ -57,9 +57,9 @@ export const EditOthersModal: FunctionComponent = () => {
   const setBucketFiles = useOthersStore((state) => state.setBucketFiles);
   const participants = useOthersStore((state) => state.participants);
 
-  const participantsPool = useOthersStore((state) => state.participantsPool);
   const hasFetchedParticipants = useOthersStore((state) => state.hasFetchedParticipants);
   const setParticipantsPool = useOthersStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useOthersStore((state) => state.setFilteredParticipantsPool);
   const setHasFetchedParticipants = useOthersStore((state) => state.setHasFetchedParticipants);
 
   const setAction = useOthersStore((state) => state.setAction);
@@ -149,6 +149,7 @@ export const EditOthersModal: FunctionComponent = () => {
     if (page === 1 && !isEmpty(category)) setPage(2);
     else if (page === 2 && (bucketFiles.length !== 0 || filesToUpload.length !== 0)) setPage(3);
     else if (page === 4) setPage(5);
+    else if (page === 1 && isEmpty(category)) setToastOptions("danger", "Error", "You have not selected a category.");
   };
 
   // query per id
@@ -161,7 +162,6 @@ export const EditOthersModal: FunctionComponent = () => {
     queryKey: ["other-per-id", id],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/other/trainings/${id}`);
-      console.log(data);
       return data;
     },
     onSuccess: (data) => {
@@ -185,15 +185,19 @@ export const EditOthersModal: FunctionComponent = () => {
   useQuery({
     queryKey: ["assignable-other-training-participants"],
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/other/trainings/${id}/assignable/participant`);
+      const { data } = await axios.get(`${url}/other/trainings/${id}/assignable/participant`, {
+        withCredentials: true,
+      });
       return data;
     },
     onSuccess: (data) => {
       setParticipantsPool(data);
+      setFilteredParticipantsPool(data);
       setHasFetchedParticipants(true);
     },
     onError: () => {
       setParticipantsPool([]);
+      setFilteredParticipantsPool([]);
     },
     enabled: modalIsOpen !== false && hasFetchedParticipants === false && !!id,
     staleTime: 2,

@@ -30,6 +30,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
   const participants = useOthersStore((state) => state.participants);
   const participantsPool = useOthersStore((state) => state.participantsPool);
   const setParticipantsPool = useOthersStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useOthersStore((state) => state.setFilteredParticipantsPool);
   const hasFetchedParticipants = useOthersStore((state) => state.hasFetchedParticipants);
   const setHasFetchedParticipants = useOthersStore((state) => state.setHasFetchedParticipants);
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
@@ -146,6 +147,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
       setToastOptions("danger", "Error", "You have not added any participant.");
     } else if (page === 2 && filesToUpload.length > 0) setPage(page + 1);
     else if (page === 4 && participants.length > 0) setPage(page + 1);
+    else if (page === 1 && isEmpty(category)) setToastOptions("danger", "Error", "You have not selected a category.");
     else setPage(page + 1);
   };
 
@@ -159,10 +161,12 @@ export const AddNewOthersModal: FunctionComponent = () => {
     },
     onSuccess: (data) => {
       setParticipantsPool(data);
+      setFilteredParticipantsPool(data);
       setHasFetchedParticipants(true);
     },
     onError: () => {
       setParticipantsPool([]);
+      setFilteredParticipantsPool([]);
     },
     enabled: hasFetchedParticipants === false && modalIsOpen !== false,
     staleTime: 2,

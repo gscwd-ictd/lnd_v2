@@ -189,6 +189,7 @@ export const AddParticipants: FunctionComponent = () => {
   const [fromIsLocked, setFromIsLocked] = useState<boolean>(false);
   const [toIsLocked, setToIsLocked] = useState<boolean>(false);
   const [sdtIsLocked, setSdtIsLocked] = useState<boolean>(false);
+  const [filteredTempEmployeePool, setFilteredTempEmployeePol] = useState<EmployeeWithSupervisor[]>(tempEmployeePool);
 
   const {
     handleSubmit,
@@ -283,10 +284,19 @@ export const AddParticipants: FunctionComponent = () => {
   };
 
   // filtered facilitators
-  const filteredEmployees =
-    searchEmployee === ""
-      ? tempEmployeePool
-      : tempEmployeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
+  // const filteredEmployees =
+  //   searchEmployee === ""
+  //     ? tempEmployeePool
+  //     : tempEmployeePool?.filter((emp) => emp.name.toLowerCase().includes(searchEmployee.toLowerCase()));
+
+  // useEffect(() => {
+  //   if (searchEmployee) {
+  //     setFilteredTempEmployeePol(
+  //       tempEmployeePool.filter((x) => x.name.toLowerCase().includes(searchEmployee.toLowerCase()))
+  //     );
+  //   } else if (searchEmployee === "") setFilteredTempEmployeePol(tempEmployeePool);
+  //   //  else setFilteredTempEmployeePol(tempEmployeePool);
+  // }, [searchEmployee]);
 
   useEffect(() => {
     register("employees");
@@ -321,32 +331,12 @@ export const AddParticipants: FunctionComponent = () => {
   useEffect(() => {
     if (selectedBatchModalIsOpen === true && initialLoadedEmp === false) {
       setTempEmployeePool(employeePool);
+      setFilteredTempEmployeePol(employeePool);
       // setTempEmployeePool(employeesWithSupervisor);
       if (batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees.length > 0) {
         setSelectedEmployees(batches.find((batch) => batch.batchNumber === selectedBatch.batchNumber)!.employees);
       }
-      // // if training date from and to is the same
-      // if (dayjs(from).isSame(dayjs(to), "day")) {
-      //   setValue("trainingStart", dayjs(from).format("YYYY-MM-DD"));
-      //   setValue("trainingEnd", dayjs(to).format("YYYY-MM-DD"));
-      //   //
-      //   setSelectedBatch({
-      //     ...selectedBatch,
-      //     isOneDayTraining: true,
-      //     trainingDate: { from: dayjs(from).format("YYYY-MM-DD"), to: dayjs(to).format("YYYY-MM-DD") },
-      //   });
-      //   setFromIsLocked(true);
-      //   setToIsLocked(true);
-      //   setSdtIsLocked(true);
-      // }
-      // // if current training date from and to is  the same
-      // else if (dayjs(selectedBatch.trainingDate?.from).isSame(dayjs(selectedBatch.trainingDate?.to), "day")) {
-      //   setSelectedBatch({
-      //     ...selectedBatch,
-      //     isOneDayTraining: true,
-      //     //  trainingDate: { from: dayjs(from).format("YYYY-MM-DD"), to: dayjs(to).format("YYYY-MM-DD") },
-      //   });
-      // }
+
       setInitialLoadedEmp(true);
     }
   }, [selectedBatchModalIsOpen]);
@@ -470,19 +460,6 @@ export const AddParticipants: FunctionComponent = () => {
                 />
                 <div className="text-xs text-red-700">{errors.trainingEnd?.message}</div>
               </div>
-
-              {/* <div className="flex items-center w-auto gap-2 px-2">
-                <Checkbox
-                  id={`checkbox-same-day-training`}
-                  label="Same day training?"
-                  // disabled={isEmpty(selectedBatch.date?.from)}
-                  disabled={sdtIsLocked}
-                  checked={selectedBatch.isOneDayTraining}
-                  onChange={() => {
-                    setSelectedBatch({ ...selectedBatch, isOneDayTraining: !selectedBatch.isOneDayTraining });
-                  }}
-                />
-              </div> */}
             </div>
           </ModalContent.Title>
 
@@ -533,8 +510,10 @@ export const AddParticipants: FunctionComponent = () => {
 
                         setValue("employees", value);
 
+                        setSearchEmployee("");
                         // setEmployeePool(newValues);
                         setTempEmployeePool(newValues);
+                        setFilteredTempEmployeePol(newValues);
                       }}
                     >
                       <Combobox.Input as={React.Fragment}>
@@ -547,7 +526,16 @@ export const AddParticipants: FunctionComponent = () => {
                               e.preventDefault();
                             }
                           }}
-                          onChange={(e) => setSearchEmployee(e.target.value)}
+                          onChange={(e) => {
+                            setSearchEmployee(e.target.value);
+                            if (isEmpty(e.target.value)) setFilteredTempEmployeePol(tempEmployeePool);
+                            else if (!isEmpty(searchEmployee))
+                              setFilteredTempEmployeePol(
+                                tempEmployeePool.filter((x) =>
+                                  x.name.toLowerCase().includes(searchEmployee.toLowerCase())
+                                )
+                              );
+                          }}
                           size="small"
                           placeholder="Search for participant"
                           className="placeholder:text-xs"
@@ -555,10 +543,10 @@ export const AddParticipants: FunctionComponent = () => {
                       </Combobox.Input>
 
                       <Combobox.Options className="absolute max-h-52 z-[80] overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
-                        {filteredEmployees?.length === 0 ? (
+                        {filteredTempEmployeePool?.length === 0 ? (
                           <div className="flex items-center justify-center py-10">No results found</div>
                         ) : (
-                          filteredEmployees.map((employee, index) => {
+                          filteredTempEmployeePool.map((employee, index) => {
                             return (
                               <Combobox.Option key={index} value={employee}>
                                 {({ active, selected }) => {
@@ -618,6 +606,17 @@ export const AddParticipants: FunctionComponent = () => {
                                       newEmployees.push(employee);
 
                                       setTempEmployeePool(
+                                        newEmployees
+                                          .sort((a, b) => (a.name > b.name ? 1 : -1))
+                                          .sort((a, b) =>
+                                            a.supervisor.name! > b.supervisor.name!
+                                              ? 1
+                                              : a.supervisor.name! === b.supervisor.name
+                                              ? 0
+                                              : -1
+                                          )
+                                      );
+                                      setFilteredTempEmployeePol(
                                         newEmployees
                                           .sort((a, b) => (a.name > b.name ? 1 : -1))
                                           .sort((a, b) =>
