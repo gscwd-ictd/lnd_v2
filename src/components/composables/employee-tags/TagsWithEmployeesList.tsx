@@ -137,41 +137,6 @@ export default function TagsWithEmployeesList() {
     },
   });
 
-  // const submitEmployeeTags = async (data: EmployeeTags) => {
-  //   try {
-  //     const result = await axios.post(`${url}/hrms/employee-tags/`, data);
-
-  //     if (result) {
-  //       if (activeTab === "employee") {
-  //         if (result.status === 201) {
-  //           setToastOptions("success", "Success", "You have successfully added a training tag!");
-  //           const { data } = await axios.get(`${url}/hrms/employee-tags/employee/${selectedEmployee?.employeeId}`); // get tags by employee id
-  //           setEmployeeTags(data);
-  //         } else
-  //           setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
-  //       } else {
-  //         if (result.status === 201) {
-  //           setToastOptions("success", "Success", "You have successfully an employee to the tag");
-
-  //           const { data } = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
-  //           var employeesFromTag: Array<Employee> = [];
-
-  //           data.forEach((test: any) => {
-  //             test.employees.forEach((emp: Employee) => {
-  //               employeesFromTag.push(emp);
-  //             });
-  //           });
-
-  //           setEmployees(employeesFromTag);
-  //         } else
-  //           setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
-  //       }
-  //     }
-  //   } catch {
-  //     setToastOptions("danger", "Something went wrong!", "Failed to add, please contract your administrator.");
-  //   }
-  // };
-
   // submit mutation
   const submitEmployeeTags = useMutation({
     onMutate: () => {},
@@ -327,7 +292,7 @@ export default function TagsWithEmployeesList() {
                         placeholder="Search tag employee..."
                       />
 
-                      <div className="absolute inset-y-0 mt-1 left-0 z-20 flex items-center pl-4 pb-2 pointer-events-none">
+                      <div className="absolute inset-y-0 mt-1 left-0 flex items-center pl-4 pb-2 pointer-events-none">
                         {!isSearching ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

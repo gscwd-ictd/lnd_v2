@@ -274,7 +274,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = await axios.get(`${url}/training/${id}`, { withCredentials: true });
-
+        console.log(data);
         // INTERNAL
         setCourseContent(data.courseContent);
         setTrainingRequirements(data.trainingRequirements);
@@ -299,7 +299,8 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           setTrainingStatus(data.status);
           setTrainingEnd(dayjs(data.trainingEnd).format("YYYY-MM-DD"));
           setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
-          setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
+          setLspSource(data.lspSource === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
+
           // setCourseTitle(data.courseTitle);
           setInitialTrainingRequirements([
             { document: "Attendance", isSelected: true },
@@ -333,7 +334,7 @@ export const EditTrainingNoticeModal: FunctionComponent = () => {
           setSelectedTags(data.trainingTags);
           setSelectedFacilitators(data.trainingLspDetails);
           setTrainingStart(dayjs(data.trainingStart).format("YYYY-MM-DD"));
-          setLspSource(data.lspSource.name === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
+          setLspSource(data.lspSource === "Internal" ? LspSource.INTERNAL : LspSource.EXTERNAL);
 
           setInitialTrainingRequirements([
             { document: "Attendance", isSelected: true },

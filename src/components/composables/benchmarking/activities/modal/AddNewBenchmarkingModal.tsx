@@ -55,13 +55,14 @@ export const AddNewBenchmarkingModal = () => {
 
   const addBenchmarkingMutation = useMutation({
     mutationFn: async () => {
-      const { title, dateFrom, dateTo, location, participants, partner, filesToUpload } = benchmarking;
+      const { title, dateFrom, dateTo, location, participants, partner, filesToUpload, description } = benchmarking;
 
       const storage = new Storage(client!);
 
       // step 1
       const benchmarkCreationResponse = await axios.post(`${url}/benchmark`, {
         title,
+        description,
         partner,
         dateFrom,
         dateTo,

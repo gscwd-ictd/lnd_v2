@@ -292,7 +292,6 @@ export const EditLspIndividualModal: FunctionComponent<EditLspIndividualModalPro
       setToastOptions("danger", "Error", "Please try again in a few seconds");
     },
     mutationFn: async () => {
-      console.log(employeeId);
       const response = await axios.put(`${url}/lsp/individual/internal`, {
         //data
         id: lspId,

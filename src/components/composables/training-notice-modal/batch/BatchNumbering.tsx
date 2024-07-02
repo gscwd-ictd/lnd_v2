@@ -20,18 +20,12 @@ export const BatchNumbering: FunctionComponent = () => {
   return (
     <>
       <div className="flex justify-between gap-2">
-        {/* <div className="flex flex-col items-center justify-center w-full gap-0 py-2 rounded-md bg-indigo-700">
-          <div className="text-3xl text-white">{numberOfParticipants}</div>
-          <div className="text-sm font-medium text-gray-200">Max Participants</div>
-        </div> */}
-
         <div
           className={`flex flex-col items-center justify-center w-full gap-0  py-2 ${
             totalSelectedEmployees.length === numberOfParticipants ? "bg-indigo-500" : "bg-zinc-500"
           } rounded-md`}
           // role="button"
           onClick={(e) => {
-            // console.log(totalSelectedEmployees)
             e.stopPropagation();
           }}
         >

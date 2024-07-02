@@ -4,13 +4,13 @@
 
 import { useEffect, useState } from "react";
 
-type WindowDimentions = {
+type WindowDimensions = {
   windowWidth: number | undefined;
   windowHeight: number | undefined;
 };
 
-const UseWindowDimensions = (): WindowDimentions => {
-  const [windowDimensions, setWindowDimensions] = useState<WindowDimentions>({
+const UseWindowDimensions = (): WindowDimensions => {
+  const [windowDimensions, setWindowDimensions] = useState<WindowDimensions>({
     windowWidth: undefined,
     windowHeight: undefined,
   });

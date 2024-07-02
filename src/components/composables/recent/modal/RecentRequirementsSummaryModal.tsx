@@ -1,25 +1,35 @@
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import dayjs from "dayjs";
-import { FunctionComponent, Suspense, useContext, useEffect, useState } from "react";
+import { FunctionComponent, Suspense, useContext, useState } from "react";
 import {
   BatchWithEmployees,
   EmployeeWithRequirements,
-  NewTrainingRequirements,
   RecentContext,
+  useRecentToastOptions,
 } from "../../recent-data-table/RecentDataTable";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { Checkbox } from "@lms/components/osprey/ui/checkbox/view/Checkbox";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
 import { AlertNotification } from "@lms/components/osprey/ui/alert-notification/view/AlertNotification";
 import { TrainingRequirement } from "@lms/utilities/stores/training-notice-store";
+import { TrainingStatus } from "@lms/utilities/types/training";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@lms/components/osprey/ui/overlays/alert-dialog/view/AlertDialog";
+import { Button } from "@lms/components/osprey/ui/button/view/Button";
 
 export const RecentRequirementsSummaryModal: FunctionComponent = () => {
+  const [alertSubmissionIsOpen, setAlertSubmissionIsOpen] = useState<boolean>(false);
   const { requirementsModalIsOpen, setRequirementsModalIsOpen, id, requirements } = useContext(RecentContext);
   const [employeeWithRequirements, setEmployeeWithRequirements] = useState<Array<EmployeeWithRequirements>>([]);
   const [attendeesCount, setattendeesCount] = useState<number>(0);
   const [attendeesCompleteCount, setattendeesCompleteCount] = useState<number>(0);
+  const { setToastOptions } = useRecentToastOptions();
+  const queryClient = useQueryClient();
 
   const { data } = useQuery({
     queryKey: ["training-requirements", id],
@@ -61,114 +71,165 @@ export const RecentRequirementsSummaryModal: FunctionComponent = () => {
     enabled: !!id && requirementsModalIsOpen !== false,
   });
 
+  const recentMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await axios.patch(
+        `${url}/training`,
+        { trainingId: id, status: TrainingStatus.COMPLETED },
+        { withCredentials: true }
+      );
+      return data;
+    },
+    onSuccess: async () => {
+      const getUpdatedRecentTrainings = await axios.get(`${url}/training/recent`);
+      queryClient.setQueryData(["recent-trainings"], getUpdatedRecentTrainings.data.items);
+      setToastOptions("success", "Success", `You have moved the training to "completed"`);
+      setAlertSubmissionIsOpen(false);
+      setRequirementsModalIsOpen(false);
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", `Something went wrong! Please try again in a few seconds."`);
+    },
+  });
+
   return (
-    <Modal
-      isOpen={requirementsModalIsOpen}
-      setIsOpen={setRequirementsModalIsOpen}
-      size={requirements.length > 5 ? "xl" : "lg"}
-    >
-      <ModalContent>
-        <ModalContent.Title>
-          <div className="px-10 py-3">
-            <p className="text-lg font-semibold text-gray-700">Requirements Summary</p>
-            <div className="flex gap-2"></div>
-          </div>
-        </ModalContent.Title>
-        <ModalContent.Body>
-          <div className="px-10  w-auto flex">
-            <AlertNotification
-              alertType="info"
-              notifMessage={`${attendeesCompleteCount} out of ${attendeesCount} ${
-                attendeesCount > 1 ? "attendees" : "attendee"
-              } completed all the requirements`}
-            />
-          </div>
-
-          <Suspense
-            fallback={
-              <div className="flex justify-center w-full h-full">
-                <Spinner />
-              </div>
-            }
-          >
-            <div className="px-10 py-5">
-              <div className="relative overflow-x-auto rounded-lg shadow-md ">
-                <table className="w-full table-fixed">
-                  {/* <thead className="text-white rounded-t bg-gradient-to-r from-indigo-700 to-purple-500"> */}
-                  <thead className="text-gray-700 bg-gray-300">
-                    <tr className="text-sm">
-                      <th className="p-2 font-medium border ">Employee Name</th>
-
-                      {data?.requirements
-                        .sort((a: TrainingRequirement, b: TrainingRequirement) => (a.document > b.document ? 1 : -1))
-                        .map((req: TrainingRequirement, idx: number) => {
-                          if (req.isSelected !== null)
-                            return (
-                              <th key={idx} className="p-2 font-medium border">
-                                {req.document}
-                              </th>
-                            );
-                        })}
-                      <th className="p-2 font-medium border">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {employeeWithRequirements?.map((employee) => {
-                      return (
-                        <tr
-                          className={`${
-                            employee.status === "Complete"
-                              ? "bg-emerald-200/70 "
-                              : "even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80 "
-                          }`}
-                          key={employee.employeeId}
-                        >
-                          <td className="p-2 text-sm font-light border text-center items-center border-gray-300">
-                            {employee.name}
-                          </td>
-                          {employee.requirements
-                            // .filter((req) => req.isSelected === null)
-                            .sort((a, b) => (a.document > b.document ? 1 : -1))
-                            .map((requirements, idx) => {
-                              if (requirements.isSelected !== null)
-                                return (
-                                  <td
-                                    className="p-2 text-sm font-light  text-center items-center border border-gray-300 hover:bg-indigo-200 "
-                                    key={idx}
-                                  >
-                                    <Checkbox
-                                      id={`checkbox-${idx}-${requirements.document.toLowerCase()}`}
-                                      checked={requirements.isSelected ? true : false}
-                                      readOnly
-                                    />
-                                  </td>
-                                );
-                            })}
-                          <td className="p-2  border border-gray-300 items-center text-center select-none">
-                            <span
-                              className={`${employee.status === "Complete" ? "text-emerald-700" : "text-gray-500"}`}
-                            >
-                              {employee.status}
-                            </span>
-                            {/* <span>{employee.status}</span> */}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+    <>
+      <Modal
+        isOpen={requirementsModalIsOpen}
+        setIsOpen={setRequirementsModalIsOpen}
+        size={requirements.length > 5 ? "xl" : "lg"}
+      >
+        <ModalContent>
+          <ModalContent.Title>
+            <div className="px-10 py-3">
+              <p className="text-lg font-semibold text-gray-700">Requirements Summary</p>
+              <div className="flex gap-2"></div>
             </div>
-          </Suspense>
-        </ModalContent.Body>
-        <ModalContent.Footer>
-          <div className="flex justify-end gap-2 px-10 py-3">
-            <button className="text-white bg-red-500 rounded w-[15rem] px-3 py-3 uppercase text-center text-md">
-              Close this Training
-            </button>
+          </ModalContent.Title>
+          <ModalContent.Body>
+            <div className="px-10  w-auto flex">
+              <AlertNotification
+                alertType="info"
+                notifMessage={`${attendeesCompleteCount} out of ${attendeesCount} ${
+                  attendeesCount > 1 ? "attendees" : "attendee"
+                } completed all the requirements`}
+              />
+            </div>
+
+            <Suspense
+              fallback={
+                <div className="flex justify-center w-full h-full">
+                  <Spinner />
+                </div>
+              }
+            >
+              <div className="px-10 py-5">
+                <div className="relative overflow-x-auto rounded-lg shadow-md ">
+                  <table className="w-full table-fixed">
+                    {/* <thead className="text-white rounded-t bg-gradient-to-r from-indigo-700 to-purple-500"> */}
+                    <thead className="text-gray-700 bg-gray-300">
+                      <tr className="text-sm">
+                        <th className="p-2 font-medium border ">Employee Name</th>
+
+                        {data?.requirements
+                          .sort((a: TrainingRequirement, b: TrainingRequirement) => (a.document > b.document ? 1 : -1))
+                          .map((req: TrainingRequirement, idx: number) => {
+                            if (req.isSelected !== null)
+                              return (
+                                <th key={idx} className="p-2 font-medium border">
+                                  {req.document}
+                                </th>
+                              );
+                          })}
+                        <th className="p-2 font-medium border">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {employeeWithRequirements?.map((employee) => {
+                        return (
+                          <tr
+                            className={`${
+                              employee.status === "Complete"
+                                ? "bg-emerald-200/70 "
+                                : "even:bg-inherit odd:bg-zinc-50 hover:bg-indigo-100/80 "
+                            }`}
+                            key={employee.employeeId}
+                          >
+                            <td className="p-2 text-sm font-light border text-center items-center border-gray-300">
+                              {employee.name}
+                            </td>
+                            {employee.requirements
+                              // .filter((req) => req.isSelected === null)
+                              .sort((a, b) => (a.document > b.document ? 1 : -1))
+                              .map((requirements, idx) => {
+                                if (requirements.isSelected !== null)
+                                  return (
+                                    <td
+                                      className="p-2 text-sm font-light  text-center items-center border border-gray-300 hover:bg-indigo-200 "
+                                      key={idx}
+                                    >
+                                      <Checkbox
+                                        id={`checkbox-${idx}-${requirements.document.toLowerCase()}`}
+                                        checked={requirements.isSelected ? true : false}
+                                        readOnly
+                                      />
+                                    </td>
+                                  );
+                              })}
+                            <td className="p-2  border border-gray-300 items-center text-center select-none">
+                              <span
+                                className={`${employee.status === "Complete" ? "text-emerald-700" : "text-gray-500"}`}
+                              >
+                                {employee.status}
+                              </span>
+                              {/* <span>{employee.status}</span> */}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </Suspense>
+          </ModalContent.Body>
+          <ModalContent.Footer>
+            <div className="flex justify-end gap-2 px-10 py-3">
+              <button
+                className="text-white bg-red-500 rounded w-[15rem] px-3 py-3 uppercase text-center text-md"
+                onClick={() => setAlertSubmissionIsOpen(true)}
+              >
+                Close this Training
+              </button>
+            </div>
+          </ModalContent.Footer>
+        </ModalContent>
+      </Modal>
+      <AlertDialog open={alertSubmissionIsOpen} onOpenChange={setAlertSubmissionIsOpen}>
+        <AlertDialogContent>
+          <AlertDialogTitle>
+            <div className="text-lg font-semibold text-gray-600">Complete this Training</div>
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            <label className="text-sm font-medium text-gray-700">
+              Are you sure you want to move the training to history tab and change the status to
+              &ldquo;Completed&ldquo;?
+            </label>
+          </AlertDialogDescription>
+          <div className="flex justify-end mt-4 space-x-2">
+            <Button variant="white" onClick={() => setAlertSubmissionIsOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                recentMutation.mutateAsync();
+              }}
+            >
+              Submit
+            </Button>
           </div>
-        </ModalContent.Footer>
-      </ModalContent>
-    </Modal>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

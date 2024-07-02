@@ -233,7 +233,7 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
                           <th className="p-2 font-medium border"></th>
                           <th className="p-2 font-medium border">Employee Name</th>
 
-                          <th className="p-2 font-medium border">Learning Application Plan</th>
+                          <th className="p-2 font-medium border">Learner's Journal</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -281,9 +281,6 @@ export const BenchmarkingRequirementsModal: FunctionComponent = () => {
           </ModalContent.Body>
           <ModalContent.Footer>
             <div className="flex justify-end">
-              {/* <Button type="button" className="w-[5rem]" onClick={() => console.log(participantsWithRequirements)}>
-                Log
-              </Button> */}
               <Button onClick={() => participantsMutation.mutateAsync()}>Submit</Button>
             </div>
           </ModalContent.Footer>

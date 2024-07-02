@@ -12,6 +12,7 @@ import * as yup from "yup";
 
 const schema = yup.object({
   title: yup.string().label("Title").required(),
+  description: yup.string().label("Description").required(),
   dateFrom: yup
     .string()
     .label("Date start")
@@ -54,14 +55,16 @@ export const EditActivityDetails: FunctionComponent = () => {
   const dateTo = useOthersStore((state) => state.dateTo);
   const location = useOthersStore((state) => state.location);
   const dateFrom = useOthersStore((state) => state.dateFrom);
+  const description = useOthersStore((state) => state.description);
   const setTitle = useOthersStore((state) => state.setTitle);
   const setDateTo = useOthersStore((state) => state.setDateTo);
   const setDateFrom = useOthersStore((state) => state.setDateFrom);
   const setLocation = useOthersStore((state) => state.setLocation);
+  const setDescription = useOthersStore((state) => state.setDescription);
   const setPage = useEditOthersModalStore((state) => state.setPage);
 
   const onSubmit = () => {
-    setPage(4);
+    setPage(5);
   };
 
   return (
@@ -72,9 +75,7 @@ export const EditActivityDetails: FunctionComponent = () => {
             <label htmlFor="course-title" className="block text-xs font-medium text-gray-700">
               Title<span className="text-red-600 text-md">*</span>
             </label>
-            <p className="text-xs text-gray-500">
-              A concise and descriptive identifier that reflects the content, focus, or objectives.
-            </p>
+            <p className="text-xs text-gray-500">Title of the other training activity.</p>
           </div>
           <Input
             {...register("title", { value: title, onChange: (e) => setTitle(e.target.value) })}
@@ -84,6 +85,26 @@ export const EditActivityDetails: FunctionComponent = () => {
             autoComplete="off"
             color={!isEmpty(errors.title) ? "error" : "primary"}
             helperText={!isEmpty(errors.title) ? errors.title?.message : undefined}
+          />
+        </div>
+
+        <div className="mt-1 mb-4">
+          <div className="mb-2">
+            <label htmlFor="course-title" className="block text-xs font-medium text-gray-700">
+              Description<span className="text-red-600 text-md">*</span>
+            </label>
+            <p className="text-xs text-gray-500">
+              A concise and descriptive identifier that reflects the content, focus, or objectives.
+            </p>
+          </div>
+          <Input
+            {...register("description", { value: description, onChange: (e) => setDescription(e.target.value) })}
+            placeholder="Please indicate the activity's description"
+            size="small"
+            className="placeholder:text-xs"
+            autoComplete="off"
+            color={!isEmpty(errors.description) ? "error" : "primary"}
+            helperText={!isEmpty(errors.description) ? errors.description?.message : undefined}
           />
         </div>
 

@@ -20,6 +20,7 @@ import { ViewDocumentModal } from "../training-notice-modal/documents/ViewDocume
 import { SetToUpcomingModal } from "../training-notice-modal/set-to-upcoming/SetToUpcomingModal";
 import { ToOngoingAlertSubmission } from "../ongoing/alert/ToOngoingAlert";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 
 type TrainingNoticeState = {
   id: string;
@@ -129,7 +130,6 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           columns={columns}
           title="Notice of Training"
           subtitle="Training outline and other details for the upcoming training programs."
-          // onRowClick={(row) => console.log(row.original.id)}
         />
 
         <TrainingNoticeContext.Provider
@@ -188,6 +188,14 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
           <ViewDocumentModal />
           <SetToUpcomingModal />
           <ToOngoingAlertSubmission />
+          <Toast
+            duration={2000}
+            open={toastIsOpen}
+            setOpen={setToastIsOpen}
+            color={toastType.color}
+            title={toastType.title}
+            content={toastType.content}
+          />
         </TrainingNoticeContext.Provider>
       </TrainingNoticeToastContext.Provider>
     </>

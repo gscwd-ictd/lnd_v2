@@ -18,6 +18,8 @@ export type BenchmarkingState = {
   setInitialTitle: (initialTitle: string) => void;
   title: string;
   setTitle: (title: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
   partner: string;
   setPartner: (partner: string) => void;
   participants: Array<EmployeeFlatWithSupervisor>;
@@ -81,6 +83,8 @@ export const useEditBenchmarkingModalStore = create<
 export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   id: "",
   setId: (id) => set({ id }),
+  description: "",
+  setDescription: (description) => set({ description }),
   initialTitle: "",
   setInitialTitle: (initialTitle) => set({ initialTitle }),
   title: "",
@@ -114,6 +118,7 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   reset: () => {
     set({
       id: "",
+      description: "",
       location: "",
       title: "",
       participants: [],

@@ -2,14 +2,22 @@
 
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { useOthersCategoryStore, useAddOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
+import {
+  useOthersCategoryStore,
+  useAddOthersModalStore,
+  useOthersStore,
+  useOthersTrainingTypeStore,
+} from "@lms/utilities/stores/others-store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { OtherCategorySelection } from "../pages/CategorySelection";
 import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
 import { isEmpty } from "lodash";
-import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
+import {
+  getActivityCategoryBadgePill,
+  getActivityCategorySelectionBadgePill,
+} from "@lms/utilities/functions/getActivityCategoryBadgePill";
 import { useOrientation } from "@lms/hooks/use-orientation";
 import { AddOthersDetailsSummary } from "../pages/AddOthersDetailsSummary";
 import { AddParticipants } from "../pages/AddParticipants";
@@ -18,6 +26,9 @@ import { url } from "@lms/utilities/url/api-url";
 import { useOthersToastOptions } from "../data-table/OthersDataTable";
 import { Storage } from "appwrite";
 import { v4 as uuidv4 } from "uuid";
+import { TrainingTypeSelection } from "../pages/TrainingTypeSelection";
+import { getTrainingTypeBadgePill } from "@lms/utilities/functions/getTrainingTypeBadgePill";
+import { AddTrainingRequirementDocuments } from "../pages/AddTrainingRequirementDocuments";
 
 export const AddNewOthersModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
@@ -36,6 +47,8 @@ export const AddNewOthersModal: FunctionComponent = () => {
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
   const others = useOthersStore();
 
+  const trainingType = useOthersTrainingTypeStore((state) => state.trainingType);
+  const resetTrainingType = useOthersTrainingTypeStore((state) => state.reset);
   const setModalIsOpen = useAddOthersModalStore((state) => state.setModalIsOpen);
   const setPage = useAddOthersModalStore((state) => state.setPage);
   const reset = useOthersStore((state) => state.reset);
@@ -48,7 +61,8 @@ export const AddNewOthersModal: FunctionComponent = () => {
   // mutation function
   const addOthersMutation = useMutation({
     mutationFn: async () => {
-      const { title, dateFrom, dateTo, location, participants, filesToUpload } = others;
+      const { title, dateFrom, dateTo, location, participants, filesToUpload, description, trainingRequirements } =
+        others;
 
       const storage = new Storage(client!);
 
@@ -57,6 +71,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
         `${url}/other/trainings`,
         {
           title,
+          // description,
           participants: participants.map((participant) => {
             return { employeeId: participant.employeeId };
           }),
@@ -64,6 +79,8 @@ export const AddNewOthersModal: FunctionComponent = () => {
           dateTo,
           location,
           category,
+          // trainingRequirements,
+          // trainingType,
         },
         { withCredentials: true }
       );
@@ -94,6 +111,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
       setModalIsOpen(false);
       reset();
       resetModal();
+      resetTrainingType();
       const getUpdatedOtherActivities = await axios.get(`${url}/other/trainings?page=1&limit=1000`);
       queryClient.setQueryData(["other-activities"], getUpdatedOtherActivities.data.items);
     },
@@ -141,12 +159,15 @@ export const AddNewOthersModal: FunctionComponent = () => {
 
   const onNext = () => {
     if (page === 1 && !isEmpty(category)) setPage(2);
-    else if (page === 2 && filesToUpload.length < 1) {
+    else if (page === 2 && !isEmpty(trainingType)) setPage(3);
+    else if (page === 2 && (isEmpty(trainingType) || trainingType === undefined))
+      setToastOptions("danger", "Error", "You have not selected a training type.");
+    else if (page === 3 && filesToUpload.length < 1)
       setToastOptions("danger", "Error", "You have not uploaded anything.");
-    } else if (page === 4 && participants.length < 1) {
+    else if (page === 5 && participants.length < 1)
       setToastOptions("danger", "Error", "You have not added any participant.");
-    } else if (page === 2 && filesToUpload.length > 0) setPage(page + 1);
-    else if (page === 4 && participants.length > 0) setPage(page + 1);
+    else if (page === 3 && filesToUpload.length > 0) setPage(page + 1);
+    else if (page === 5 && participants.length > 0) setPage(page + 1);
     else if (page === 1 && isEmpty(category)) setToastOptions("danger", "Error", "You have not selected a category.");
     else setPage(page + 1);
   };
@@ -187,6 +208,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
           setModalIsOpen(false);
           setCategory(undefined);
           reset();
+          resetTrainingType();
           resetModal();
         }}
       >
@@ -214,18 +236,24 @@ export const AddNewOthersModal: FunctionComponent = () => {
         <ModalContent>
           <ModalContent.Title>
             <header className="pl-2">
-              <h3 className="text-lg font-semibold text-gray-600  ">
-                New Other Activity {!isEmpty(category) ? getActivityCategoryBadgePill(category) : null}
+              <h3 className="text-lg font-semibold text-gray-600  flex gap-1 items-center">
+                <div>New Other Activity </div>
+                <div className="text-xs">
+                  {!isEmpty(category) ? getActivityCategorySelectionBadgePill(category) : null}
+                </div>
+                <div className="text-xs">{!isEmpty(trainingType) ? getTrainingTypeBadgePill(trainingType) : null}</div>
               </h3>
             </header>
           </ModalContent.Title>
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {page === 1 && <OtherCategorySelection />}
-              {page === 2 && <UploadActivityAttachment />}
-              {page === 3 && <ActivityDetails />}
-              {page === 4 && <AddParticipants />}
-              {page === 5 && <AddOthersDetailsSummary />}
+              {page === 2 && <TrainingTypeSelection />}
+              {page === 3 && <UploadActivityAttachment />}
+              {page === 4 && <ActivityDetails />}
+              {page === 5 && <AddParticipants />}
+              {page === 6 && <AddTrainingRequirementDocuments />}
+              {page === 7 && <AddOthersDetailsSummary />}
             </main>
           </ModalContent.Body>
           <ModalContent.Footer>
@@ -239,6 +267,7 @@ export const AddNewOthersModal: FunctionComponent = () => {
                       setModalIsOpen(false);
                       setCategory(undefined);
                       reset();
+                      resetTrainingType();
                       resetModal();
                     }}
                   >
@@ -269,16 +298,23 @@ export const AddNewOthersModal: FunctionComponent = () => {
                   </Button>
                 )}
 
+                {page === 6 && (
+                  <Button variant="white" className="w-[6rem]" onClick={() => setPage(5)}>
+                    Previous
+                  </Button>
+                )}
+
+                {page === 7 && (
+                  <Button variant="white" className="w-[6rem]" onClick={() => setPage(6)}>
+                    Previous
+                  </Button>
+                )}
+
                 {page === 1 && (
                   <Button className="w-[6rem]" onClick={onNext}>
                     Next
                   </Button>
                 )}
-                {/* {page === 2 && (
-                  <Button className="w-[6rem]" type="submit" form="othersDetailsForm">
-                    Next
-                  </Button>
-                )} */}
 
                 {page === 2 && (
                   <Button className="w-[6rem]" onClick={onNext}>
@@ -287,17 +323,30 @@ export const AddNewOthersModal: FunctionComponent = () => {
                 )}
 
                 {page === 3 && (
-                  <Button className="w-[6rem]" type="submit" form="othersDetailsForm">
+                  <Button className="w-[6rem]" onClick={onNext}>
                     Next
                   </Button>
                 )}
 
                 {page === 4 && (
-                  <Button className="w-[6rem]" type="button" onClick={onNext}>
+                  <Button className="w-[6rem]" type="submit" form="othersDetailsForm">
                     Next
                   </Button>
                 )}
+
                 {page === 5 && (
+                  <Button className="w-[6rem]" onClick={onNext}>
+                    Next
+                  </Button>
+                )}
+
+                {page === 6 && (
+                  <Button className="w-[6rem]" type="submit" form="addTrainingDocumentsForm">
+                    Next
+                  </Button>
+                )}
+
+                {page === 7 && (
                   <Button className="w-[6rem]" onClick={() => addOthersMutation.mutateAsync()}>
                     Submit
                   </Button>

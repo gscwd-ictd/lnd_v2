@@ -10,7 +10,6 @@ type MyError = Omit<AxiosResponse, "data"> & {
 // create a bucket
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  console.log(request);
   const { id, name } = body;
 
   try {
@@ -58,7 +57,5 @@ export async function GET(request: NextRequest) {
     const data = await storage.listFiles(id);
 
     return NextResponse.json(data);
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
 }

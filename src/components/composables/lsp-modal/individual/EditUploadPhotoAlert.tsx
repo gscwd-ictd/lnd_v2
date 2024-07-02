@@ -35,6 +35,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
   const setPhotoToUpload = useLspDetailsStore((state) => state.setPhotoToUpload);
   const photoToUploadUrl = useLspDetailsStore((state) => state.photoToUploadUrl);
   const setPhotoToUploadUrl = useLspDetailsStore((state) => state.setPhotoToUploadUrl);
+  const setName = useLspDetailsStore((state) => state.setName);
   // const uploadAlertIsOpen = useEditLspModalStore((state) => state.uploadAlertIsOpen);
   // const setUploadAlertIsOpen = useEditLspModalStore((state) => state.setUploadAlertIsOpen);
   const { uploadAlertIsOpen, setUploadAlertIsOpen } = useIndSlideOver();
@@ -70,6 +71,8 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
     },
     onSuccess: async (data) => {
       // get file and set photoUrl
+      // setName(data.name);
+      console.log("INDIVIDUAL SUCCESS");
       setPhotoId(data.photoId);
       setPhotoUrl(data.photoUrl);
       setUploadAlertIsOpen(false);
@@ -152,7 +155,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
               />
             </div>
           </AlertDialogDescription>
-          {photoUrl}
+
           <div className="flex justify-end py-4 px-2 space-x-2">
             {photoToUploadUrl === null ? (
               <>

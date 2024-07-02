@@ -38,10 +38,12 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
   const filesToDelete = useBenchmarkingStore((state) => state.filesToDelete);
   const participants = useBenchmarkingStore((state) => state.participants);
   const status = useBenchmarkingStore((state) => state.status);
+  const description = useBenchmarkingStore((state) => state.description);
   const setBucketFiles = useBenchmarkingStore((state) => state.setBucketFiles);
   const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
   const setFilteredParticipantsPool = useBenchmarkingStore((state) => state.setFilteredParticipantsPool);
 
+  const setDescription = useBenchmarkingStore((state) => state.setDescription);
   const setHasFetchedParticipants = useBenchmarkingStore((state) => state.setHasFetchedParticipants);
   const setId = useBenchmarkingStore((state) => state.setId);
   const setInitialTitle = useBenchmarkingStore((state) => state.setInitialTitle);
@@ -78,10 +80,11 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
     queryKey: ["benchmark-per-id", id],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/benchmark/${id}`);
-
+      console.log(data);
       return data;
     },
     onSuccess: (data) => {
+      setDescription(data.description);
       setTitle(data.title);
       setPartner(data.partner);
       setDateFrom(data.dateFrom);
@@ -214,6 +217,7 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
         `${url}/benchmark/${id}`,
         {
           title,
+          description,
           partner,
           dateFrom,
           dateTo,
@@ -283,7 +287,7 @@ export const EditBenchmarkingModal: FunctionComponent = () => {
           </ModalContent.Title>
           <ModalContent.Body>
             <main className="px-2 space-y-4 max-h-[32rem]">
-              {(!benchmarkingData || isLoading || isFetching) && !isError && action === "update" ? (
+              {(!benchmarkingData || isLoading) && !isError && action === "update" ? (
                 <div className="flex flex-col">
                   <div className="flex items-center justify-center w-full h-full">
                     <Spinner size="large" />

@@ -29,20 +29,9 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    // // map all files to upload as we call the storage.createFile function to save it in appwrite
-    // const allFiles = await Promise.all(
-    //   files.map(async (file: any) => {
-    //     const _file = InputFile.fromBuffer(file.fromBuffer, file.originalname);
-    //     console.log("FROM BACKEND: ", _file);
-    //     const result = await storage.createFile(bucketId, uuidv4(), _file);
-    //     return result;
-    //   })
-    // );
-
     return NextResponse.json(allFiles);
   } catch (error) {
     const myError = error as MyError;
-    console.log(error);
     return NextResponse.json({ error: { ...myError, step: 3 } }, { status: 400 });
   }
 }

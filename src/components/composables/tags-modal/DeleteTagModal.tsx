@@ -28,9 +28,8 @@ export const DeleteTagModal: FunctionComponent<DeleteTagModalProps> = ({ id, rem
       queryClient.setQueryData(["tags"], getNewestTags.data.items);
       setRemove(false);
     },
-    onError: () => console.log("error"),
+    onError: () => {},
     mutationFn: async () => {
-      console.log(id, "DELETING");
       const response = await axios.delete(`${url}/tags/${id}`);
       return response.data;
     },

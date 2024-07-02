@@ -51,6 +51,12 @@ export enum TrainingStatus {
   CANCELLED = "cancelled",
 }
 
+export enum TrainingNominationStatus {
+  NOMINATION_PENDING = "nomination pending",
+  NOMINATION_INELIGIBLE = "nomination ineligible",
+  NOMINATION_COMPLETED = "nomination completed",
+}
+
 export enum TrainingNomineeStatus {
   DECLINED = "declined",
   PENDING = "pending",
@@ -64,6 +70,17 @@ export type EmployeeWithStatus = {
   status?: TrainingNomineeStatus;
   remarks?: string | null;
   isReplacedBy?: boolean;
+};
+
+export type TrainingNominationDetails = {
+  accepted: number;
+  declined: number;
+  employeeId: string;
+  name: string;
+  pending: number;
+  slot: number;
+  status: string;
+  remarks?: string;
 };
 
 // export type EmployeeFlatWithSupervisor = Employee & Pick<Recommendation, "supervisor">;

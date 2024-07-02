@@ -555,8 +555,9 @@ export const sidebarItems: SidebarItems = [
         ),
       },
       {
-        path: "/settings/tags",
+        path: "/settings/training-tags",
         label: "Training Tags",
+
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -575,30 +576,11 @@ export const sidebarItems: SidebarItems = [
           </svg>
         ),
       },
-      // {
-      //   path: "",
-      //   label: "Employees Tags",
 
-      //   icon: (
-      //     <svg
-      //       xmlns="http://www.w3.org/2000/svg"
-      //       fill="none"
-      //       viewBox="0 0 24 24"
-      //       strokeWidth="1.5"
-      //       stroke="currentColor"
-      //       className="w-5 h-5 text-zinc-700"
-      //     >
-      //       <path
-      //         strokeLinecap="round"
-      //         strokeLinejoin="round"
-      //         d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-      //       />
-      //     </svg>
-      //   ),
-      // },
       {
-        path: "/settings/employees-with-tags",
-        label: "Employees with Tags",
+        path: "/settings/employees",
+        label: "Employees",
+        withIndentation: true,
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -617,8 +599,9 @@ export const sidebarItems: SidebarItems = [
         ),
       },
       {
-        path: "/settings/tags-with-employees",
-        label: "Tags with Employees",
+        path: "/settings/tags",
+        label: "Tags",
+        withIndentation: true,
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"

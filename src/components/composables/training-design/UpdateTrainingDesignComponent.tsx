@@ -97,7 +97,7 @@ export const UpdateTrainingDesignComponent: FunctionComponent = () => {
         return newData;
       });
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {},
     mutationFn: async () => {
       const response = await axios.patch(`${url}/training/designs/${params.id}`, {
         courseTitle,

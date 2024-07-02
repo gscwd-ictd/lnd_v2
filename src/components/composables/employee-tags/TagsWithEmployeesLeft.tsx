@@ -30,7 +30,7 @@ export default function TagsWithEmployeesLeft() {
     enabled: !queryTag,
     queryFn: async () => {
       // const { data } = await axios.get(`${url}/employee-tags/tag/${selectedTag?.id}`);
-      const { data } = await axios.get(`${url}/tags`);
+      const { data } = await axios.get(`${url}/tags?page=1&limit=1000`);
       setTags(data.items);
       setFilteredTags(data.items);
 

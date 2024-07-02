@@ -25,35 +25,6 @@ export const AddRecommendations: FunctionComponent = () => {
   const action = useTrainingNoticeModalStore((state) => state.action);
   const numberOfParticipants = useTrainingNoticeStore((state) => state.numberOfParticipants);
 
-  // useEffect(() => {
-  //   if (!hasFetchedRecommendations && !isEmpty(selectedTags)) {
-  //     const selectedTagIds = selectedTags.map((tag) => {
-  //       return tag.id;
-  //     });
-
-  //     const getRecommendedEmployees = async () => {
-  //       // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTags[0].id}`);
-  //       const result = await axios.post(`${url}/hrms/employee-tags/tag/`, selectedTagIds);
-
-  //       console.log(result);
-
-  //       result.data.map((slot: Recommendation) => {
-  //         slot.numberOfSlots = 0;
-  //         return slot;
-  //       });
-
-  //       setSlotDistribution(result.data);
-  //       if (!isEmpty(result.data)) {
-  //         setHasFetchedRecommendations(true);
-  //       }
-  //     };
-
-  //     getRecommendedEmployees();
-  //   }
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [selectedTags, hasFetchedRecommendations, action]);
-
   useQuery({
     queryKey: ["tag-recommendations", selectedTags],
     enabled: hasFetchedRecommendations === false,

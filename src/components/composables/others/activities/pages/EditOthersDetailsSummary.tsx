@@ -1,5 +1,5 @@
 import { Disclosure } from "@headlessui/react";
-import { useOthersStore } from "@lms/utilities/stores/others-store";
+import { TrainingRequirement, useOthersStore } from "@lms/utilities/stores/others-store";
 import dayjs from "dayjs";
 import { FunctionComponent } from "react";
 
@@ -12,6 +12,8 @@ export const EditOthersDetailsSummary: FunctionComponent = () => {
   const filesToDelete = useOthersStore((state) => state.filesToDelete);
   const participants = useOthersStore((state) => state.participants);
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
+  const description = useOthersStore((state) => state.description);
+  const trainingRequirements = useOthersStore((state) => state.trainingRequirements);
 
   return (
     <div className="flex flex-col gap-2 px-6 py-4 text-sm text-gray-700 border-2 border-dashed rounded-lg bg-gray-50">
@@ -32,6 +34,25 @@ export const EditOthersDetailsSummary: FunctionComponent = () => {
           />
         </svg>
         {title}
+      </div>
+
+      {/* DESC */}
+      <div className="flex items-center justify-start gap-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+          />
+        </svg>
+        {description}
       </div>
 
       {/* LOCATION */}
@@ -285,6 +306,30 @@ export const EditOthersDetailsSummary: FunctionComponent = () => {
             </div>
           )}
         </Disclosure>
+      </div>
+
+      {/* TRAINING REQUIREMENTS SUMMARY */}
+      <div>
+        <div className="pb-1">Training Requirements</div>
+        {trainingRequirements &&
+          trainingRequirements.map((req: TrainingRequirement, idx) => {
+            return (
+              <div key={idx} className="flex w-full gap-2 pl-2 gap-0s">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+
+                <span className="text-indigo-500">{req.document}</span>
+              </div>
+            );
+          })}
       </div>
     </div>
   );

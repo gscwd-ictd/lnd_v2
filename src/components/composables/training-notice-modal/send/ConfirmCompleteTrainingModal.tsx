@@ -31,7 +31,7 @@ export const ConfirmCompleteTrainingModal: FunctionComponent = () => {
           <ModalContent.Body>
             <main className="px-2 space-y-4">
               {/* <TrainingRecommendations /> */}
-              Is the training details complete?
+              Are the training details complete?
             </main>
           </ModalContent.Body>
 

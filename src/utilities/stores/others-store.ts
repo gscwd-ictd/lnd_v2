@@ -1,7 +1,12 @@
 import { create } from "zustand";
 import { OthersCategory } from "../types/others";
-import { BucketFile } from "./training-notice-store";
+import { BucketFile, TrainingTypes } from "./training-notice-store";
 import { EmployeeFlatWithSupervisor } from "../types/training";
+
+export type TrainingRequirement = {
+  document: string;
+  isSelected?: boolean;
+};
 
 export type OthersModalStore = {
   page: number;
@@ -16,9 +21,17 @@ export type OthersCategoryState = {
   setCategory: (category: OthersCategory | undefined) => void;
 };
 
+export type OthersTrainingTypeState = {
+  trainingType: TrainingTypes | undefined;
+  setTrainingType: (trainingType: TrainingTypes | undefined) => void;
+  reset: () => void;
+};
+
 export type OthersState = {
   id: string;
   setId: (id: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
   initialTitle: string;
   setInitialTitle: (initialTitle: string) => void;
   filesToUpload: Array<File>;
@@ -37,6 +50,12 @@ export type OthersState = {
   setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   hasFetchedFiles: boolean;
   setHasFetchedFiles: (hasFetchedFiles: boolean) => void;
+  initialTrainingRequirements: Array<TrainingRequirement>;
+  setInitialTrainingRequirements: (initialTrainingRequirements: Array<TrainingRequirement>) => void;
+  trainingRequirements: Array<TrainingRequirement>;
+  setTrainingRequirements: (trainingRequirements: Array<TrainingRequirement>) => void;
+  hasTrainingRequirements: boolean;
+  setHasTrainingRequirements: (hasTrainingRequirements: boolean) => void;
   title: string;
   setTitle: (title: string) => void;
   dateFrom: string;
@@ -90,9 +109,17 @@ export const useOthersCategoryStore = create<OthersCategoryState>((set) => ({
   setCategory: (category) => set({ category }),
 }));
 
+export const useOthersTrainingTypeStore = create<OthersTrainingTypeState>((set) => ({
+  trainingType: undefined,
+  setTrainingType: (trainingType) => set({ trainingType }),
+  reset: () => set({ trainingType: undefined }),
+}));
+
 export const useOthersStore = create<OthersState>((set) => ({
   id: "",
   setId: (id) => set({ id }),
+  description: "",
+  setDescription: (description) => set({ description }),
   filesToUpload: [],
   setFilesToUpload: (filesToUpload) => set({ filesToUpload }),
   title: "",
@@ -121,10 +148,28 @@ export const useOthersStore = create<OthersState>((set) => ({
   setHasFetchedFiles: (hasFetchedFiles) => set({ hasFetchedFiles }),
   hasFetchedParticipants: false,
   setHasFetchedParticipants: (hasFetchedParticipants) => set({ hasFetchedParticipants }),
+  initialTrainingRequirements: [
+    { document: "Attendance", isSelected: true },
+    { document: "Certificate of Appearance", isSelected: false },
+    { document: "Certificate of Training", isSelected: false },
+    { document: "Course Evaluation Report", isSelected: false },
+    { document: "Course Materials", isSelected: false },
+    { document: "Learning Application Plan", isSelected: false },
+    { document: "Post Training Report", isSelected: false },
+    { document: "Post-test", isSelected: false },
+    { document: "Pre-test", isSelected: false },
+    { document: "Program", isSelected: false },
+  ],
+  setInitialTrainingRequirements: (initialTrainingRequirements) => set({ initialTrainingRequirements }),
+  trainingRequirements: [],
+  setTrainingRequirements: (trainingRequirements) => set({ trainingRequirements }),
+  hasTrainingRequirements: false,
+  setHasTrainingRequirements: (hasTrainingRequirements) => set({ hasTrainingRequirements }),
   reset: () =>
     set({
       action: undefined,
       filesToUpload: [],
+      description: "",
       title: "",
       dateFrom: "",
       dateTo: "",
@@ -136,6 +181,9 @@ export const useOthersStore = create<OthersState>((set) => ({
       filteredParticipantsPool: [],
       hasFetchedFiles: false,
       hasFetchedParticipants: false,
+      hasTrainingRequirements: false,
+      initialTrainingRequirements: [],
+      trainingRequirements: [],
       id: "",
     }),
 }));

@@ -11,7 +11,7 @@ type EmployeeBatchesProps = {
 export const EmployeeBatches: FunctionComponent<EmployeeBatchesProps> = ({ batches }) => {
   const to = useTrainingNoticeStore((state) => state.trainingEnd);
 
-  const { setBatchAttendanceIsOpen, setSelectedBatch, setTemporarySelectedBatch } = useContext(RecentContext);
+  const { setBatchAttendanceIsOpen, setSelectedBatch } = useContext(RecentContext);
 
   return (
     <div>

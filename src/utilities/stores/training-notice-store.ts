@@ -108,10 +108,6 @@ export type TrainingNoticeModalStore = {
   setAction: (action: "create" | "update" | undefined) => void;
   modalIsOpen: boolean;
   setModalIsOpen: (modalIsOpen: boolean) => void;
-  // confirmCompleteModalIsOpen: boolean;
-  // setConfirmCompleteModalIsOpen: (confirmCompleteModalIsOpen: boolean) => void;
-  // sendConfirmationModalIsOpen: boolean;
-  // setSendConfirmationModalIsOpen: (sendConfirmationModalIsOpen: boolean) => void;
   resetModal: () => void;
 };
 
@@ -142,8 +138,8 @@ export type BucketFile = {
 };
 
 export type TrainingNoticeStore = {
-  hasSetTrainingRequirements: boolean;
-  setHasSetTrainingRequirements: (hasSetTrainingRequirements: boolean) => void;
+  hasTrainingRequirements: boolean;
+  setHasTrainingRequirements: (hasTrainingRequirements: boolean) => void;
   isOnline: boolean;
   setIsOnline: (isOnline: boolean) => void;
   hasSelectedFacilitators: boolean;
@@ -274,8 +270,8 @@ export const useTrainingNoticeModalStore = create<TrainingNoticeModalStore>((set
 
 export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
   devtools((set, get) => ({
-    hasSetTrainingRequirements: false,
-    setHasSetTrainingRequirements: (hasSetTrainingRequirements) => set({ hasSetTrainingRequirements }),
+    hasTrainingRequirements: false,
+    setHasTrainingRequirements: (hasTrainingRequirements) => set({ hasTrainingRequirements }),
     trainingRequirements: [],
     setTrainingRequirements: (trainingRequirements) => set({ trainingRequirements }),
     isOnline: false,
@@ -369,7 +365,7 @@ export const useTrainingNoticeStore = create<TrainingNoticeStore>()(
     // setTrainingDocuments: (trainingDocuments: TrainingDocument[]) => set({ trainingDocuments }),
     reset: () =>
       set({
-        hasSetTrainingRequirements: false,
+        hasTrainingRequirements: false,
         isOnline: false,
         filesToUpload: [],
         filesToDelete: [],

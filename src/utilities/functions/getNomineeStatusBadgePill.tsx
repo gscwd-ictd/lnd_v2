@@ -1,6 +1,6 @@
 import { TrainingNomineeStatus } from "../types/training";
 
-export const getNomineeStatusBadgePill = (status: TrainingNomineeStatus) => {
+export const getNomineeStatusBadgePill = (status: TrainingNomineeStatus | string) => {
   if (status === TrainingNomineeStatus.PENDING)
     return (
       <div className="py-0.5 text-sm text-center bg-gray-300 rounded shadow-md font-medium border border-zinc-400 text-zinc-700">

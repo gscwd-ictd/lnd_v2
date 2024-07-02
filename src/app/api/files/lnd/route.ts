@@ -20,8 +20,7 @@ export async function POST(request: NextRequest) {
       .setEndpoint(appwriteUrl!)
       .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_LND!)
       .setKey(process.env.NEXT_PUBLIC_APPWRITE_LND_SECRET_KEY!);
-    console.log("files: ", filesToUpload);
-    console.log("bucketId: ", bucketId);
+
     // map all files to upload as we call the storage.createFile function to save it in appwrite
     const files = await Promise.all(
       filesToUpload.map(async (file: File) => {
@@ -32,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(files);
   } catch (error) {
     const myError = error as MyError;
-    console.log(error);
+
     return NextResponse.json({ error: { ...myError, step: 3 } }, { status: 400 });
   }
 }

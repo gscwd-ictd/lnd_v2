@@ -36,7 +36,7 @@ export const UpdateTagModal: FunctionComponent<UpdateTagModalProps> = ({ id, upd
     mutationFn: async () => {
       return await axios.patch(`${url}/tags/${id}`, { name: getValues().name });
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {},
     onSuccess: (data) => {
       queryClient.refetchQueries({
         queryKey: ["tags"],

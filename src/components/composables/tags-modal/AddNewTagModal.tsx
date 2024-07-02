@@ -33,7 +33,7 @@ export const AddNewTagModal: FunctionComponent = () => {
       queryClient.refetchQueries({ queryKey: ["tags"], type: "all", exact: true, stale: true });
       setTagName("");
     },
-    onError: () => console.log("error"),
+    onError: () => {},
     mutationFn: async () => {
       const response = await axios.post(`${url}/tags/`, { name });
       setIsOpenToast(true);

@@ -3,7 +3,7 @@
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
 import { TrainingNotice } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { Dispatch, FunctionComponent, SetStateAction, createContext, useState } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, createContext, useContext, useState } from "react";
 import { useRecentDataTable } from "./hooks/use-recent-data-table";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,6 +21,7 @@ import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props"
 import { RecentSlideOver } from "../recent/slideover/RecentSlideOver";
 import { RecentRequirementsModal } from "../recent/modal/RecentRequirementsModal";
 import { RecentRequirementsSummaryModal } from "../recent/modal/RecentRequirementsSummaryModal";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 
 type RecentState = {
   id: string;
@@ -37,11 +38,6 @@ type RecentState = {
   setSlideOverIsOpen: Dispatch<SetStateAction<boolean>>;
   alertSubmissionIsOpen: boolean;
   setAlertSubmissionIsOpen: Dispatch<SetStateAction<boolean>>;
-  setToastOptions: (color: ToastType["color"], title: string, content: string | undefined) => void;
-  toastIsOpen: boolean;
-  setToastIsOpen: Dispatch<SetStateAction<boolean>>;
-  toastType: ToastType;
-  setToastType: Dispatch<SetStateAction<ToastType>>;
   requirements: Array<TrainingRequirement>;
   setRequirements: Dispatch<SetStateAction<Array<TrainingRequirement>>>;
   requirementsModalIsOpen: boolean;
@@ -72,6 +68,15 @@ export type TrainingWithRequirements = {
   requirements: Array<NewTrainingRequirements>;
 };
 
+type RecentToastContextState = {
+  toastIsOpen: boolean;
+  setToastIsOpen: Dispatch<SetStateAction<boolean>>;
+  toastType: ToastType;
+  setToastType: Dispatch<SetStateAction<ToastType>>;
+};
+
+const RecentToastContext = createContext<RecentToastContextState>({} as RecentToastContextState);
+
 export const RecentContext = createContext({} as RecentState);
 
 export const RecentDataTable: FunctionComponent = () => {
@@ -82,6 +87,7 @@ export const RecentDataTable: FunctionComponent = () => {
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+
   const [requirements, setRequirements] = useState<Array<TrainingRequirement>>([]);
   const [temporarySelectedBatch, setTemporarySelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);
   const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
@@ -101,11 +107,6 @@ export const RecentDataTable: FunctionComponent = () => {
   const setBucketFiles = useTrainingNoticeStore((state) => state.setBucketFiles);
   const setSelectedTrainingDesign = useTrainingNoticeStore((state) => state.setSelectedTrainingDesign);
   const setCourseContent = useTrainingNoticeStore((state) => state.setCourseContent);
-
-  const setToastOptions = (color: typeof toastType.color, title: string, content: string | undefined) => {
-    setToastType({ color, title, content });
-    setToastIsOpen(true);
-  };
 
   // per training notice query
   useQuery({
@@ -207,50 +208,66 @@ export const RecentDataTable: FunctionComponent = () => {
 
   return (
     <>
-      <RecentContext.Provider
-        value={{
-          id,
-          selectedBatch,
-          batchesWithEmployees,
-          batchAttendanceIsOpen,
-          hasFetchedBatches,
-          slideOverIsOpen,
-          alertSubmissionIsOpen,
-          toastIsOpen,
-          toastType,
-          requirements,
-          requirementsModalIsOpen,
-          temporarySelectedBatch,
-          setTemporarySelectedBatch,
-          setRequirements,
-          setBatchesWithEmployees,
-          setRequirementsModalIsOpen,
-          setToastIsOpen,
-          setId,
-          setToastOptions,
-          setToastType,
-          setAlertSubmissionIsOpen,
-          setSlideOverIsOpen,
-          setHasFetchedBatches,
-          setBatchAttendanceIsOpen,
-          setSelectedBatch,
-        }}
-      >
-        <DataTable<TrainingNotice>
-          datasource={`${url}/training/recent`}
-          queryKey={["recent-trainings"]}
-          columns={columns}
-          title="Recent Trainings"
-          subtitle="Newly finished trainings"
-          onRowClick={(row) => {
-            setSlideOverIsOpen(true);
-            setId(row.original.id);
+      <RecentToastContext.Provider value={{ toastType, toastIsOpen, setToastIsOpen, setToastType }}>
+        <RecentContext.Provider
+          value={{
+            id,
+            selectedBatch,
+            batchesWithEmployees,
+            batchAttendanceIsOpen,
+            hasFetchedBatches,
+            slideOverIsOpen,
+            alertSubmissionIsOpen,
+            requirements,
+            requirementsModalIsOpen,
+            temporarySelectedBatch,
+            setTemporarySelectedBatch,
+            setRequirements,
+            setBatchesWithEmployees,
+            setRequirementsModalIsOpen,
+            setId,
+            setAlertSubmissionIsOpen,
+            setSlideOverIsOpen,
+            setHasFetchedBatches,
+            setBatchAttendanceIsOpen,
+            setSelectedBatch,
           }}
-        />
-        <RecentSlideOver />
-        <RecentRequirementsModal />
-        <RecentRequirementsSummaryModal />
-      </RecentContext.Provider>
+        >
+          <DataTable<TrainingNotice>
+            datasource={`${url}/training/recent`}
+            queryKey={["recent-trainings"]}
+            columns={columns}
+            title="Recent Trainings"
+            subtitle="Newly finished trainings"
+            onRowClick={(row) => {
+              setSlideOverIsOpen(true);
+              setId(row.original.id);
+            }}
+          />
+          <RecentSlideOver />
+          <RecentRequirementsModal />
+          <RecentRequirementsSummaryModal />
+        </RecentContext.Provider>
+      </RecentToastContext.Provider>
+      <Toast
+        duration={toastType.color === "danger" ? 2000 : 1500}
+        open={toastIsOpen}
+        setOpen={setToastIsOpen}
+        color={toastType.color}
+        title={toastType.title}
+        content={toastType.content}
+      />
     </>
   );
+};
+
+// use hook for recent toast
+export const useRecentToastOptions = () => {
+  const { setToastIsOpen, setToastType, toastIsOpen, toastType } = useContext(RecentToastContext);
+
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string | undefined) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
+  return { toastIsOpen, setToastIsOpen, toastType, setToastOptions };
 };

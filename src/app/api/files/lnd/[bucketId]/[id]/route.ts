@@ -11,7 +11,6 @@ type Param = {
 
 // delete a file by bucket_id and file_id
 export async function DELETE(request: NextRequest, { params }: Param) {
-  console.log(params);
   try {
     const client = new sdk.Client();
     const storage = new sdk.Storage(client);

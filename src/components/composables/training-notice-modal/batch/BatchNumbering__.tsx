@@ -31,7 +31,6 @@ export const BatchNumberingBack: FunctionComponent = () => {
           } rounded-md`}
           role="button"
           onClick={(e) => {
-            // console.log(totalSelectedEmployees)
             e.stopPropagation();
           }}
         >
@@ -44,7 +43,7 @@ export const BatchNumberingBack: FunctionComponent = () => {
             employeePool.length === 0 ? "bg-sky-400 hover:bg-sky-600" : "bg-zinc-500"
           } rounded-md`}
           role="button"
-          onClick={() => console.log(employeePool)}
+          onClick={() => {}}
         >
           <div className="text-3xl text-white">{employeePool.length}</div>
           <div className="text-sm font-medium text-gray-100">Available</div>

@@ -20,7 +20,6 @@ async function createFile(files: File[]) {
     // setBucketStrings(tempIds);
     return Response.json({ Data: test });
   } catch (error) {
-    console.log("ERROR");
     return Response.json({ Error: "Route not working" });
   }
 }
@@ -36,7 +35,6 @@ async function createBucketFile(id: string, name: string) {
 
     return Response.json({ Data: data });
   } catch (error) {
-    console.log("ERROR");
     return Response.json({ Error: "Route not working" });
   }
 }

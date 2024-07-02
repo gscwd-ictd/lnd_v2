@@ -5,12 +5,16 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { isEmpty } from "lodash";
 import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
 import { HiRefresh } from "react-icons/hi";
-import { useViewNomineesContext } from "../ViewNomineeStatusModal";
 import { useState } from "react";
 
 export type Nominee = {
   name: string;
   nomineeId: string;
+  employeeId: string;
+};
+
+type Person = {
+  fullName: string;
   employeeId: string;
 };
 
@@ -20,12 +24,27 @@ export type Supervisor = {
   supervisorId: string;
 };
 
+export type EmployeeWithTag = Omit<Nominee, "nomineeId"> & { isTagged: boolean };
+
+export type EmployeeSelectProps = {
+  label: string;
+  value: EmployeeWithTag;
+};
+
 export const useViewNomineesStatusDataTable = () => {
-  const [auxModalIsOpen, setAuxModalIsOpen] = useState<boolean>(false);
+  const [viewAuxModalIsOpen, setViewAuxModalIsOpen] = useState<boolean>(false);
+  const [confirmAddTraineesAlertIsOpen, setConfirmAddAlertTraineesIsOpen] = useState<boolean>(false);
+  const [viewAdditionalTraineesModalIsOpen, setViewAdditionalTraineesModalIsOpen] = useState<boolean>(false);
   const [reason, setReason] = useState<string>("");
   const [nominee, setNominee] = useState<Nominee>({} as Nominee);
   const [standInTrainees, setStandInTrainees] = useState<Array<Nominee>>([]);
   const [supervisor, setSupervisor] = useState<Supervisor>({} as Supervisor);
+  const [supervisors, setSupervisors] = useState<Array<Person>>([]);
+  const [employees, setEmployees] = useState<Array<{ label: string; value: EmployeeWithTag }>>([]);
+  const [countEmployees, setCountEmployees] = useState<number>(0);
+  const [acceptedEmployees, setAcceptedEmployees] = useState<number>(0);
+  const [nominatedEmployees, setNominatedEmployees] = useState<number>(0);
+  const [declinedEmployees, setDeclinedEmployees] = useState<number>(0);
 
   const helper = createColumnHelper<EmployeeWithSupervisor>();
 
@@ -56,7 +75,7 @@ export const useViewNomineesStatusDataTable = () => {
           ) : (
             <div className=" w-full line-clamp-1">
               <Tooltip content={info.row.original.remarks!}>
-                <div className="w-full text-start hover:cursor-wait">{info.row.original.remarks}</div>
+                <div className="w-full text-start hover:cursor-context-menu">{info.row.original.remarks}</div>
               </Tooltip>
             </div>
           )}
@@ -68,11 +87,15 @@ export const useViewNomineesStatusDataTable = () => {
       header: "Action",
       cell: (info) => (
         <div className="flex w-full justify-center">
-          {info.row.original.status === "declined" && info.row.original.isReplacedBy === false ? (
+          {/* Accepted : {acceptedEmployees}
+          Counted : {countEmployees} */}
+          {info.row.original.status === "declined" &&
+          info.row.original.isReplacedBy === false &&
+          acceptedEmployees < countEmployees ? (
             <button
               className="border p-2 rounded flex justify-center w-full bg-gray-100 active:bg-gray-300 hover:bg-gray-200"
               onClick={() => {
-                setAuxModalIsOpen(true);
+                setViewAuxModalIsOpen(true);
                 setReason(info.row.original.remarks!);
                 setNominee({
                   employeeId: info.row.original.employeeId,
@@ -98,15 +121,31 @@ export const useViewNomineesStatusDataTable = () => {
 
   return {
     columns,
-    auxModalIsOpen,
+    viewAuxModalIsOpen,
     reason,
     nominee,
     supervisor,
     standInTrainees,
+    viewAdditionalTraineesModalIsOpen,
+    supervisors,
+    employees,
+    confirmAddTraineesAlertIsOpen,
+    acceptedEmployees,
+    countEmployees,
+    declinedEmployees,
+    nominatedEmployees,
+    setAcceptedEmployees,
+    setCountEmployees,
+    setDeclinedEmployees,
+    setNominatedEmployees,
+    setConfirmAddAlertTraineesIsOpen,
+    setEmployees,
+    setSupervisors,
+    setViewAdditionalTraineesModalIsOpen,
     setSupervisor,
     setNominee,
     setStandInTrainees,
-    setAuxModalIsOpen,
+    setViewAuxModalIsOpen,
     setReason,
   };
 };

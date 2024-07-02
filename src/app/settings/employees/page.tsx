@@ -1,22 +1,21 @@
 import { EmployeeTagsArrow } from "@lms/components/composables/employee-tags/EmployeeTagsArrow";
 import EmployeeWithTagsLeft from "@lms/components/composables/employee-tags/EmployeeWithTagsLeft";
 import EmployeeWithTagsList from "@lms/components/composables/employee-tags/EmployeeWithTagsList";
-import Link from "next/link";
+import { BreadCrumbs } from "@lms/components/osprey/ui/breadcrumbs/view/BreadCrumbs";
 
 export default function EmployeeTags() {
   return (
     <div className="h-full p-5">
       <div className="flex flex-col h-full">
         <div className="flex justify-between mb-3">
-          <div>Employees with Tags</div>
-          <div>
-            <ul className="flex items-center gap-1 text-sm">
-              <Link href="/trainings/on-going" className="text-gray-700">
-                Settings /
-              </Link>
-              <li className="text-gray-500">Employees with Tags</li>
-            </ul>
-          </div>
+          <div>Employees</div>
+          <BreadCrumbs
+            crumbs={[
+              { layerText: "Settings", path: "" },
+              { layerText: "Training Tags", path: "/settings/tags" },
+              { layerText: "Employees", path: "" },
+            ]}
+          />
         </div>
         <div className="flex sm:flex-col lg:flex-row  gap-3 h-full">
           <div className="flex sm:w-full lg:w-5/12">

@@ -30,6 +30,11 @@ export const useBenchmarkingDataTable = () => {
       header: "Title",
       cell: (info) => info.getValue(),
     }),
+
+    helper.accessor("description", {
+      header: "Description",
+      cell: (info) => info.getValue(),
+    }),
     helper.accessor("partner", {
       header: "Partner",
       cell: (info) => info.getValue(),

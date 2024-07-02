@@ -27,7 +27,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Spinner } from "../../../spinner/view/Spinner";
-import { HiExclamationCircle } from "react-icons/hi";
+import { HiExclamationCircle, HiInformationCircle } from "react-icons/hi";
 
 export type DataTableProps<T extends unknown> = {
   datasource: string;
@@ -82,8 +82,11 @@ export const ViewNomineesDataTable = <T extends unknown>({
     queryKey,
     queryFn: async () => {
       const { data } = await axios.get(datasource, { withCredentials });
+
       return data.nominees as T[];
     },
+    refetchOnMount: true,
+    retry: 3,
   });
 
   // const tblData = useMemo(() => data, [data]);
@@ -113,14 +116,16 @@ export const ViewNomineesDataTable = <T extends unknown>({
   if (error)
     return (
       <div className="w-full flex gap-2 justify-center items-center">
-        <HiExclamationCircle className="h-10 w-10 text-rose-600" />
-        <span>Cannot fetch table data.</span>
+        <HiExclamationCircle className="h-10 w-10 text-blue-400" />
+        <span>Error in fetching the table data.</span>
       </div>
     );
   if (isLoading)
     return (
-      <div className="flex justify-center w-full h-full overflow-hidden">
-        <Spinner borderSize={4} size="large" />
+      <div className="w-full h-full">
+        {/* <div className="flex justify-center w-full h-full overflow-hidden">
+          <Spinner borderSize={4} size="large" />
+        </div> */}
       </div>
     );
 
@@ -220,7 +225,9 @@ export const ViewNomineesDataTable = <T extends unknown>({
               <tr>
                 <td colSpan={columns.length} className="text-xs text-center">
                   <div className="py-5">
-                    <h3 className="text-xl font-semibold text-center text-gray-300 select-none">No data to display</h3>
+                    <h3 className="text-xl font-semibold text-center text-gray-300 select-none">
+                      No nominees at the moment
+                    </h3>
                   </div>
                 </td>
               </tr>

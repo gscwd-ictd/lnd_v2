@@ -2,14 +2,16 @@ import { Batch } from "@lms/utilities/stores/training-notice-store";
 import { TrainingNotice } from "@lms/utilities/types/training";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
+import { BatchWithEmployees } from "../../recent-data-table/RecentDataTable";
 
 export const useHistoryDataTable = () => {
   const helper = createColumnHelper<TrainingNotice>();
-  const [batches, setBatches] = useState<Batch[]>([
-    { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
-  ]);
+  // const [batches, setBatches] = useState<Batch[]>([
+  //   { batchNumber: 1, employees: [], trainingDate: { from: "", to: "" } },
+  // ]);
   const [hasFetchedBatches, setHasFetchedBatches] = useState<boolean>(false);
   const [viewSlideOverIsOpen, setViewSlideOverIsOpen] = useState<boolean>(false);
+  const [batchesWithEmployees, setBatchesWithEmployees] = useState<Array<BatchWithEmployees>>([]);
   const [id, setId] = useState<string>("");
 
   const columns = [
@@ -66,11 +68,11 @@ export const useHistoryDataTable = () => {
   return {
     columns,
     id,
-    batches,
     viewSlideOverIsOpen,
     hasFetchedBatches,
+    batchesWithEmployees,
+    setBatchesWithEmployees,
     setHasFetchedBatches,
-    setBatches,
     setViewSlideOverIsOpen,
     setId,
   };

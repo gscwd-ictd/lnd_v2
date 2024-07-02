@@ -309,7 +309,9 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
         } else setPage(6);
       } else if (page === 7) {
         // await insertInternalTraining();
-        await internalTrainingMutation.mutateAsync();
+        lspSource === "internal"
+          ? await internalTrainingMutation.mutateAsync()
+          : await externalTrainingMutation.mutateAsync();
       } else setPage(page + 1);
     }
     // external
@@ -330,8 +332,11 @@ export const AddNewTrainingNoticeModal: FunctionComponent = () => {
           setToastOptions("danger", "Error", "Enter number of participants first!");
         else setPage(5);
       } else if (page === 7) {
-        await externalTrainingMutation.mutateAsync();
+        // await externalTrainingMutation.mutateAsync();
         // await insertTrainingNoticeMutation.mutateAsync();
+        lspSource === "internal"
+          ? await internalTrainingMutation.mutateAsync()
+          : await externalTrainingMutation.mutateAsync();
       } else setPage(page + 1);
     }
   };

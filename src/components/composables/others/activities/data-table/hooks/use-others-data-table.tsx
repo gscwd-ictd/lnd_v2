@@ -1,6 +1,7 @@
 import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
 import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
 import { getOthersStatusBadgePill } from "@lms/utilities/functions/getOthersStatusBadgePill";
+import { getTrainingTypeBadgePill } from "@lms/utilities/functions/getTrainingTypeBadgePill";
 import { useDeleteOthersModalStore, useEditOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
 import { Others, OthersStatus } from "@lms/utilities/types/others";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -18,6 +19,10 @@ export const useOthersDataTable = () => {
   const columns = [
     helper.accessor("title", {
       header: "Title",
+      cell: (info) => info.getValue(),
+    }),
+    helper.accessor("description", {
+      header: "Description",
       cell: (info) => info.getValue(),
     }),
     helper.accessor("location", {
@@ -38,6 +43,11 @@ export const useOthersDataTable = () => {
     helper.accessor("category", {
       header: "Category",
       cell: (info) => getActivityCategoryBadgePill(info.getValue()),
+    }),
+
+    helper.accessor("type", {
+      header: "Type",
+      cell: (info) => getTrainingTypeBadgePill(info.getValue()),
     }),
 
     helper.accessor("status", {

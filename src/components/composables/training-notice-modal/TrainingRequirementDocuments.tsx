@@ -18,14 +18,13 @@ export type PostTrainingDocument = {
 };
 
 export const TrainingRequirementDocuments: FunctionComponent = () => {
-  // const setTrainingDocuments = useTrainingNoticeStore((state) => state.setTrainingDocuments);
   const initialTrainingRequirements = useTrainingNoticeStore((state) => state.initialTrainingRequirements);
   const setInitialTrainingRequirements = useTrainingNoticeStore((state) => state.setInitialTrainingRequirements);
   const setPage = useTrainingNoticeModalStore((state) => state.setPage);
   const trainingRequirements = useTrainingNoticeStore((state) => state.trainingRequirements);
   const setTrainingRequirements = useTrainingNoticeStore((state) => state.setTrainingRequirements);
-  const hasSetTrainingRequirements = useTrainingNoticeStore((state) => state.hasSetTrainingRequirements);
-  const setHasSetTrainingRequirements = useTrainingNoticeStore((state) => state.setHasSetTrainingRequirements);
+  const hasTrainingRequirements = useTrainingNoticeStore((state) => state.hasTrainingRequirements);
+  const setHasTrainingRequirements = useTrainingNoticeStore((state) => state.setHasTrainingRequirements);
 
   const schema = yup.object({
     trainingRequirements: yup
@@ -82,7 +81,7 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
   }, [trainingRequirements]);
 
   useEffect(() => {
-    if (trainingRequirements && hasSetTrainingRequirements === false) {
+    if (trainingRequirements && hasTrainingRequirements === false) {
       const tempTrainingRequirements = [...trainingRequirements];
       const newInitialTrainingRequirements = initialTrainingRequirements.map((ir: TrainingRequirement, index) => {
         tempTrainingRequirements.map((tr: TrainingRequirement) => {
@@ -95,7 +94,7 @@ export const TrainingRequirementDocuments: FunctionComponent = () => {
       });
 
       setInitialTrainingRequirements(newInitialTrainingRequirements);
-      setHasSetTrainingRequirements(true);
+      setHasTrainingRequirements(true);
     }
   }, [trainingRequirements]);
 
