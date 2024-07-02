@@ -44,6 +44,7 @@ export const UsersAddUserAlert: FunctionComponent = () => {
       setAddModalIsOpen(false);
     },
     mutationFn: async () => {
+      console.log(id);
       const request = axios.post(`${url}/hrms/lnd/users`, { employeeId: id });
       return request;
     },

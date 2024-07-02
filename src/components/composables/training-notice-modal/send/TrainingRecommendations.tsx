@@ -124,9 +124,6 @@ export const TrainingRecommendations = () => {
                           </div>
                         </Disclosure.Button>
 
-                        {/* <button className="px-2 py-1 bg-blue-300 rounded" onClick={() => console.log(data.slot)}>
-                      log
-                    </button> */}
                         <div className="p-2">
                           <div className="flex gap-1 text-lg text-indigo-700">
                             <span>{data.numberOfSlots}</span>

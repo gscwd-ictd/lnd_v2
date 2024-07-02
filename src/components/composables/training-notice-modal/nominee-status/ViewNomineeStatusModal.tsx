@@ -1,162 +1,316 @@
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { Recommendation, useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
-import { FunctionComponent, useContext, useEffect, useState } from "react";
-import { TrainingNoticeContext } from "../../training-notice-data-table/TrainingNoticeDataTable";
-import { EmployeeWithStatus, EmployeeWithSupervisor, TrainingNomineeStatus } from "@lms/utilities/types/training";
-import { useQuery } from "@tanstack/react-query";
+import { useTrainingNoticeStore } from "@lms/utilities/stores/training-notice-store";
+import { Dispatch, FunctionComponent, SetStateAction, createContext, useContext, useEffect, useState } from "react";
+import {
+  TrainingNoticeContext,
+  useTrainingNoticeToastOptions,
+} from "../../training-notice-data-table/TrainingNoticeDataTable";
+import { EmployeeWithSupervisor, TrainingNominationDetails, TrainingStatus } from "@lms/utilities/types/training";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
+import Select, { ActionMeta, MultiValue, SingleValue } from "react-select";
 import axios from "axios";
 import { url } from "@lms/utilities/url/api-url";
-import { Tooltip } from "@lms/components/osprey/ui/tooltip/view/Tooltip";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
+import { ViewNomineesDataTable } from "@lms/components/osprey/ui/local-table/data-table/view/ViewNomineesDataTable";
+import {
+  EmployeeSelectProps,
+  Nominee,
+  Supervisor,
+  useViewNomineesStatusDataTable,
+} from "./data-table/use-view-nominees-status-data-table";
+import { ViewNominationStatusModal } from "./ViewNominationStatusModal";
+import { HiCheckCircle, HiTag } from "react-icons/hi";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@lms/components/osprey/ui/overlays/alert-dialog/view/AlertDialog";
+import { RevolvingDot } from "react-loader-spinner";
 
-//todo REMOVE
-// const employeesWithSupervisor: EmployeeWithSupervisor[] = [
-//   {
-//     employeeId: "001",
-//     name: "Richard Vincent Narvaez",
-//     status: TrainingNomineeStatus.PENDING,
-//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
-//   },
-//   {
-//     employeeId: "002",
-//     name: "Hafez Benanben Saiyou",
-//     status: TrainingNomineeStatus.PENDING,
-//     supervisor: { supervisorId: "123", name: "Michael Gabales" },
-//   },
-//   {
-//     employeeId: "003",
-//     name: "Jan Freigseg Lared",
-//     status: TrainingNomineeStatus.DECLINED,
-//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-//   },
-//   {
-//     employeeId: "004",
-//     name: "Xavier Dale Dabuco",
-//     status: TrainingNomineeStatus.PENDING,
-//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-//   },
-//   {
-//     employeeId: "005",
-//     name: "Paul Ryner Uchiha",
-//     status: TrainingNomineeStatus.ACCEPTED,
-//     supervisor: { supervisorId: "234", name: "Ferdinand Ferrer" },
-//   },
-//   {
-//     employeeId: "006",
-//     name: "Joel Amoguis",
-//     status: TrainingNomineeStatus.DECLINED,
-//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
-//   },
-//   {
-//     employeeId: "007",
-//     name: "Mark Leandre Gamutin",
-//     status: TrainingNomineeStatus.ACCEPTED,
-//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
-//   },
-//   {
-//     employeeId: "008",
-//     name: "Ralph Mari Dayot",
-//     status: TrainingNomineeStatus.ACCEPTED,
-//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
-//   },
-//   {
-//     employeeId: "009",
-//     name: "Louise Mae Soledad",
-//     status: TrainingNomineeStatus.PENDING,
-//     supervisor: { supervisorId: "345", name: "Anjo Turija" },
-//   },
-// ];
+type SelectProp = {
+  value: string;
+  label: string;
+};
+
+type ViewNomineeState = {
+  selectedStandInTrainee: SelectProp;
+  setSelectedStandInTrainee: (selectedStandInTrainee: SelectProp) => void;
+  viewDistributionModalIsOpen: boolean;
+  setViewDistributionModalIsOpen: Dispatch<SetStateAction<boolean>>;
+  nominationDetails: Array<TrainingNominationDetails>;
+  setNominationDetails: Dispatch<SetStateAction<Array<TrainingNominationDetails>>>;
+};
+
+const ViewNomineesContext = createContext<ViewNomineeState>({} as ViewNomineeState);
 
 export const ViewNomineeStatusModal: FunctionComponent = () => {
   const setTrainingId = useTrainingNoticeStore((state) => state.setId);
-  const [countEmployees, setCountEmployees] = useState<number>(0);
-  const [acceptedEmployees, setAcceptedEmployees] = useState<EmployeeWithStatus[]>([]);
-  const [nominatedEmployees, setNominatedEmployees] = useState<EmployeeWithStatus[]>([]);
-  const [declinedEmployees, setDeclinedEmployees] = useState<EmployeeWithStatus[]>([]);
-  const { id, nomineeStatusIsOpen, setNomineeStatusIsOpen, employeesWithStatus, setEmployeesWithStatus } =
-    useContext(TrainingNoticeContext);
-  const [countIsDone, setCountIsDone] = useState<boolean>(false);
+
+  const [availableSlots, setAvailableSlots] = useState<number>(0);
+  const [initialAvailableSlots, setInitialAvailableSlots] = useState<number>(0);
+  const [totalSlots, setTotalSlots] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
+  const [nominationDetails, setNominationDetails] = useState<Array<TrainingNominationDetails>>([]);
+  const [viewDistributionModalIsOpen, setViewDistributionModalIsOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+
+  const [selectedStandInTrainee, setSelectedStandInTrainee] = useState<SelectProp>({} as SelectProp);
+  const [selectedSupervisor, setSelectedSupervisor] = useState<SelectProp>({} as SelectProp);
+  const [selectedEmployees, setSelectedEmployees] = useState<Array<EmployeeSelectProps>>([]);
+
+  const {
+    columns,
+    standInTrainees,
+    reason,
+    nominee,
+    supervisor,
+    supervisors,
+    viewAuxModalIsOpen,
+    confirmAddTraineesAlertIsOpen,
+    viewAdditionalTraineesModalIsOpen,
+    employees,
+    acceptedEmployees,
+    countEmployees,
+    declinedEmployees,
+    nominatedEmployees,
+    setAcceptedEmployees,
+    setCountEmployees,
+    setDeclinedEmployees,
+    setNominatedEmployees,
+    setEmployees,
+    setSupervisors,
+    setViewAdditionalTraineesModalIsOpen,
+    setConfirmAddAlertTraineesIsOpen,
+    setViewAuxModalIsOpen,
+    setReason,
+    setSupervisor,
+    setStandInTrainees,
+    setNominee,
+  } = useViewNomineesStatusDataTable();
+
+  const { id, nomineeStatusIsOpen, setNomineeStatusIsOpen, setEmployeesWithStatus } = useContext(TrainingNoticeContext);
   const trainingId = useTrainingNoticeStore((state) => state.id);
+  const status = useTrainingNoticeStore((state) => state.status);
+  const setStatus = useTrainingNoticeStore((state) => state.setStatus);
+
+  const { setToastOptions } = useTrainingNoticeToastOptions();
 
   // per training notice query
-  const { isLoading, isFetching, data } = useQuery({
+  const {
+    isLoading,
+    isFetching,
+    data: trainingData,
+  } = useQuery({
     queryKey: ["training-nominees", trainingId],
-    enabled: !!trainingId && nomineeStatusIsOpen !== false,
+    enabled: nomineeStatusIsOpen !== false,
     staleTime: 2,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    retryOnMount: false,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+
     queryFn: async () => {
-      try {
-        const { data } = (await axios.get(`${url}/training/${id}/nominees`)) as any;
-        if (data.length > 0) {
-          let tempCountEmployees = 0;
-          let newAcceptedEmployees = [...acceptedEmployees];
-          let newDeclinedEmployees = [...declinedEmployees];
-          let newNominatedEmployees = [...nominatedEmployees];
-          data
-            .map((employee: EmployeeWithSupervisor) => {
-              tempCountEmployees += 1;
-              if (employee.status === TrainingNomineeStatus.ACCEPTED) {
-                newAcceptedEmployees.push(employee);
-              } else if (employee.status === TrainingNomineeStatus.DECLINED) {
-                newDeclinedEmployees.push(employee);
-              } else if (employee.status === TrainingNomineeStatus.PENDING) {
-                newNominatedEmployees.push(employee);
-              }
-
-              return employee;
-            })
-            .sort((a: EmployeeWithSupervisor, b: EmployeeWithSupervisor) =>
-              a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
-            );
-          setEmployeesWithStatus(data);
-          setAcceptedEmployees(newAcceptedEmployees);
-          setDeclinedEmployees(newDeclinedEmployees);
-          setNominatedEmployees(newNominatedEmployees);
-          setCountEmployees(tempCountEmployees);
-          //  setCountIsDone(true);
-        }
-
-        return data;
-      } catch (error) {
-        return error;
-      }
+      const { data } = await axios.get(`${url}/training/${id}/nominees`);
+      return data;
+    },
+    onSuccess: (data) => {
+      setEmployeesWithStatus(
+        data.nominees.sort((a: EmployeeWithSupervisor, b: EmployeeWithSupervisor) =>
+          a.name! > b.name! ? -1 : a.name! < b.name! ? 1 : -1
+        )
+      );
+      setAcceptedEmployees(data.countStatus.accepted);
+      setDeclinedEmployees(data.countStatus.declined);
+      setNominatedEmployees(data.countStatus.pending);
+      setCountEmployees(data.numberOfParticipants);
     },
   });
 
-  // useEffect(() => {
-  //   if (employeesWithStatus.length > 0 && countIsDone === false) {
-  //     let tempCountEmployees = 0;
-  //     let newAcceptedEmployees = [...acceptedEmployees];
-  //     let newDeclinedEmployees = [...declinedEmployees];
-  //     let newNominatedEmployees = [...nominatedEmployees];
-  //     employeesWithStatus
-  //       .map((employee) => {
-  //         tempCountEmployees += 1;
-  //         if (employee.status === TrainingNomineeStatus.ACCEPTED) {
-  //           newAcceptedEmployees.push(employee);
-  //         } else if (employee.status === TrainingNomineeStatus.DECLINED) {
-  //           newDeclinedEmployees.push(employee);
-  //         } else if (employee.status === TrainingNomineeStatus.PENDING) {
-  //           newNominatedEmployees.push(employee);
-  //         }
+  // get training status
+  useQuery({
+    queryKey: ["training-details", trainingId],
+    enabled: nomineeStatusIsOpen !== false,
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/training/${id}`);
+      return data;
+    },
+    onSuccess: (data) => {
+      setStatus(data.status);
+    },
+  });
 
-  //         return employee;
-  //       })
-  //       .sort((a, b) =>
-  //         a.supervisor.name! > b.supervisor.name! ? -1 : a.supervisor.name! < b.supervisor.name! ? 1 : -1
-  //       );
+  // find stand in nominees by distribution id
+  useQuery({
+    enabled: !!viewAuxModalIsOpen && !!supervisor.distributionId,
+    queryKey: ["standin-nominees", supervisor.distributionId],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/training/distributions/${supervisor.distributionId}/standin`);
+      return data;
+    },
+    onSuccess: (data) => {
+      setTotalSlots(data.slots);
+      setInitialAvailableSlots(data.availableSlots);
+      setAvailableSlots(data.availableSlots);
+      setStandInTrainees(data.standin);
+    },
+    onError: () => {
+      setTotalSlots(0);
+      setAvailableSlots(0);
+      setInitialAvailableSlots(0);
+      setStandInTrainees([]);
+    },
+  });
 
-  //     setAcceptedEmployees(newAcceptedEmployees);
-  //     setDeclinedEmployees(newDeclinedEmployees);
-  //     setNominatedEmployees(newNominatedEmployees);
-  //     setCountEmployees(tempCountEmployees);
-  //     setCountIsDone(true);
-  //   }
-  // }, [employeesWithStatus, countIsDone]);
+  // find supervisors under training
+  useQuery({
+    refetchOnWindowFocus: false,
+    enabled: !!viewAdditionalTraineesModalIsOpen && !!trainingId,
+    queryKey: ["training-supervisors", trainingId],
+    queryFn: async () => {
+      const { data } = await axios.get(`${url}/training/${trainingId}/distributions/supervisors`);
+      return data;
+    },
+    onSuccess: async (data) => {
+      setSupervisors(data.supervisors);
+      setAvailableSlots(data.availableSlot);
+      setInitialAvailableSlots(data.availableSlot);
+    },
+    onError: () => {
+      setSupervisors([]);
+    },
+  });
+
+  // find employees under supervisor for a specific training
+  useQuery({
+    enabled: !!viewAdditionalTraineesModalIsOpen && !!selectedSupervisor.value,
+    queryKey: ["training-employees", trainingId, selectedSupervisor.value],
+    queryFn: async () => {
+      const { data } = await axios.get(
+        `${url}/training/${trainingId}/distributions/supervisors/${selectedSupervisor.value}`
+      );
+      return data;
+    },
+    onSuccess: (data) => {
+      setEmployees(data);
+    },
+    onError: () => setEmployees([]),
+  });
+
+  // submit stand in
+  const standInMutation = useMutation({
+    mutationFn: async () => {
+      const newNomineeFromStandin = await axios.post(
+        `${url}/training/distributions/standin`,
+        {
+          nomineeId: nominee.nomineeId,
+          standinId: selectedStandInTrainee.value,
+        },
+        { withCredentials: true }
+      );
+
+      return newNomineeFromStandin;
+    },
+    onSuccess: async () => {
+      setToastOptions("success", "Success", "You have swapped an auxiliary to a nominee.");
+
+      // fetch the updated table of nominees per training
+      const getUpdatedViewNominees = await axios.get(`${url}/training/${trainingId}/nominees`);
+      setAcceptedEmployees(getUpdatedViewNominees.data.countStatus.accepted);
+      setDeclinedEmployees(getUpdatedViewNominees.data.countStatus.declined);
+      setNominatedEmployees(getUpdatedViewNominees.data.countStatus.pending);
+      setCountEmployees(getUpdatedViewNominees.data.numberOfParticipants);
+      queryClient.setQueryData(["training-nominees", trainingId], getUpdatedViewNominees.data.nominees);
+      queryClient.setQueryData(["view-training-nominees-table", trainingId], getUpdatedViewNominees.data.nominees);
+
+      const getUpdatedStandinNominees = await axios.get(
+        `${url}/training/distributions/${supervisor.distributionId}/standin`
+      );
+      // queryClient.setQueryData(['standin-nominees',supervisor.distributionId],getUpdatedStandinNominees.data)
+      setStandInTrainees(getUpdatedStandinNominees.data.standin);
+      setSelectedStandInTrainee({ label: "", value: "" });
+      setLoading(true);
+
+      setViewAuxModalIsOpen(false);
+    },
+    onError: () => {
+      setToastOptions("danger", "Error", "Something went wrong. Please try again in a few seconds.");
+    },
+  });
+
+  // submit additional trainees mutation
+  const addtlTraineesMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await axios.post(`${url}/training/additional-trainees`, {
+        trainingId,
+        supervisorId: selectedSupervisor.value,
+        employees: selectedEmployees.map((employee) => {
+          return { employeeId: employee.value.employeeId };
+        }),
+      });
+
+      return data;
+    },
+    onSuccess: async () => {
+      // get and set new data table details
+      const getUpdatedTrainingNomineeDetails = await axios.get(`${url}/training/${trainingId}/nominees`);
+      queryClient.setQueryData(["training-nominees", trainingId], getUpdatedTrainingNomineeDetails.data.nominees);
+      queryClient.setQueryData(
+        ["view-training-nominees-table", trainingId],
+        getUpdatedTrainingNomineeDetails.data.nominees
+      );
+
+      setEmployeesWithStatus(
+        getUpdatedTrainingNomineeDetails.data.nominees.sort((a: EmployeeWithSupervisor, b: EmployeeWithSupervisor) =>
+          a.name! > b.name! ? -1 : a.name! < b.name! ? 1 : -1
+        )
+      );
+      setAcceptedEmployees(getUpdatedTrainingNomineeDetails.data.countStatus.accepted);
+      setDeclinedEmployees(getUpdatedTrainingNomineeDetails.data.countStatus.declined);
+      setNominatedEmployees(getUpdatedTrainingNomineeDetails.data.countStatus.pending);
+      setCountEmployees(getUpdatedTrainingNomineeDetails.data.numberOfParticipants);
+
+      // close modal
+      setConfirmAddAlertTraineesIsOpen(false);
+      setViewAdditionalTraineesModalIsOpen(false);
+      setSelectedSupervisor({ label: "", value: "" });
+      setSelectedEmployees([]);
+      setToastOptions("success", "Success", "You have added new trainees for this training");
+    },
+    onError: () => {
+      setConfirmAddAlertTraineesIsOpen(false);
+      setToastOptions("danger", "Error", "Something went wrong. Please try again in a few seconds");
+    },
+  });
+
+  // on change employees
+  const onChangeEmployees = (value: MultiValue<EmployeeSelectProps>, actionTypes: ActionMeta<EmployeeSelectProps>) => {
+    setSelectedEmployees(
+      value.map((employee) => {
+        return { value: employee.value, label: employee.label };
+      })
+    );
+    if (actionTypes.action === "remove-value") setAvailableSlots((currentSlots) => currentSlots + 1);
+    else if (actionTypes.action === "select-option") setAvailableSlots((currentSlots) => currentSlots - 1);
+
+    if (actionTypes.action === "clear") {
+      setSelectedEmployees([]);
+      setAvailableSlots(initialAvailableSlots);
+    }
+  };
+
+  // on change supervisor
+  const onChangeSupervisor = (value: SingleValue<SelectProp>, actionTypes: ActionMeta<SelectProp>) => {
+    setSelectedSupervisor({ label: value?.label!, value: value?.value! });
+    setLoading(true);
+    if (actionTypes.action === "select-option") setSelectedEmployees([]);
+    if (actionTypes.action === "clear") {
+      setSelectedEmployees([]);
+      setSelectedSupervisor({ label: "", value: "" });
+    }
+    setAvailableSlots(initialAvailableSlots);
+  };
 
   // set the training notice id only on one instance upon opening the modal
   useEffect(() => {
@@ -165,43 +319,72 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
     }
   }, [id, trainingId]);
 
+  useEffect(() => {
+    if (loading) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
+    }
+  }, [loading]);
+
   return (
     <>
-      <Modal
-        isOpen={nomineeStatusIsOpen}
-        setIsOpen={setNomineeStatusIsOpen}
-        size="2md"
-        animate={false}
-        isStatic
-        onClose={() => {
-          setTrainingId(null);
-          setEmployeesWithStatus([]);
-          setCountIsDone(false);
-          setNomineeStatusIsOpen(false);
-          setAcceptedEmployees([]);
-          setDeclinedEmployees([]);
-          setNominatedEmployees([]);
+      <ViewNomineesContext.Provider
+        value={{
+          selectedStandInTrainee,
+          viewDistributionModalIsOpen,
+          nominationDetails,
+          setNominationDetails,
+          setViewDistributionModalIsOpen,
+
+          setSelectedStandInTrainee,
         }}
       >
-        <ModalContent>
-          <ModalContent.Title>
-            <header className="pl-2">
-              {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
-              <div className="flex items-start gap-2">
-                <h3 className="text-lg font-semibold text-gray-600">Training Nominee Status</h3>
-              </div>
-              <p className="text-sm text-gray-400">Details are as follows</p>
-            </header>
-          </ModalContent.Title>
+        {/* View Nominee Status Modal */}
+        <Modal
+          isOpen={nomineeStatusIsOpen}
+          setIsOpen={setNomineeStatusIsOpen}
+          size="lg"
+          animate={false}
+          isStatic
+          onClose={() => {
+            setTrainingId(null);
+            setEmployeesWithStatus([]);
+            setNomineeStatusIsOpen(false);
+            setAcceptedEmployees(0);
+            setDeclinedEmployees(0);
+            setNominatedEmployees(0);
+          }}
+        >
+          <ModalContent>
+            <ModalContent.Title>
+              <header className="pl-2">
+                {/* <p className="text-xs font-medium text-indigo-500">test</p> */}
+                <div className="flex items-start gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900">Training Nominee Status</h3>
+                </div>
+                {/* <p className="text-sm text-gray-400">Details are as follows</p> */}
+                <div className="flex flex-col gap-2">
+                  <div className="text-sm text-gray-500 font-medium text-md">
+                    <span className="text-gray-700 font-semibold">{acceptedEmployees}</span> out of{" "}
+                    <span className="text-gray-700 font-semibold">{countEmployees}</span> accepted
+                  </div>
+                </div>
+              </header>
+            </ModalContent.Title>
 
-          <ModalContent.Body>
-            {isLoading || isFetching ? (
-              <div className="flex justify-center w-full h-full overflow-hidden">
-                <Spinner size="large" borderSize={2} />
-              </div>
-            ) : (
-              <main className="px-2 space-y-4">
-                <div className="flex items-end justify-between">
+            <ModalContent.Body>
+              <main className="px-2 relative min-h-[28rem]">
+                {(isLoading || isFetching) && !loading ? (
+                  <div className="flex justify-center w-full h-full items-center overflow-hidden absolute bg-gray-100 opacity-50">
+                    <div className="flex flex-col justify-center gap-2">
+                      <Spinner size="large" borderSize={4} />
+                      <span className="text-lg font-medium">Loading . . . </span>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="flex items-end justify-between static ">
                   <div className="flex flex-col border-4 border-dashed border-zinc-200 bg-zinc-50  w-[12rem] py-2 px-4 rounded">
                     <div className="flex items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -212,7 +395,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                           className=" fill-green-500"
                         />
                       </svg>
-                      <span className="text-sm text-gray-700 uppercase">{acceptedEmployees.length} accepted</span>
+                      <span className="text-sm text-gray-700 uppercase">{acceptedEmployees} accepted</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -223,7 +406,7 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                           className=" fill-gray-500"
                         />
                       </svg>
-                      <span className="text-sm text-gray-700 uppercase">{nominatedEmployees.length} pending</span>
+                      <span className="text-sm text-gray-700 uppercase">{nominatedEmployees} pending</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -234,98 +417,444 @@ export const ViewNomineeStatusModal: FunctionComponent = () => {
                           className=" fill-red-500"
                         />
                       </svg>
-                      <span className="text-sm text-gray-700 uppercase">{declinedEmployees.length} declined</span>
+                      <span className="text-sm text-gray-700 uppercase">{declinedEmployees} declined</span>
                     </div>
                   </div>
+                  {acceptedEmployees !== countEmployees &&
+                    nominatedEmployees === 0 &&
+                    declinedEmployees >= 1 &&
+                    status === TrainingStatus.ON_GOING_NOMINATION && (
+                      <Button variant="soft" size="small" onClick={() => setViewAdditionalTraineesModalIsOpen(true)}>
+                        Additional Trainees
+                      </Button>
+                    )}
+                </div>
+                <div className="rounded border mt-4">
+                  <ViewNomineesDataTable
+                    columns={columns}
+                    datasource={`${url}/training/${id}/nominees`}
+                    queryKey={["view-training-nominees-table", id!]}
+                  />
+                  {/* <RevolvingDot /> */}
+                </div>
+              </main>
+            </ModalContent.Body>
 
-                  <div className="text-sm text-gray-700">
-                    <span className="font-medium text-md ">
-                      {acceptedEmployees.length} out of {countEmployees} accepted
-                    </span>
+            <ModalContent.Footer>
+              <div className="px-2 pt-2 pb-3">
+                <div className="flex items-center justify-between w-full gap-2">
+                  <Button
+                    size="default"
+                    variant="soft"
+                    onClick={() => {
+                      // setNomineeStatusIsOpen(false);
+                      // setTrainingId(null);
+                      // setEmployeesWithStatus([]);
+                      // setAcceptedEmployees(0);
+                      // setDeclinedEmployees(0);
+                      // setNominatedEmployees(0);
+                      setViewDistributionModalIsOpen(true);
+                    }}
+                  >
+                    Slot Distribution Status
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="white"
+                    onClick={() => {
+                      setNomineeStatusIsOpen(false);
+                      setTrainingId(null);
+                      setEmployeesWithStatus([]);
+                      setAcceptedEmployees(0);
+                      setDeclinedEmployees(0);
+                      setNominatedEmployees(0);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </ModalContent.Footer>
+          </ModalContent>
+        </Modal>
+
+        {/* View Auxiliary Modal */}
+        <Modal
+          isOpen={viewAuxModalIsOpen}
+          setIsOpen={setViewAuxModalIsOpen}
+          size="2md"
+          center
+          isStatic={true}
+          withCloseBtn={true}
+          onClose={() => {
+            setReason("");
+            setNominee({} as Nominee);
+            setSupervisor({} as Supervisor);
+            setSelectedStandInTrainee({ label: "", value: "" } as SelectProp);
+          }}
+        >
+          <ModalContent>
+            <ModalContent.Title>
+              <header>
+                <h3 className="px-2 py-2 font-semibold text-xl ">Swap to an auxiliary trainee</h3>
+              </header>
+            </ModalContent.Title>
+            <ModalContent.Body>
+              <main className="px-2 py-2 h-[30rem]">
+                {/* <div>{reason}</div> */}
+                <div className="text-justify ">
+                  <span className="font-semibold">{nominee.name}</span> declined this training with the reason:
+                  {"\t"}
+                  <span className="text-gray-600">❝ {reason} ❞</span>
+                </div>
+
+                <div className="pt-5 pb-2">
+                  Pick an auxiliary trainee under <span className=" font-semibold">{supervisor.name}</span>
+                </div>
+
+                <div className="flex w-full gap-2">
+                  <div className="flex-1">
+                    <Select
+                      id="customReactSelectTags"
+                      className="basic-multi-select"
+                      classNamePrefix="select2-selection"
+                      value={selectedStandInTrainee}
+                      onChange={(nominee) => {
+                        setSelectedStandInTrainee({ label: nominee?.label!, value: nominee?.value! });
+                        setAvailableSlots(initialAvailableSlots - 1);
+                      }}
+                      closeMenuOnSelect={false}
+                      options={standInTrainees.map((nominee) => {
+                        return { value: nominee.nomineeId, label: nominee.name };
+                      })}
+                    />
                   </div>
                 </div>
 
-                <div className="relative overflow-x-auto rounded-lg shadow-md">
-                  <table className="w-full text-left table-fixed">
-                    <thead className="text-white rounded-t bg-sky-600">
-                      <tr>
-                        <th className="p-2 font-medium border">Employee Name</th>
-                        <th className="p-2 font-medium border">Supervisor</th>
-                        <th className="p-2 font-medium text-center border">Status</th>
-                        <th className="p-2 font-medium text-center border">Remarks</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {employeesWithStatus.length > 0 &&
-                        employeesWithStatus.map((employee) => {
-                          return (
-                            <tr className="even:bg-inherit odd:bg-zinc-50" key={employee.employeeId}>
-                              <td className="p-2 text-sm font-light border ">{employee.name}</td>
-                              <td className="p-2 text-sm font-light border ">{employee.supervisor.name}</td>
-                              <td className="p-2 text-sm font-light border ">{BadgePill(employee.status!)}</td>
-                              <td className="p-2 text-sm font-light text-center border ">
-                                {employee.remarks ? (
-                                  <Tooltip content={employee.remarks}>
-                                    <div className="text-left truncate hover:cursor-zoom-in">{employee.remarks}</div>
-                                  </Tooltip>
-                                ) : (
-                                  <span className="text-center">-</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
+                <div className="pt-2">
+                  <div className="flex flex-col border rounded px-3 py-2 border-gray-300">
+                    {/* <div className="text-sm text-gray-600">
+                      Total Assigned Slots: <span className="text-gray-800 font-medium">{totalSlots}</span>
+                    </div> */}
+                    <div className="text-sm text-gray-600">
+                      Remaining Available Slots after submission:{" "}
+                      <span className="text-gray-800 font-medium">{availableSlots}</span>
+                    </div>
+                  </div>
                 </div>
               </main>
-            )}
-          </ModalContent.Body>
+            </ModalContent.Body>
+            <ModalContent.Footer>
+              <footer>
+                <div className="flex w-full justify-end px-1 py-2">
+                  <button
+                    className="w-[5rem] bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white rounded px-3 py-2 text-sm"
+                    onClick={() => standInMutation.mutateAsync()}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </footer>
+            </ModalContent.Footer>
+          </ModalContent>
+        </Modal>
 
-          <ModalContent.Footer>
-            <div className="px-2 pt-2 pb-3">
-              <div className="flex items-center justify-end w-full gap-2">
-                <Button
-                  size="small"
-                  variant="white"
-                  onClick={() => {
-                    setNomineeStatusIsOpen(false);
-                    setTrainingId(null);
-                    setEmployeesWithStatus([]);
-                    setCountIsDone(false);
-                    setAcceptedEmployees([]);
-                    setDeclinedEmployees([]);
-                    setNominatedEmployees([]);
-                  }}
-                >
-                  Close
-                </Button>
-              </div>
+        {/* View Additional Trainees Modal */}
+        <Modal
+          isOpen={viewAdditionalTraineesModalIsOpen}
+          setIsOpen={setViewAdditionalTraineesModalIsOpen}
+          size="3md"
+          isStatic
+          onClose={() => {
+            setSelectedSupervisor({ label: "", value: "" });
+            setViewAdditionalTraineesModalIsOpen(false);
+            setAvailableSlots(0);
+            setInitialAvailableSlots(0);
+            setSelectedEmployees([]);
+          }}
+        >
+          <ModalContent>
+            <ModalContent.Title>
+              <header className="px-2 py-2 ">
+                <h3 className="font-semibold text-xl ">Additional Trainees</h3>
+                <div className="text-gray-700 text-sm">Remaining available slots: {availableSlots}</div>
+              </header>
+            </ModalContent.Title>
+
+            <ModalContent.Body>
+              <main className="px-2 sm:h-full overflow-hidden lg:min-h-[34rem]">
+                {/* <Button onClick={() => setSelectedSupervisor({ label: "", value: "" })}>CLEAR</Button> */}
+                {/* Search */}
+
+                <div className="flex h-[4rem] w-full px-7">
+                  {/* FIRST */}
+                  {isEmpty(selectedSupervisor.value) ? (
+                    <div className="w-[30%] h-full border-blue-800 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <section className="w-8 h-8 bg-blue-800 rounded-full flex text-indigo-200 shrink-0 items-center justify-center text-xs font-medium">
+                          1
+                        </section>
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Supervisor</span>
+                          <span className="text-gray-700 text-xs">Select one</span>
+                        </section>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-[30%] h-full border-blue-800 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <HiCheckCircle className="w-10 h-10 text-emerald-600" />
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Supervisor</span>
+                          <span className="text-gray-700 text-xs">Done</span>
+                        </section>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* FIRST CONNECTING STEM */}
+                  {!isEmpty(selectedSupervisor.value) ? (
+                    <div className="w-[5%] h-full flex flex-col">
+                      <div className="w-full h-full border-b border-blue-800 text-transparent">.</div>
+                      <div className="w-full h-full border-t border-blue-800 text-transparent">.</div>
+                    </div>
+                  ) : (
+                    <div className="w-[5%] h-full flex flex-col">
+                      <div className="w-full h-full border-b border-slate-300 text-transparent">.</div>
+                      <div className="w-full h-full border-t border-slate-300 text-transparent">.</div>
+                    </div>
+                  )}
+
+                  {/* SECOND */}
+                  {isEmpty(selectedSupervisor.value) && isEmpty(selectedEmployees) ? (
+                    <div className="w-[30%] h-full border-slate-300 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <section className="w-8 h-8 bg-slate-300 rounded-full flex text-gray-700 shrink-0 items-center justify-center text-xs font-medium">
+                          2
+                        </section>
+
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Employees</span>
+                          <span className="text-gray-700 text-xs">Select one or many</span>
+                        </section>
+                      </div>
+                    </div>
+                  ) : !isEmpty(selectedSupervisor.value) && isEmpty(selectedEmployees) ? (
+                    <div className="w-[30%] h-full border-blue-800 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <section className="w-8 h-8 bg-blue-800 rounded-full flex text-indigo-300 shrink-0 items-center justify-center text-xs font-medium">
+                          2
+                        </section>
+
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Employees</span>
+                          <span className="text-gray-700 text-xs">Select one or many</span>
+                        </section>
+                      </div>
+                    </div>
+                  ) : !isEmpty(selectedSupervisor.value) && !isEmpty(selectedEmployees) ? (
+                    <div className="w-[30%] h-full border-blue-800 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <HiCheckCircle className="w-10 h-10 text-emerald-600" />
+
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Employees</span>
+                          <span className="text-gray-700 text-xs">Done</span>
+                        </section>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* SECOND CONNECTING STEM */}
+                  {!isEmpty(selectedEmployees) ? (
+                    <div className="w-[5%] h-full flex flex-col">
+                      <div className="w-full h-full border-b border-blue-800 text-transparent">.</div>
+                      <div className="w-full h-full border-t border-blue-800 text-transparent">.</div>
+                    </div>
+                  ) : (
+                    <div className="w-[5%] h-full flex flex-col">
+                      <div className="w-full h-full border-b border-slate-300 text-transparent">.</div>
+                      <div className="w-full h-full border-t border-slate-300 text-transparent">.</div>
+                    </div>
+                  )}
+
+                  {/* THIRD */}
+                  {!isEmpty(selectedSupervisor.value) && !isEmpty(selectedEmployees) ? (
+                    <div className="w-[30%] h-full border-blue-800 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <section className="w-8 h-8 bg-emerald-600 rounded-full animate-pulse flex text-gray-200 shrink-0 items-center justify-center text-xs font-medium">
+                          3
+                        </section>
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Submit</span>
+                          <span className="text-gray-700 text-xs">Click the button</span>
+                        </section>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-[30%] h-full border-slate-300 border-2 rounded-xl p-2">
+                      <div className="flex gap-2 items-center h-full justify-center ">
+                        <section className="w-8 h-8 bg-gray-200 rounded-full flex text-gray-700 shrink-0 items-center justify-center text-xs font-medium">
+                          3
+                        </section>
+                        <section className="flex flex-col">
+                          <span className="font-medium text-sm">Submit</span>
+                          <span className="text-gray-700 text-xs">Finish steps 1 and 2</span>
+                        </section>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex w-full items-center pt-10 h-full pr-7">
+                  <div className="flex flex-col gap-8 w-full h-full">
+                    <div className="flex gap-6 items-center w-full">
+                      {/* <div className="w-10 h-10 bg-indigo-700 rounded-full flex text-indigo-200 shrink-0 items-center justify-center text-xs font-medium">
+                        1
+                      </div> */}
+                      <span className="text-xs w-[6px]">1</span>
+
+                      <div className="flex w-full flex-col gap-0">
+                        <div className="flex-1">
+                          <Select
+                            id="customReactSelectSupervisor"
+                            className="basic-multi-select"
+                            classNamePrefix="select2-selection"
+                            placeholder="Select a supervisor"
+                            isClearable
+                            // value={selectedSupervisor}
+                            onChange={onChangeSupervisor}
+                            isMulti={false}
+                            closeMenuOnSelect={true}
+                            options={supervisors.map((supervisor) => {
+                              return { value: supervisor.employeeId, label: supervisor.fullName };
+                            })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SELECT EMPLOYEES */}
+                    <div className="flex gap-6 items-center w-full">
+                      <span className="text-xs w-[6px]"> 2</span>
+                      <div className="flex w-full gap-0 flex-col">
+                        <div className="flex-1">
+                          <Select
+                            id="customReactSelectEmployees"
+                            className="basic-multi-select"
+                            classNamePrefix="select2-selection"
+                            placeholder="Select employees..."
+                            value={selectedEmployees}
+                            isDisabled={isEmpty(selectedSupervisor.value) ? true : false}
+                            isOptionDisabled={() => {
+                              if (availableSlots < 1) return true;
+                              else return false;
+                            }}
+                            onChange={onChangeEmployees}
+                            formatOptionLabel={(custom) => {
+                              return (
+                                <div className="flex gap-2 items-center">
+                                  {custom.label} {custom.value.isTagged ? <HiTag className="text-blue-600" /> : null}
+                                </div>
+                              );
+                            }}
+                            isMulti
+                            closeMenuOnSelect={false}
+                            options={employees}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SUBMISSION BUTTON */}
+                    <div className="flex w-full mt-0 items-center gap-6">
+                      <span className="text-xs w-[6px]">3</span>
+                      <Button
+                        variant={isEmpty(selectedSupervisor.value) || isEmpty(selectedEmployees) ? "white" : "soft"}
+                        disabled={isEmpty(selectedSupervisor.value) || isEmpty(selectedEmployees) ? true : false}
+                        size="small"
+                        className={`${
+                          isEmpty(selectedSupervisor.value) || (isEmpty(selectedEmployees) && "cursor-not-allowed")
+                        } min-w-[8rem] h-[3rem] flex-1 shrink-0`}
+                        onClick={() => setConfirmAddAlertTraineesIsOpen(true)}
+                      >
+                        Submit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </ModalContent.Body>
+            <ModalContent.Footer>
+              <footer>
+                <div className="flex w-full justify-end px-1 py-2 gap-2">
+                  <Button
+                    variant="white"
+                    onClick={() => {
+                      setSelectedSupervisor({ label: "", value: "" });
+                      setSelectedEmployees([]);
+                      setViewAdditionalTraineesModalIsOpen(false);
+                      setAvailableSlots(0);
+                      setInitialAvailableSlots(0);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </footer>
+            </ModalContent.Footer>
+          </ModalContent>
+        </Modal>
+
+        {/* View Nomination Status Modal */}
+        <ViewNominationStatusModal />
+
+        {/* Alert Confirmation Modal */}
+        <AlertDialog open={confirmAddTraineesAlertIsOpen} onOpenChange={setConfirmAddAlertTraineesIsOpen}>
+          <AlertDialogContent>
+            <AlertDialogTitle>
+              <div className="text-lg font-semibold text-gray-600">Confirm Additional Trainees</div>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <label className="text-sm font-medium text-gray-700">
+                Are you sure you want to add the selected trainees to this training?
+              </label>
+            </AlertDialogDescription>
+            <div className="flex justify-end mt-4 space-x-2">
+              <Button variant="white" onClick={() => setConfirmAddAlertTraineesIsOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  addtlTraineesMutation.mutateAsync();
+                }}
+              >
+                Submit
+              </Button>
             </div>
-          </ModalContent.Footer>
-        </ModalContent>
-      </Modal>
+          </AlertDialogContent>
+        </AlertDialog>
+      </ViewNomineesContext.Provider>
     </>
   );
 };
 
-const BadgePill = (status: TrainingNomineeStatus) => {
-  if (status === TrainingNomineeStatus.PENDING)
-    return (
-      <div className="py-0.5 text-sm text-center bg-gray-300 rounded shadow-md font-medium border border-zinc-400 text-zinc-700">
-        Pending
-      </div>
-    );
-  else if (status === TrainingNomineeStatus.DECLINED)
-    return (
-      <div className="py-0.5 text-sm text-center bg-red-300 font-medium text-red-700  rounded shadow-md border border-red-500">
-        Declined
-      </div>
-    );
-  else if (status === TrainingNomineeStatus.ACCEPTED)
-    return (
-      <div className="py-0.5 text-sm text-center bg-green-300 font-medium border border-green-500 rounded shadow-md text-green-800">
-        Accepted
-      </div>
-    );
+export const useViewNomineesContext = () => {
+  const {
+    selectedStandInTrainee,
+    viewDistributionModalIsOpen,
+    nominationDetails,
+    setNominationDetails,
+    setViewDistributionModalIsOpen,
+    setSelectedStandInTrainee,
+  } = useContext(ViewNomineesContext);
+
+  return {
+    selectedStandInTrainee,
+    viewDistributionModalIsOpen,
+    nominationDetails,
+    setNominationDetails,
+    setViewDistributionModalIsOpen,
+    setSelectedStandInTrainee,
+  };
 };

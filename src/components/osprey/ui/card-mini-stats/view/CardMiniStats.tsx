@@ -7,8 +7,9 @@ export const CardMiniStats: FunctionComponent<CardProps> = ({
   className,
   icon,
   title,
-  content,
+  cardContent,
   subtitle,
+  contentIsValue = true,
 }) => {
   return (
     <div className={styles.card({ variant, className })}>
@@ -24,7 +25,7 @@ export const CardMiniStats: FunctionComponent<CardProps> = ({
             <div className="  sm:text-sm  lg:text-md font-sans  text-gray-500 ">{title}</div>
             <div className=" sm:text-sm lg:text-md">{subtitle}</div>
           </div>
-          <div className={`text-3xl font-medium text-slate-700`}>{content}</div>
+          <div className={contentIsValue ? "text-3xl font-medium text-slate-700" : ""}>{cardContent}</div>
         </section>
 
         {icon ? <section className="w-[25%] items-center justify-center flex shrink-0 pr-2 ">{icon}</section> : null}

@@ -2,14 +2,22 @@
 
 import { Button } from "@lms/components/osprey/ui/button/view/Button";
 import { Modal, ModalContent } from "@lms/components/osprey/ui/overlays/modal/view/Modal";
-import { useOthersCategoryStore, useEditOthersModalStore, useOthersStore } from "@lms/utilities/stores/others-store";
+import {
+  useOthersCategoryStore,
+  useEditOthersModalStore,
+  useOthersStore,
+  useOthersTrainingTypeStore,
+} from "@lms/utilities/stores/others-store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
 import { ActivityDetails } from "../pages/ActivityDetails";
 import { OtherCategorySelection } from "../pages/CategorySelection";
 import { UploadActivityAttachment } from "../pages/UploadActivityAttachment";
 import { isEmpty } from "lodash";
-import { getActivityCategoryBadgePill } from "@lms/utilities/functions/getActivityCategoryBadgePill";
+import {
+  getActivityCategoryBadgePill,
+  getActivityCategorySelectionBadgePill,
+} from "@lms/utilities/functions/getActivityCategoryBadgePill";
 import axios from "axios";
 import { useOrientation } from "@lms/hooks/use-orientation";
 import { Storage } from "appwrite";
@@ -23,6 +31,9 @@ import { EditOthersDetailsSummary } from "../pages/EditOthersDetailsSummary";
 import convertSize from "convert-size";
 import { useOthersToastOptions } from "../data-table/OthersDataTable";
 import { EditParticipants } from "../pages/EditParticipants";
+import { TrainingTypeSelection } from "../pages/TrainingTypeSelection";
+import { EditTrainingRequirementDocuments } from "../pages/EditTrainingRequirementDocuments";
+import { getTrainingTypeBadgePill } from "@lms/utilities/functions/getTrainingTypeBadgePill";
 
 export const EditOthersModal: FunctionComponent = () => {
   const queryClient = useQueryClient();
@@ -42,12 +53,14 @@ export const EditOthersModal: FunctionComponent = () => {
   const setCategory = useOthersCategoryStore((state) => state.setCategory);
 
   const id = useOthersStore((state) => state.id);
+  const description = useOthersStore((state) => state.description);
   const action = useOthersStore((state) => state.action);
   const hasFetchedFiles = useOthersStore((state) => state.hasFetchedFiles);
   const bucketFiles = useOthersStore((state) => state.bucketFiles);
   const filesToUpload = useOthersStore((state) => state.filesToUpload);
 
   const setTitle = useOthersStore((state) => state.setTitle);
+  const setDescription = useOthersStore((state) => state.setDescription);
   const setLocation = useOthersStore((state) => state.setLocation);
   const setDateFrom = useOthersStore((state) => state.setDateFrom);
   const setDateTo = useOthersStore((state) => state.setDateTo);
@@ -56,19 +69,23 @@ export const EditOthersModal: FunctionComponent = () => {
   const setHasFetchedFiles = useOthersStore((state) => state.setHasFetchedFiles);
   const setBucketFiles = useOthersStore((state) => state.setBucketFiles);
   const participants = useOthersStore((state) => state.participants);
+  const trainingType = useOthersTrainingTypeStore((state) => state.trainingType);
+  const setInitialTrainingRequirements = useOthersStore((state) => state.setInitialTrainingRequirements);
+  const setTrainingRequirements = useOthersStore((state) => state.setTrainingRequirements);
 
-  const participantsPool = useOthersStore((state) => state.participantsPool);
   const hasFetchedParticipants = useOthersStore((state) => state.hasFetchedParticipants);
   const setParticipantsPool = useOthersStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useOthersStore((state) => state.setFilteredParticipantsPool);
   const setHasFetchedParticipants = useOthersStore((state) => state.setHasFetchedParticipants);
-
+  const trainingRequirements = useOthersStore((state) => state.trainingRequirements);
   const setAction = useOthersStore((state) => state.setAction);
 
   const editOrientationMutation = useMutation({
     mutationFn: async () => {
       const storage = new Storage(client!);
 
-      const { initialTitle, filesToUpload, filesToDelete, dateTo, dateFrom, location, title } = orientation;
+      const { initialTitle, filesToUpload, filesToDelete, dateTo, dateFrom, location, title, description } =
+        orientation;
 
       // const storage = new Storage(client!);
 
@@ -113,9 +130,12 @@ export const EditOthersModal: FunctionComponent = () => {
         `${url}/other/trainings/${id}`,
         {
           title,
+          description,
           dateFrom,
           dateTo,
           location,
+          trainingType,
+          trainingRequirements,
           // filesToUpload,
           category,
           participants: participants.map((participant) => {
@@ -147,8 +167,17 @@ export const EditOthersModal: FunctionComponent = () => {
 
   const onNext = () => {
     if (page === 1 && !isEmpty(category)) setPage(2);
-    else if (page === 2 && (bucketFiles.length !== 0 || filesToUpload.length !== 0)) setPage(3);
-    else if (page === 4) setPage(5);
+    else if (page === 2 && !isEmpty(trainingType)) setPage(3);
+    else if (page === 2 && isEmpty(trainingType))
+      setToastOptions("danger", "Error", "You have not selected a training type.");
+    else if (page === 3 && bucketFiles.length === 0 && filesToUpload.length > 0) setPage(4);
+    else if (page === 3 && bucketFiles.length > 0 && filesToUpload.length === 0) setPage(4);
+    else if (page === 3 && bucketFiles.length > 0 && filesToUpload.length > 0) setPage(4);
+    else if (page === 3 && bucketFiles.length < 1 && filesToUpload.length < 1)
+      setToastOptions("danger", "Error", "You have not uploaded anything.");
+    else if (page === 5) setPage(6);
+    else if (page === 6) setPage(7);
+    else if (page === 1 && isEmpty(category)) setToastOptions("danger", "Error", "You have not selected a category.");
   };
 
   // query per id
@@ -161,11 +190,24 @@ export const EditOthersModal: FunctionComponent = () => {
     queryKey: ["other-per-id", id],
     queryFn: async () => {
       const { data } = await axios.get(`${url}/other/trainings/${id}`);
-      console.log(data);
       return data;
     },
     onSuccess: (data) => {
+      setInitialTrainingRequirements([
+        { document: "Attendance", isSelected: true },
+        { document: "Certificate of Appearance", isSelected: false },
+        { document: "Certificate of Training", isSelected: false },
+        { document: "Course Evaluation Report", isSelected: false },
+        { document: "Course Materials", isSelected: false },
+        { document: "Learning Application Plan", isSelected: false },
+        { document: "Post Training Report", isSelected: false },
+        { document: "Post-test", isSelected: false },
+        { document: "Pre-test", isSelected: false },
+        { document: "Program", isSelected: false },
+      ]);
+      setTrainingRequirements(data.trainingRequirements);
       setTitle(data.title);
+      setDescription(data.description);
       setCategory(data.category);
       setDateFrom(data.dateFrom);
       setDateTo(data.dateTo);
@@ -185,15 +227,19 @@ export const EditOthersModal: FunctionComponent = () => {
   useQuery({
     queryKey: ["assignable-other-training-participants"],
     queryFn: async () => {
-      const { data } = await axios.get(`${url}/other/trainings/${id}/assignable/participant`);
+      const { data } = await axios.get(`${url}/other/trainings/${id}/assignable/participant`, {
+        withCredentials: true,
+      });
       return data;
     },
     onSuccess: (data) => {
       setParticipantsPool(data);
+      setFilteredParticipantsPool(data);
       setHasFetchedParticipants(true);
     },
     onError: () => {
       setParticipantsPool([]);
+      setFilteredParticipantsPool([]);
     },
     enabled: modalIsOpen !== false && hasFetchedParticipants === false && !!id,
     staleTime: 2,
@@ -264,8 +310,12 @@ export const EditOthersModal: FunctionComponent = () => {
         <ModalContent>
           <ModalContent.Title>
             <header className="pl-2">
-              <h3 className="text-lg font-semibold text-gray-600 ">
-                Edit Activity {!isEmpty(category) ? getActivityCategoryBadgePill(category) : null}
+              <h3 className="text-lg font-semibold text-gray-600 flex gap-1 items-center ">
+                <div>Edit Activity </div>
+                <div className="text-xs">
+                  {!isEmpty(category) ? getActivityCategorySelectionBadgePill(category) : null}
+                </div>
+                <div className="text-xs">{!isEmpty(trainingType) ? getTrainingTypeBadgePill(trainingType) : null}</div>
               </h3>
             </header>
           </ModalContent.Title>
@@ -289,10 +339,12 @@ export const EditOthersModal: FunctionComponent = () => {
               ) : otherTrainingsData ? (
                 <>
                   {page === 1 && <OtherCategorySelection />}
-                  {page === 2 && <EditUploadActivityAttachment />}
-                  {page === 3 && <EditActivityDetails />}
-                  {page === 4 && <EditParticipants />}
-                  {page === 5 && <EditOthersDetailsSummary />}
+                  {page === 2 && <TrainingTypeSelection />}
+                  {page === 3 && <EditUploadActivityAttachment />}
+                  {page === 4 && <EditActivityDetails />}
+                  {page === 5 && <EditParticipants />}
+                  {page === 6 && <EditTrainingRequirementDocuments />}
+                  {page === 7 && <EditOthersDetailsSummary />}
                 </>
               ) : null}
             </main>
@@ -338,6 +390,18 @@ export const EditOthersModal: FunctionComponent = () => {
                   </Button>
                 )}
 
+                {page === 6 && (
+                  <Button variant="white" className="w-[6rem]" onClick={() => setPage(5)}>
+                    Previous
+                  </Button>
+                )}
+
+                {page === 7 && (
+                  <Button variant="white" className="w-[6rem]" onClick={() => setPage(6)}>
+                    Previous
+                  </Button>
+                )}
+
                 {page === 1 && (
                   <Button className="w-[6rem]" onClick={onNext}>
                     Next
@@ -350,18 +414,30 @@ export const EditOthersModal: FunctionComponent = () => {
                 )}
 
                 {page === 3 && (
-                  <Button className="w-[6rem]" type="submit" form="othersDetailsForm">
-                    Next
-                  </Button>
-                )}
-
-                {page === 4 && (
                   <Button className="w-[6rem]" onClick={onNext}>
                     Next
                   </Button>
                 )}
 
+                {page === 4 && (
+                  <Button className="w-[6rem]" type="submit" form="othersDetailsForm">
+                    Next
+                  </Button>
+                )}
+
                 {page === 5 && (
+                  <Button className="w-[6rem]" onClick={onNext}>
+                    Next
+                  </Button>
+                )}
+
+                {page === 6 && (
+                  <Button className="w-[6rem]" type="submit" form="editTrainingDocumentsForm">
+                    Next
+                  </Button>
+                )}
+
+                {page === 7 && (
                   <Button className="w-[6rem]" onClick={() => editOrientationMutation.mutateAsync()}>
                     Submit
                   </Button>

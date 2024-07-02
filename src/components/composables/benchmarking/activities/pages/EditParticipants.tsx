@@ -4,8 +4,9 @@ import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { useBenchmarkingStore } from "@lms/utilities/stores/benchmarking-store";
 import { EmployeeFlatWithSupervisor } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { isEmpty } from "lodash";
 import React from "react";
 import { FunctionComponent, useState } from "react";
 
@@ -16,19 +17,14 @@ export const EditParticipants: FunctionComponent = () => {
   const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
   const participantsPool = useBenchmarkingStore((state) => state.participantsPool);
   const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
+  const filteredParticipantsPool = useBenchmarkingStore((state) => state.filteredParticipantsPool);
+  const setFilteredParticipantsPool = useBenchmarkingStore((state) => state.setFilteredParticipantsPool);
+
   const queryClient = useQueryClient();
 
   /**
    *  get employee names
    */
-
-  // filtered facilitators
-  const filteredParticipants =
-    searchParticipant === ""
-      ? participantsPool
-      : participantsPool?.filter((participant) =>
-          participant.name.toLowerCase().includes(searchParticipant.toLowerCase())
-        );
 
   const participantsState = queryClient.getQueryState(["assignable-benchmarking-participants"]);
 
@@ -72,7 +68,7 @@ export const EditParticipants: FunctionComponent = () => {
               Error in fetching participants
             </div>
           ) : (
-            <div className="pt-5">
+            <div className="relative pt-5">
               <div>
                 <Combobox
                   value={participants}
@@ -83,6 +79,8 @@ export const EditParticipants: FunctionComponent = () => {
                     // setSelectedParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
                     setParticipants(value.sort((a, b) => (a.name > b.name ? 1 : -1)));
                     setParticipantsPool(newValues);
+                    setFilteredParticipantsPool(newValues);
+                    setSearchParticipant("");
                   }}
                 >
                   <Combobox.Input as={React.Fragment}>
@@ -95,7 +93,17 @@ export const EditParticipants: FunctionComponent = () => {
                           e.preventDefault();
                         }
                       }}
-                      onChange={(e) => setSearchParticipant(e.target.value)}
+                      onChange={(e) => {
+                        setSearchParticipant(e.target.value);
+                        setSearchParticipant(e.target.value);
+                        if (isEmpty(e.target.value)) setFilteredParticipantsPool(participantsPool);
+                        else if (!isEmpty(searchParticipant))
+                          setFilteredParticipantsPool(
+                            participantsPool.filter((x) =>
+                              x.name.toLowerCase().includes(searchParticipant.toLowerCase())
+                            )
+                          );
+                      }}
                       size="small"
                       placeholder="Search for participant"
                       className="placeholder:text-xs"
@@ -103,10 +111,10 @@ export const EditParticipants: FunctionComponent = () => {
                   </Combobox.Input>
 
                   <Combobox.Options className="absolute z-[80] max-h-60 overflow-y-auto  bg-white w-full border rounded-md shadow-lg shadow-gray-100">
-                    {filteredParticipants?.length === 0 ? (
+                    {filteredParticipantsPool?.length === 0 ? (
                       <div className="flex items-center justify-center py-10">No results found</div>
                     ) : (
-                      filteredParticipants.map((participant, index) => {
+                      filteredParticipantsPool.map((participant, index) => {
                         return (
                           <Combobox.Option key={index} value={participant}>
                             {({ active, selected }) => {

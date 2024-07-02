@@ -3,7 +3,7 @@
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
 import { EmployeeWithSupervisor, TrainingNotice, TrainingStatus } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { Dispatch, FunctionComponent, SetStateAction, createContext } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, createContext, useContext, useState } from "react";
 import { useTrainingNoticeDataTable } from "./hooks/use-training-notice-data-table";
 import { EditTrainingNoticeModal } from "../training-notice-modal/EditTrainingNoticeModal";
 import { DeleteTrainingNoticeModal } from "../training-notice-modal/delete/DeleteTrainingNoticeModal";
@@ -19,6 +19,8 @@ import { AddParticipants } from "../training-notice-modal/batch/AddParticipants"
 import { ViewDocumentModal } from "../training-notice-modal/documents/ViewDocumentModal";
 import { SetToUpcomingModal } from "../training-notice-modal/set-to-upcoming/SetToUpcomingModal";
 import { ToOngoingAlertSubmission } from "../ongoing/alert/ToOngoingAlert";
+import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
+import { Toast } from "@lms/components/osprey/ui/overlays/toast/view/Toast";
 
 type TrainingNoticeState = {
   id: string;
@@ -62,7 +64,15 @@ type TrainingNoticeState = {
   setToOngoingAlertIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
+type TrainingNoticeToastContextState = {
+  toastIsOpen: boolean;
+  setToastIsOpen: Dispatch<SetStateAction<boolean>>;
+  toastType: ToastType;
+  setToastType: Dispatch<SetStateAction<ToastType>>;
+};
+
 export const TrainingNoticeContext = createContext({} as TrainingNoticeState);
+const TrainingNoticeToastContext = createContext({} as TrainingNoticeToastContextState);
 
 export const TrainingNoticeDataTable: FunctionComponent = () => {
   const {
@@ -108,74 +118,99 @@ export const TrainingNoticeDataTable: FunctionComponent = () => {
     setNomineeStatusIsOpen,
   } = useTrainingNoticeDataTable();
 
+  const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>({} as ToastType);
+
   return (
     <>
-      <DataTable<TrainingNotice>
-        datasource={`${url}/training?page=1&limit=1000`}
-        queryKey={["training-notice"]}
-        columns={columns}
-        title="Notice of Training"
-        subtitle="Training outline and other details for the upcoming training programs."
-        // onRowClick={(row) => console.log(row.original.id)}
-      />
+      <TrainingNoticeToastContext.Provider value={{ toastIsOpen, toastType, setToastIsOpen, setToastType }}>
+        <DataTable<TrainingNotice>
+          datasource={`${url}/training?page=1&limit=1000`}
+          queryKey={["training-notice"]}
+          columns={columns}
+          title="Notice of Training"
+          subtitle="Training outline and other details for the upcoming training programs."
+        />
 
-      <TrainingNoticeContext.Provider
-        value={{
-          id: trainingNoticeId,
-          confirmCompleteModalIsOpen,
-          editModalIsOpen,
-          nomineeStatusIsOpen,
-          removeModalIsOpen,
-          sendConfirmationModalIsOpen,
-          sendModalIsOpen,
-          submitToPdcSecModalIsOpen,
-          viewTrainingNoticeModalIsOpen,
-          viewDocumentsModalIsOpen,
-          batches,
-          selectedBatch,
-          selectedBatchModalIsOpen,
-          employeePool,
-          totalSelectedEmployees,
-          employeesWithStatus,
-          batchingModalIsOpen,
-          trainingStatus,
-          toUpcomingModalIsOpen,
-          toOngoingAlertIsOpen,
-          setToOngoingAlertIsOpen,
-          setToUpcomingModalIsOpen,
-          setTrainingStatus,
-          setBatchingModalIsOpen,
-          setEmployeesWithStatus,
-          setTotalSelectedEmployees,
-          setEmployeePool,
-          setSelectedBatchModalIsOpen,
-          setSelectedBatch,
-          setBatches,
-          setViewDocumentsModalIsOpen,
-          setViewTrainingNoticeModalIsOpen,
-          setSubmitToPdcSecModalIsOpen,
-          setConfirmCompleteModalIsOpen,
-          setEditModalIsOpen,
-          setNomineeStatusIsOpen,
-          setRemoveModalIsOpen,
-          setSendConfirmationModalIsOpen,
-          setSendModalIsOpen,
-        }}
-      >
-        <EditTrainingNoticeModal />
-        <DeleteTrainingNoticeModal />
-        <SendTrainingNoticeModal />
-        <ViewNomineeStatusModal />
-        <ConfirmCompleteTrainingModal />
-        <SendConfirmationTrainingModal />
-        <SubmitToPdcSecModal />
-        <ViewTrainingNoticeModal />
-        <BatchModal />
-        <AddParticipants />
-        <ViewDocumentModal />
-        <SetToUpcomingModal />
-        <ToOngoingAlertSubmission />
-      </TrainingNoticeContext.Provider>
+        <TrainingNoticeContext.Provider
+          value={{
+            id: trainingNoticeId,
+            confirmCompleteModalIsOpen,
+            editModalIsOpen,
+            nomineeStatusIsOpen,
+            removeModalIsOpen,
+            sendConfirmationModalIsOpen,
+            sendModalIsOpen,
+            submitToPdcSecModalIsOpen,
+            viewTrainingNoticeModalIsOpen,
+            viewDocumentsModalIsOpen,
+            batches,
+            selectedBatch,
+            selectedBatchModalIsOpen,
+            employeePool,
+            totalSelectedEmployees,
+            employeesWithStatus,
+            batchingModalIsOpen,
+            trainingStatus,
+            toUpcomingModalIsOpen,
+            toOngoingAlertIsOpen,
+            setToOngoingAlertIsOpen,
+            setToUpcomingModalIsOpen,
+            setTrainingStatus,
+            setBatchingModalIsOpen,
+            setEmployeesWithStatus,
+            setTotalSelectedEmployees,
+            setEmployeePool,
+            setSelectedBatchModalIsOpen,
+            setSelectedBatch,
+            setBatches,
+            setViewDocumentsModalIsOpen,
+            setViewTrainingNoticeModalIsOpen,
+            setSubmitToPdcSecModalIsOpen,
+            setConfirmCompleteModalIsOpen,
+            setEditModalIsOpen,
+            setNomineeStatusIsOpen,
+            setRemoveModalIsOpen,
+            setSendConfirmationModalIsOpen,
+            setSendModalIsOpen,
+          }}
+        >
+          <EditTrainingNoticeModal />
+          <DeleteTrainingNoticeModal />
+          <SendTrainingNoticeModal />
+          <ViewNomineeStatusModal />
+          <ConfirmCompleteTrainingModal />
+          <SendConfirmationTrainingModal />
+          <SubmitToPdcSecModal />
+          <ViewTrainingNoticeModal />
+          <BatchModal />
+          <AddParticipants />
+          <ViewDocumentModal />
+          <SetToUpcomingModal />
+          <ToOngoingAlertSubmission />
+          <Toast
+            duration={2000}
+            open={toastIsOpen}
+            setOpen={setToastIsOpen}
+            color={toastType.color}
+            title={toastType.title}
+            content={toastType.content}
+          />
+        </TrainingNoticeContext.Provider>
+      </TrainingNoticeToastContext.Provider>
     </>
   );
+};
+
+// hook for training notice toast
+export const useTrainingNoticeToastOptions = () => {
+  const { toastIsOpen, toastType, setToastIsOpen, setToastType } = useContext(TrainingNoticeToastContext);
+
+  // set the toast options here
+  const setToastOptions = (color: typeof toastType.color, title: string, content: string) => {
+    setToastType({ color, title, content });
+    setToastIsOpen(true);
+  };
+
+  return { toastIsOpen, setToastIsOpen, toastType, setToastOptions, setToastType };
 };

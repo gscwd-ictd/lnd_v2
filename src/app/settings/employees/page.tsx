@@ -1,30 +1,33 @@
-import EmployeeTagList from "@lms/components/composables/employee-tags/EmployeeTagList";
-import EmployeeTagTabs from "@lms/components/composables/employee-tags/EmployeeTagTabs";
+import { EmployeeTagsArrow } from "@lms/components/composables/employee-tags/EmployeeTagsArrow";
 import EmployeeWithTagsLeft from "@lms/components/composables/employee-tags/EmployeeWithTagsLeft";
 import EmployeeWithTagsList from "@lms/components/composables/employee-tags/EmployeeWithTagsList";
-import Link from "next/link";
+import { BreadCrumbs } from "@lms/components/osprey/ui/breadcrumbs/view/BreadCrumbs";
 
 export default function EmployeeTags() {
   return (
     <div className="h-full p-5">
       <div className="flex flex-col h-full">
         <div className="flex justify-between mb-3">
-          <div>Employees with Tags</div>
-          <div>
-            <ul className="flex items-center gap-1 text-sm">
-              <Link href="/trainings/on-going" className="text-gray-700">
-                Settings /
-              </Link>
-              <li className="text-gray-500">Employees with Tags</li>
-            </ul>
-          </div>
+          <div>Employees</div>
+          <BreadCrumbs
+            crumbs={[
+              { layerText: "Settings", path: "" },
+              { layerText: "Training Tags", path: "/settings/tags" },
+              { layerText: "Employees", path: "" },
+            ]}
+          />
         </div>
         <div className="flex sm:flex-col lg:flex-row  gap-3 h-full">
-          <div className="flex sm:w-full lg:w-1/3">
+          <div className="flex sm:w-full lg:w-5/12">
             {/* <EmployeeTagTabs /> */}
             <EmployeeWithTagsLeft />
           </div>
-          <div className="flex sm:w-full lg:w-2/3 p-3 bg-white">
+          <div className="flex sm:w-full lg:w-1/12">
+            <div className="place-items-center flex justify-center w-full">
+              <EmployeeTagsArrow />
+            </div>
+          </div>
+          <div className="flex sm:w-full lg:w-7/12 p-3 bg-white">
             {/* <EmployeeTagList /> */}
             <EmployeeWithTagsList />
           </div>

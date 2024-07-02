@@ -1,11 +1,14 @@
 import { CardMiniStats } from "@lms/components/osprey/ui/card-mini-stats/view/CardMiniStats";
 import { FunctionComponent } from "react";
+type DoneBenchmarkingProps = {
+  value: number;
+};
 
-export const CardApprovedBenchmarking: FunctionComponent = () => {
+export const CardDoneBenchmarking: FunctionComponent<DoneBenchmarkingProps> = ({ value }) => {
   return (
     <CardMiniStats
-      title="Approved Benchmarking"
-      content="3"
+      title="Benchmarkings Done"
+      cardContent={value}
       className="shadow-sm"
       icon={
         <svg

@@ -128,12 +128,7 @@ export const Recommendations: FunctionComponent = () => {
             / {numberOfParticipants}
           </p>
         </div>
-        {/* <button className="px-3 py-2 text-white bg-indigo-600" onClick={() => console.log(slotDistribution)}>
-          Log Current
-        </button>
-        <button className="px-3 py-2 text-white bg-indigo-600" onClick={() => console.log(previousSlotDistribution)}>
-          Log Previous
-        </button> */}
+
         <ul className="space-y-3">
           {slotDistribution.length > 0 ? (
             slotDistribution.map((data, index) => (
@@ -153,9 +148,6 @@ export const Recommendations: FunctionComponent = () => {
                       </div>
                     </Disclosure.Button>
 
-                    {/* <button className="px-2 py-1 bg-blue-300 rounded" onClick={() => console.log(data.slot)}>
-                      log
-                    </button> */}
                     <div className="p-2">
                       <input
                         type="number"

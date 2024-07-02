@@ -1,10 +1,6 @@
-import {
-  BatchEmployee,
-  useTrainingNoticeStore,
-  useTrainingTypesStore,
-} from "@lms/utilities/stores/training-notice-store";
+import { useTrainingNoticeStore, useTrainingTypesStore } from "@lms/utilities/stores/training-notice-store";
 import dayjs from "dayjs";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import { isEmpty } from "lodash";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 import { EmployeeBatches } from "./EmployeeBatches";
@@ -144,30 +140,6 @@ export const RecentSlideOverBody = () => {
           <EmployeeBatches batches={batchesWithEmployees} />
         </Suspense>
       </div>
-
-      {/* <AlertDialog open={confirmAlertIsOpen} onOpenChange={setConfirmAlertIsOpen}>
-        <AlertDialogContent>
-          <AlertDialogTitle>
-            <div className="text-lg font-semibold text-gray-600">Move to recents</div>
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            <label className="text-sm font-medium text-gray-700">
-              Are you sure you want to move the training to recents and change the status to &ldquo;For requirements
-              submission&ldquo;?
-            </label>
-          </AlertDialogDescription>
-          <div className="flex justify-end mt-4 space-x-2">
-            <Button variant="soft">Cancel</Button>
-            <Button
-              onClick={async () => {
-                confirmToSubmit.mutateAsync();
-              }}
-            >
-              Submit
-            </Button>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog> */}
     </>
   );
 };

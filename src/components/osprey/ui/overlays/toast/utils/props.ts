@@ -19,7 +19,7 @@ export type ToastStore = {
 export type ToastProps = {
   duration?: number;
   startIcon?: ReactNode | ReactNode[];
-  color?: "default" | "success" | "danger" | "info" | "warning";
+  color?: "success" | "warning" | "info" | "default" | "danger";
   title: string;
   content?: string;
   children?: ReactNode | ReactNode[];

@@ -4,6 +4,7 @@ export type Benchmarking = {
   deletedAt: Date | null;
   id: string;
   title: string;
+  description: string;
   location: string;
   dateFrom: string;
   dateTo: string;

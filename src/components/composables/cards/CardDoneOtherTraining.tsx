@@ -1,11 +1,15 @@
 import { CardMiniStats } from "@lms/components/osprey/ui/card-mini-stats/view/CardMiniStats";
 import { FunctionComponent } from "react";
 
-export const CardApprovedOtherActivities: FunctionComponent = () => {
+type DoneOtherTrainingProps = {
+  value: number;
+};
+
+export const CardDoneOtherTraining: FunctionComponent<DoneOtherTrainingProps> = ({ value }) => {
   return (
     <CardMiniStats
-      title="Approved Other Activities"
-      content="9"
+      title="Other Trainings Done"
+      cardContent={value}
       className="shadow-sm"
       icon={
         <svg

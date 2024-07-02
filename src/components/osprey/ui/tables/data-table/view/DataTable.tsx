@@ -119,7 +119,7 @@ export const DataTable = <T extends unknown>({
     );
   if (isLoading)
     return (
-      <div className="flex justify-center w-full h-full">
+      <div className="flex justify-center w-full h-full overflow-hidden">
         <Spinner borderSize={4} size="large" />
       </div>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentPropsWithRef, ElementRef, forwardRef, FunctionComponent } from "react";
+import { ComponentPropsWithRef, ElementRef, forwardRef } from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 const TooltipProvider = TooltipPrimitive.Provider;

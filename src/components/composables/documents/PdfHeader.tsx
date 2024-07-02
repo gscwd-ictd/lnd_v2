@@ -128,9 +128,8 @@ const PdfHeader: FunctionComponent<HeaderProps> = ({ isFixed, isoCode, withIsoLo
               <Text style={{ fontSize: 8, fontFamily: "Helvetica" }}>{isoCode}</Text>
             </View>
           ) : null}
-
           {/* ISO LOGO */}
-          {withIsoLogo ? <Image src={IsoAccreditorLogo.src} style={[styles.isoLogo]} /> : null}
+          {/* {withIsoLogo ? <Image src={IsoAccreditorLogo.src} style={[styles.isoLogo]} /> : null} // TODO REMOVE SOCOTEC */}
         </View>
       </View>
     </>

@@ -14,6 +14,9 @@ export const BenchmarkingSlideOver: FunctionComponent = () => {
   const setLocation = useBenchmarkingStore((state) => state.setLocation);
   const setDateFrom = useBenchmarkingStore((state) => state.setDateFrom);
   const setDateTo = useBenchmarkingStore((state) => state.setDateTo);
+  const setParticipants = useBenchmarkingStore((state) => state.setParticipants);
+  const setParticipantsPool = useBenchmarkingStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useBenchmarkingStore((state) => state.setFilteredParticipantsPool);
 
   return (
     <SlideOver
@@ -30,6 +33,9 @@ export const BenchmarkingSlideOver: FunctionComponent = () => {
         setDateTo("");
         setBenchmarkingId(null);
         setHasFetchedParticipants(false);
+        setParticipants([]);
+        setParticipantsPool([]);
+        setFilteredParticipantsPool([]);
       }}
     >
       <SlideOver.Body>

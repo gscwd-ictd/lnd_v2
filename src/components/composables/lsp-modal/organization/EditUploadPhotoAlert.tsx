@@ -27,6 +27,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
 
   const inputRef = useRef() as MutableRefObject<HTMLInputElement>;
   const name = useLspDetailsStore((state) => state.name);
+  const setName = useLspDetailsStore((state) => state.setName);
   // const lspId = useLspDetailsStore((state) => state.id);
   const photoUrl = useLspDetailsStore((state) => state.photoUrl);
   const photoToUpload = useLspDetailsStore((state) => state.photoToUpload);
@@ -68,10 +69,16 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
     },
     onSuccess: async (data) => {
       // get file and set photoUrl
+
       setPhotoId(data.photoId);
       setPhotoUrl(data.photoUrl);
       setUploadAlertIsOpen(false);
-      queryClient.setQueryData(["lsp-organization-details", id], data);
+      const freshData = await axios.get(`${url}/lsp/${id}`);
+      setName(freshData.data.name);
+      queryClient.setQueryData(["lsp-organization-details", id], {
+        photoId: data.photoId,
+        photoUrl: data.photoUrl,
+      });
       setToastOptions("success", "Success", "You have successfully uploaded a photo!");
     },
     onError: () => {
@@ -148,7 +155,7 @@ export const EditUploadPhotoAlert: FunctionComponent = () => {
               />
             </div>
           </AlertDialogDescription>
-          {photoUrl}
+          {/* {photoUrl} */}
           <div className="flex justify-end py-4 px-2 space-x-2">
             {photoToUploadUrl === null ? (
               <>

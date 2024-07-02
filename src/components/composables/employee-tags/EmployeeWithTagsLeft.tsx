@@ -1,17 +1,11 @@
 "use client";
 
 import { Combobox } from "@headlessui/react";
-import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { TabContentWrap, Tabs, TabsContent, TabsList, TabsTrigger } from "@lms/components/osprey/ui/tabs/view/Tabs";
-import { useDebounce } from "@lms/hooks/use-debounce";
 import { useTabStore } from "@lms/utilities/stores/employee-tags-store";
-import { Tag } from "@lms/utilities/types/tags";
 import { url } from "@lms/utilities/url/api-url";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Fragment, useCallback, useEffect, useState } from "react";
-import { useTagsDataTable } from "./tags/use-tags-data-table";
-import { HiTag, HiUserCircle, HiXCircle } from "react-icons/hi";
+import { useCallback, useEffect, useState } from "react";
+import { HiUserCircle, HiXCircle } from "react-icons/hi";
 
 type EmployeeProps = {
   employeeId: string;
@@ -20,23 +14,16 @@ type EmployeeProps = {
 };
 
 export default function EmployeeWithTagsLeft() {
-  const tabs = useTabStore((state) => state.setActiveTab);
-  const { columns } = useTagsDataTable();
-
   //set employee global state
   const setSelectedEmployee = useTabStore((state) => state.setSelectedEmployee);
   const selectedEmployee = useTabStore((state) => state.selectedEmployee);
+  const query = useTabStore((state) => state.queryEmployee);
+  const setQuery = useTabStore((state) => state.setQueryEmployee);
+  const setSearchTagEmployee = useTabStore((state) => state.setSearchTagEmployee);
 
   //employee tab state
-  const [query, setQuery] = useState("");
+
   const [employees, setEmployees] = useState<Array<EmployeeProps>>([]);
-
-  //tags tab state
-  const [queryTag, setQueryTag] = useState("");
-  const [tags, setTags] = useState<Array<Tag>>([]);
-
-  const setSelectedTag = useTabStore((state) => state.setSelectedTag);
-  const selectedTag = useTabStore((state) => state.selectedTag);
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
@@ -44,34 +31,14 @@ export default function EmployeeWithTagsLeft() {
     if (query.length >= 3) {
       const getEmployee = async () => {
         const result = await axios.get(`${url}/hrms/employees/q?name=${query}`);
-        // const result = await axios.get(`${url}/hrms/employee-tags/tag/${selectedTag?.id}`);
         setEmployees(result.data);
       };
 
       getEmployee();
+    } else if (query.length < 3) {
+      setEmployees([]);
     }
   }, [query]);
-
-  useEffect(() => {
-    if (queryTag.length >= 3) {
-      const getTags = async () => {
-        const result = await axios.get(`${url}/tags/search/q?name=${queryTag}`);
-        setTags(result.data);
-      };
-
-      getTags();
-    }
-  }, [queryTag]);
-
-  // useQuery({
-  //   queryKey: ["getEmployeeByTagId", selectedTag],
-  //   enabled: !!selectedTag,
-  //   queryFn: async () => {
-  //     const { data } = await axios.get(`${url}/employee-tags/tag/${selectedTag?.id}`);
-  //     setEmployees(data);
-  //     return data;
-  //   },
-  // });
 
   const debounce = (fn: Function) => {
     let timer: NodeJS.Timeout | null;
@@ -98,12 +65,14 @@ export default function EmployeeWithTagsLeft() {
   return (
     <div className="flex flex-col w-full">
       {selectedEmployee?.employeeId ? (
-        <div className="shadow-md rounded p-5 mb-2 bg-indigo-50 flex gap-2 justify-between items-center">
-          <div className="text-slate-600 font-medium flex gap-2 items-center">
-            <HiUserCircle className="w-6 h-6 text-slate-400" />
+        <div className="shadow-md rounded p-5 mb-2 bg-indigo-100/80 flex gap-2 justify-between items-center">
+          <div className="text-slate-600 font-medium flex gap-4 items-center">
+            <div>
+              <HiUserCircle className="w-8 h-8 text-slate-500" />
+            </div>
             <div className="flex flex-col">
-              <div className="font-semibold">{selectedEmployee.fullName}</div>
-              <div className="font-normal">{selectedEmployee.positionTitle}</div>
+              <div className="font-semibold text-slate-700 text-lg">{selectedEmployee.fullName}</div>
+              <div className="font-light text-gray-600 text-sm">{selectedEmployee.positionTitle}</div>
             </div>
           </div>
         </div>
@@ -121,6 +90,7 @@ export default function EmployeeWithTagsLeft() {
               onChange={(event) => {
                 debounceFn(event.target.value);
                 setQuery(event.target.value);
+                setSearchTagEmployee("");
               }}
               className="flex w-full px-4 py-3 mb-2 pl-11 text-sm transition-colors bg-gray-100 border-transparent rounded-md focus:z-10 focus:border-indigo-500 focus:ring-indigo-500"
               displayValue={() => (selectedEmployee !== undefined ? selectedEmployee.fullName : "")}
@@ -150,7 +120,7 @@ export default function EmployeeWithTagsLeft() {
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-gray-500 animate-spin"
+                  className="w-5 h-5 text-indigo-500 animate-spin"
                 >
                   <path
                     opacity="0.2"
@@ -168,6 +138,7 @@ export default function EmployeeWithTagsLeft() {
               <div className="absolute inset-y-0 mt-1 right-0 z-20 flex items-center pr-8 ">
                 <button
                   onClick={() => {
+                    setSearchTagEmployee("");
                     setSelectedEmployee({ employeeId: "", fullName: "", positionTitle: "" });
                   }}
                 >
@@ -176,23 +147,24 @@ export default function EmployeeWithTagsLeft() {
               </div>
             ) : null}
 
-            <Combobox.Options className="absolute w-full p-1 space-y-1 overflow-auto bg-white rounded-sm max-h-60">
+            <Combobox.Options className="absolute w-full space-y-1 z-10  overflow-auto bg-white rounded-sm max-h-60">
               {employees.length === 0 && query !== "" ? (
                 <div className="p-2 text-sm">No records.</div>
               ) : (
                 <>
-                  {employees.map((employee) => (
-                    <Combobox.Option
-                      key={employee.employeeId}
-                      value={employee}
-                      className={({ active }) => `p-1 ${active ? "bg-slate-200 rounded-sm" : ""}`}
-                    >
-                      <div className="flex flex-col">
-                        <div className="text-sm">{employee.fullName}</div>
-                        <div className="text-xs text-gray-500">{employee.positionTitle}</div>
-                      </div>
-                    </Combobox.Option>
-                  ))}
+                  {employees &&
+                    employees.map((employee) => (
+                      <Combobox.Option
+                        key={employee.employeeId}
+                        value={employee}
+                        className={({ active }) => `p-1 ${active ? "bg-slate-200 rounded-sm" : ""}`}
+                      >
+                        <div className="flex flex-col px-2 py-1">
+                          <div className="text-sm">{employee.fullName}</div>
+                          <div className="text-xs text-gray-500">{employee.positionTitle}</div>
+                        </div>
+                      </Combobox.Option>
+                    ))}
                 </>
               )}
             </Combobox.Options>

@@ -5,18 +5,21 @@ import { Tag } from "@lms/utilities/types/tags";
 import { url } from "@lms/utilities/url/api-url";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { FormEvent, Fragment, MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
-import { useTagsDataTable } from "./tags/use-tags-data-table";
+import { FormEvent, Fragment, MutableRefObject, useCallback, useRef, useState } from "react";
 import { HiExclamationCircle, HiTag, HiXCircle } from "react-icons/hi";
 import { Spinner } from "@lms/components/osprey/ui/spinner/view/Spinner";
 
 export default function TagsWithEmployeesLeft() {
   //tags tab state
-  const [queryTag, setQueryTag] = useState("");
+
   const [tags, setTags] = useState<Array<Tag>>([]);
   const [filteredTags, setFilteredTags] = useState<Array<Tag>>([]);
 
+  const queryTag = useTabStore((state) => state.queryTag);
+  const setQueryTag = useTabStore((state) => state.setQueryTag);
+
   const setSelectedTag = useTabStore((state) => state.setSelectedTag);
+  const setSearchEmployee = useTabStore((state) => state.setSearchTagEmployee);
   const selectedTag = useTabStore((state) => state.selectedTag);
   const employees = useTabStore((state) => state.employees);
 
@@ -27,7 +30,7 @@ export default function TagsWithEmployeesLeft() {
     enabled: !queryTag,
     queryFn: async () => {
       // const { data } = await axios.get(`${url}/employee-tags/tag/${selectedTag?.id}`);
-      const { data } = await axios.get(`${url}/tags`);
+      const { data } = await axios.get(`${url}/tags?page=1&limit=1000`);
       setTags(data.items);
       setFilteredTags(data.items);
 
@@ -90,30 +93,21 @@ export default function TagsWithEmployeesLeft() {
     <>
       <div className="w-full">
         {selectedTag?.id ? (
-          <div className="shadow-md rounded  mb-2 p-5 bg-indigo-50 ">
-            <div className="sflex gap-2 justify-between items-center">
-              <div className="text-slate-600 font-medium flex gap-2 items-center">
-                <HiTag />
-                {selectedTag ? selectedTag.name : "None"}
+          <div className="shadow-md rounded p-5 mb-2 bg-indigo-100/80 flex gap-2 justify-between items-center">
+            <div className="text-slate-600 font-medium flex gap-4 items-center">
+              <div>
+                <HiTag className="w-8 h-8 text-slate-500" />
               </div>
-              <div className="text-gray-700 font-light text-sm pl-5">
-                {employees.length === 0 ? "No" : employees.length} assigned{" "}
-                {employees.length > 1 ? "employees" : "employee"}
+              <div className="flex flex-col">
+                <div className="font-semibold text-slate-700 text-lg">{selectedTag.name}</div>
+                <div className="font-light text-gray-600 text-sm">
+                  {employees.length === 0 ? "No" : employees.length} assigned{" "}
+                  {employees.length > 1 ? "employees" : "employee"}
+                </div>
               </div>
             </div>
           </div>
         ) : null}
-
-        {/* <DataTable
-          datasource={`${url}/tags?page=1&limit=1000`}
-          queryKey={[`tags`]}
-          columns={columns}
-          fullWidthSearch
-          onRowClick={(row) => {
-            // console.log(row.original);
-            setSelectedTag(row.original);
-          }}
-        /> */}
 
         <div className="border p-2 bg-white w-full">
           <div className="relative px-4 pt-1 items-center">
@@ -148,7 +142,7 @@ export default function TagsWithEmployeesLeft() {
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-gray-500 animate-spin"
+                  className="w-5 h-5 text-indigo-500 animate-spin"
                 >
                   <path
                     opacity="0.2"
@@ -194,18 +188,19 @@ export default function TagsWithEmployeesLeft() {
         ) : (
           <div className="bg-white border">
             {filteredTags.length > 0 ? (
-              <div className="bg-gray-100 text-xs border-b text-gray-700 font-medium px-5 py-3">Tag Name</div>
+              <div className="bg-gray-100 text-xs border-b text-gray-700 font-medium px-6 py-3">Tag Name</div>
             ) : null}
             <div className="overflow-y-auto overflow-x-hidden h-full">
               {filteredTags.map((tag) => {
                 return (
                   <button
                     key={tag.id}
-                    className="odd:bg-white odd:hover:bg-gray-50 even:bg-gray-100 even:hover:bg-gray-200/75 px-5 py-3 text-gray-700 text-xs flex flex-col w-full"
+                    className="odd:bg-white odd:hover:bg-gray-50 even:bg-gray-100 even:hover:bg-gray-200/75 px-6 py-3 text-gray-700 text-xs flex flex-col w-full"
                     onClick={() => {
                       setSelectedTag(tag);
                       debounceFn(tag.name);
                       setQueryTag(tag.name);
+                      setSearchEmployee("");
                     }}
                   >
                     {tag.name}

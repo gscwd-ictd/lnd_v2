@@ -1,16 +1,14 @@
 "use client";
 
 import { DataTable } from "@lms/components/osprey/ui/tables/data-table/view/DataTable";
-import { EmployeeWithSupervisor, TrainingNotice } from "@lms/utilities/types/training";
+import { TrainingNotice } from "@lms/utilities/types/training";
 import { url } from "@lms/utilities/url/api-url";
-import { Dispatch, FunctionComponent, SetStateAction, createContext, useEffect, useState } from "react";
-import { SlideOver } from "@lms/components/osprey/ui/overlays/slider-over/view/SliderOver";
+import { Dispatch, FunctionComponent, SetStateAction, createContext, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { isEmpty } from "lodash";
 import {
-  Batch,
-  BatchEmployee,
+  TrainingRequirement,
   useTrainingNoticeStore,
   useTrainingTypesStore,
 } from "@lms/utilities/stores/training-notice-store";
@@ -18,13 +16,18 @@ import { getTrainingTypeFromString } from "@lms/utilities/functions/getTrainingT
 import dayjs from "dayjs";
 import { ToastType } from "@lms/components/osprey/ui/overlays/toast/utils/props";
 import { useHistoryDataTable } from "./hooks/use-history-data-table";
+import { BatchWithEmployees, EmployeeWithRequirements } from "../recent-data-table/RecentDataTable";
+import { HistorySlideOver } from "../history/slideover/HistorySlideOver";
+import { HistoryRequirementsModal } from "../history/modal/HistoryRequirementsModal";
+import { HistoryRequirementsSummaryModal } from "../history/modal/HistoryRequirementsSummaryModal";
 
 type HistoryState = {
   id: string;
-  batches: Array<Batch>;
-  setBatches: Dispatch<SetStateAction<Array<Batch>>>;
-  selectedBatch: Batch;
-  setSelectedBatch: Dispatch<SetStateAction<Batch>>;
+  setId: Dispatch<SetStateAction<string>>;
+  batchesWithEmployees: Array<BatchWithEmployees>;
+  setBatchesWithEmployees: Dispatch<SetStateAction<Array<BatchWithEmployees>>>;
+  selectedBatch: BatchWithEmployees;
+  setSelectedBatch: Dispatch<SetStateAction<BatchWithEmployees>>;
   batchAttendanceIsOpen: boolean;
   setBatchAttendanceIsOpen: Dispatch<SetStateAction<boolean>>;
   hasFetchedBatches: boolean;
@@ -38,17 +41,24 @@ type HistoryState = {
   setToastIsOpen: Dispatch<SetStateAction<boolean>>;
   toastType: ToastType;
   setToastType: Dispatch<SetStateAction<ToastType>>;
+  requirements: Array<TrainingRequirement>;
+  setRequirements: Dispatch<SetStateAction<Array<TrainingRequirement>>>;
+  requirementsModalIsOpen: boolean;
+  setRequirementsModalIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 export const HistoryContext = createContext({} as HistoryState);
 
 export const HistoryDataTable: FunctionComponent = () => {
+  const [requirementsModalIsOpen, setRequirementsModalIsOpen] = useState<boolean>(false);
+  const [requirements, setRequirements] = useState<Array<TrainingRequirement>>([]);
   const [slideOverIsOpen, setSlideOverIsOpen] = useState<boolean>(false);
   const [alertSubmissionIsOpen, setAlertSubmissionIsOpen] = useState<boolean>(false);
-  const [selectedBatch, setSelectedBatch] = useState<Batch>({} as Batch);
+  const [selectedBatch, setSelectedBatch] = useState<BatchWithEmployees>({} as BatchWithEmployees);
   const [batchAttendanceIsOpen, setBatchAttendanceIsOpen] = useState<boolean>(false);
   const [toastIsOpen, setToastIsOpen] = useState(false);
   const [toastType, setToastType] = useState<ToastType>({} as ToastType);
-  const { columns, id, hasFetchedBatches, batches, setHasFetchedBatches, setId, setBatches } = useHistoryDataTable();
+  const { columns, id, hasFetchedBatches, batchesWithEmployees, setBatchesWithEmployees, setHasFetchedBatches, setId } =
+    useHistoryDataTable();
   const setSelectedTrainingSource = useTrainingNoticeStore((state) => state.setSelectedTrainingSource);
   const setSelectedTrainingType = useTrainingTypesStore((state) => state.setSelectedTrainingType);
   const setCourseTitle = useTrainingNoticeStore((state) => state.setCourseTitle);
@@ -81,6 +91,7 @@ export const HistoryDataTable: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const { data } = (await axios.get(`${url}/training/${id}`)) as any;
+
         if (!isEmpty(data)) {
           if (data.source.name === "Internal") {
             setId(data.id);
@@ -128,6 +139,46 @@ export const HistoryDataTable: FunctionComponent = () => {
   });
 
   // this is to check the status if it already has batching and fetch the batches
+  // useQuery({
+  //   queryKey: ["training-details-nominees-batches", id],
+  //   enabled: !!id && hasFetchedBatches === false,
+  //   staleTime: 2,
+  //   refetchOnReconnect: false,
+  //   refetchOnMount: false,
+  //   refetchOnWindowFocus: false,
+  //   queryFn: async () => {
+  //     try {
+  //       const { data } = await axios.get(`${url}/training-nominees/${id}/batch`, { withCredentials: true });
+  //       let updatedSelectedEmployees: EmployeeWithRequirements[] = [];
+  //       const fetchedBatches = data.map((batch: BatchWithEmployees) => {
+  //         if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
+
+  //         return {
+  //           batchNumber: batch.batchNumber,
+
+  //           trainingDate: {
+  //             from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
+  //             to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
+  //           },
+  //           isOneDayTraining:
+  //             dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
+  //           employees: batch.employees,
+  //         };
+  //       });
+
+  //       // set fetched batches to true
+  //       setHasFetchedBatches(true);
+  //       setBatchesWithEmployees(fetchedBatches);
+
+  //       // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+  //       // setEmployeePool([]);
+
+  //       return fetchedBatches;
+  //     } catch (error) {
+  //       return error;
+  //     }
+  //   },
+  // });
   useQuery({
     queryKey: ["training-details-nominees-batches", id],
     enabled: !!id && hasFetchedBatches === false,
@@ -136,36 +187,35 @@ export const HistoryDataTable: FunctionComponent = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      try {
-        const { data } = (await axios.get(`${url}/training-nominees/${id}/batch`)) as any;
-        let updatedSelectedEmployees: BatchEmployee[] = [];
-        const fetchedBatches = data.map((batch: Batch) => {
-          if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees);
+      // const { data } = await axios.get(`${url}/training/${id}/batch`);
+      const { data } = await axios.get(`${url}/training/${id}/requirements`);
+      let updatedSelectedEmployees: EmployeeWithRequirements[] = [];
 
-          return {
-            batchNumber: batch.batchNumber,
+      const fetchedBatches = data.batches.map((batch: BatchWithEmployees) => {
+        if (batch.employees.length > 0) updatedSelectedEmployees.push(...batch.employees!);
+        return {
+          batchNumber: batch.batchNumber,
 
-            trainingDate: {
-              from: dayjs(batch.trainingDate.from).format("YYYY-MM-DD hh:mm"),
-              to: dayjs(batch.trainingDate.to).format("YYYY-MM-DD hh:mm"),
-            },
-            isOneDayTraining:
-              dayjs(batch.trainingDate.from).isSame(dayjs(batch.trainingDate.to), "day") === true ? true : false,
-            employees: batch.employees,
-          };
-        });
+          trainingDate: {
+            from: dayjs(batch.trainingDate?.from).format("YYYY-MM-DD hh:mm"),
+            to: dayjs(batch.trainingDate?.to).format("YYYY-MM-DD hh:mm"),
+          },
+          isOneDayTraining:
+            dayjs(batch.trainingDate?.from).isSame(dayjs(batch.trainingDate?.to), "day") === true ? true : false,
+          employees: batch.employees,
+        };
+      });
 
-        // set fetched batches to true
-        setHasFetchedBatches(true);
-        setBatches(fetchedBatches);
+      setRequirements(data.requirements);
 
-        // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
-        // setEmployeePool([]);
+      // set fetched batches to true
+      setHasFetchedBatches(true);
+      setBatchesWithEmployees(fetchedBatches);
 
-        return batches;
-      } catch (error) {
-        return error;
-      }
+      // setTotalSelectedEmployees(updatedSelectedEmployees.sort((a, b) => (a.name > b.name ? 1 : -1)));
+      // setEmployeePool([]);
+
+      return fetchedBatches;
     },
   });
 
@@ -174,15 +224,21 @@ export const HistoryDataTable: FunctionComponent = () => {
       <HistoryContext.Provider
         value={{
           id,
-          batches,
           selectedBatch,
           batchAttendanceIsOpen,
           hasFetchedBatches,
           slideOverIsOpen,
           alertSubmissionIsOpen,
           toastIsOpen,
-          setToastIsOpen,
           toastType,
+          batchesWithEmployees,
+          requirements,
+          requirementsModalIsOpen,
+          setId,
+          setRequirements,
+          setRequirementsModalIsOpen,
+          setBatchesWithEmployees,
+          setToastIsOpen,
           setToastOptions,
           setToastType,
           setAlertSubmissionIsOpen,
@@ -190,7 +246,6 @@ export const HistoryDataTable: FunctionComponent = () => {
           setHasFetchedBatches,
           setBatchAttendanceIsOpen,
           setSelectedBatch,
-          setBatches,
         }}
       >
         <DataTable<TrainingNotice>
@@ -206,6 +261,9 @@ export const HistoryDataTable: FunctionComponent = () => {
             setId(row.original.id);
           }}
         />
+        <HistorySlideOver />
+        <HistoryRequirementsModal />
+        <HistoryRequirementsSummaryModal />
       </HistoryContext.Provider>
     </>
   );

@@ -16,6 +16,9 @@ export const OthersSlideOver: FunctionComponent = () => {
   const setLocation = useOthersStore((state) => state.setLocation);
   const setDateFrom = useOthersStore((state) => state.setDateFrom);
   const setDateTo = useOthersStore((state) => state.setDateTo);
+  const setParticipants = useOthersStore((state) => state.setParticipants);
+  const setParticipantsPool = useOthersStore((state) => state.setParticipantsPool);
+  const setFilteredParticipantsPool = useOthersStore((state) => state.setFilteredParticipantsPool);
 
   return (
     <SlideOver
@@ -31,6 +34,9 @@ export const OthersSlideOver: FunctionComponent = () => {
         setLocation("");
         setDateFrom("");
         setDateTo("");
+        setParticipants([]);
+        setParticipantsPool([]);
+        setFilteredParticipantsPool([]);
       }}
     >
       <SlideOver.Body>

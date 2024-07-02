@@ -171,26 +171,6 @@ export const EmployeeRequirements: FunctionComponent = () => {
     );
   };
 
-  // check if state is blah blah blah
-  // const checkAllState = (allRequirements: Array<TrainingRequirement>) => {
-  //   allRequirements.map((req: TrainingRequirement) => {
-  //     if (req.document === "Attendance" && req.isSelected !== null) {
-  //       console.log("NISULOD SA ATTENDANCE", req.isSelected);
-  //       setCheckAllAttendance(req.isSelected!);
-  //     } else if (req.document === "Certificate of Appearance") {
-  //       //
-  //     } else if (req.document === "Learning Application Plan" && req.isSelected !== null) {
-  //       setCheckAllLap(req.isSelected!);
-  //     } else if (req.document === "Post Training Report" && req.isSelected !== null) {
-  //       setCheckAllPtr(req.isSelected!);
-  //     } else if (req.document === "Post-test" && req.isSelected !== null) {
-  //       setCheckAllPostTest(req.isSelected!);
-  //     } else if (req.document === "Pre-test") {
-  //       setCheckAllPreTest(req.isSelected!);
-  //     }
-  //   });
-  // };
-
   return (
     <div className="px-10 py-5">
       <div className="relative overflow-x-auto rounded-lg shadow-md">
@@ -256,43 +236,12 @@ export const EmployeeRequirements: FunctionComponent = () => {
                           </td>
                         );
                     })}
-
-                  {/* <td className="text-sm text-center text-gray-600 border hover:cursor-pointer">-</td> */}
                 </tr>
               );
             })}
-            {/* <tr className="text-sm">
-              <td className="p-2 font-medium border"></td>
-
-              {allRequirements
-                .sort((a, b) => (a.document > b.document ? 1 : -1))
-                .map((req, idx) => {
-                  if (req.isSelected !== null)
-                    return (
-                      <td className="p-2 font-medium border text-xs text-center text-gray-700" key={idx}>
-                        <div className="flex flex-col gap-2 items-center text-center justify-center">
-                          <label htmlFor={`checkbox-${req.document}-${idx}`} className="w-full"></label>
-                          <Checkbox
-                            id={`checkbox-${req.document}-${idx}`}
-                            checked={req.isSelected}
-                            onChange={(e) => onChangeSelectAllByRequirement(e, req)}
-                          />
-                        </div>
-                      </td>
-                    );
-                })}
-            </tr> */}
           </tbody>
         </table>
       </div>
-      {/* <button onClick={() => console.log(selectedBatch.employees)} className="bg-blue-500 border px-2 py-3 text-white">
-        Employees
-      </button>
-      <button onClick={() => console.log(allRequirements)} className="bg-blue-500 border px-2 py-3 text-white">
-        Sec
-      </button>
-      Attendance: {checkAllAttendance ? "true" : "false"}
-      Lap: {checkAllLap ? "true" : "false"} */}
     </div>
   );
 };

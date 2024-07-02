@@ -37,7 +37,7 @@ export const DeleteTrainingDesignDialog: FunctionComponent<DeleteLspIndividualAl
       setRemove(false);
       setIsOpenToast(true);
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {},
     mutationFn: async () => {
       const response = await axios.delete(`${url}/training/designs/${id}`);
 

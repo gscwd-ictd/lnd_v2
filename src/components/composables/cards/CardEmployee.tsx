@@ -7,7 +7,7 @@ export const CardEmployee = () => {
   const user = useUserDetails();
 
   return (
-    <div className="static flex flex-col w-full h-[18rem] bg-white rounded-md border shadow overflow-hidden">
+    <div className="static flex flex-col w-full  h-[18rem] bg-white rounded-md border shadow overflow-hidden">
       {/** TOP PART */}
       <section className="min-w-full h-[50%] bg-slate-200 rounded-t ">
         <div className="flex flex-col p-6">

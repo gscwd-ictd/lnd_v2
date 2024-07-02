@@ -323,36 +323,68 @@ export const TrainingInformation: FunctionComponent = () => {
           {!isOnline ? (
             <div className="flex items-center float-right gap-2">
               <div className="text-xs text-gray-600">Suggested: </div>
-              <button
-                tabIndex={-1}
-                className="px-1.5 py-0.5 mt-1 bg-orange-200 border border-orange-500 text-orange-700 rounded hover:bg-orange-500 hover:text-white"
-                type="button"
-                onClick={() => {
-                  setLocation(
-                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
-                  );
-                  setValue(
-                    "location",
-                    "General Santos City Water District - Multi-Purpose Hall, E. Fernandez St., Lagao, General Santos City"
-                  );
-                  clearErrors("location");
-                }}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                <div className="flex items-center gap-1 text-xs text-center transition-all">
-                  <span>GSCWD Multi-Purpose Hall</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    className={`w-3 h-3 ${isHovered ? "stroke-orange-800" : "stroke-orange-600"} `}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </div>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  tabIndex={-1}
+                  className="px-1.5 py-0.5 mt-1 bg-orange-200 border border-orange-500 text-orange-700 rounded hover:bg-orange-500 hover:text-white"
+                  type="button"
+                  onClick={() => {
+                    setLocation(
+                      "General Santos City Water District - Multi-Purpose Hall 1, E. Fernandez St., Lagao, General Santos City"
+                    );
+                    setValue(
+                      "location",
+                      "General Santos City Water District - Multi-Purpose Hall 1, E. Fernandez St., Lagao, General Santos City"
+                    );
+                    clearErrors("location");
+                  }}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <div className="flex items-center gap-1 text-xs text-center transition-all">
+                    <span>GSCWD MP Hall 1</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      className={`w-3 h-3 ${isHovered ? "stroke-orange-800" : "stroke-orange-600"} `}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                  </div>
+                </button>
+                <button
+                  tabIndex={-1}
+                  className="px-1.5 py-0.5 mt-1 bg-blue-200 border border-blue-500 text-blue-700 rounded hover:bg-blue-500 hover:text-white"
+                  type="button"
+                  onClick={() => {
+                    setLocation(
+                      "General Santos City Water District - Multi-Purpose Hall 2, E. Fernandez St., Lagao, General Santos City"
+                    );
+                    setValue(
+                      "location",
+                      "General Santos City Water District - Multi-Purpose Hall 2, E. Fernandez St., Lagao, General Santos City"
+                    );
+                    clearErrors("location");
+                  }}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <div className="flex items-center gap-1 text-xs text-center transition-all">
+                    <span>GSCWD MP Hall 2</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      className={`w-3 h-3 ${isHovered ? "stroke-blue-800" : "stroke-blue-600"} `}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

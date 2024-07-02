@@ -87,7 +87,7 @@ export const CreateTrainingDesignComponent: FunctionComponent = () => {
         return newData;
       });
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {},
     mutationFn: async () => {
       const response = await axios.post(`${url}/training/designs`, {
         courseTitle,

@@ -18,12 +18,16 @@ export type BenchmarkingState = {
   setInitialTitle: (initialTitle: string) => void;
   title: string;
   setTitle: (title: string) => void;
+  description: string;
+  setDescription: (description: string) => void;
   partner: string;
   setPartner: (partner: string) => void;
   participants: Array<EmployeeFlatWithSupervisor>;
   setParticipants: (participants: Array<EmployeeFlatWithSupervisor>) => void;
   participantsPool: Array<EmployeeFlatWithSupervisor>;
   setParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
+  filteredParticipantsPool: Array<EmployeeFlatWithSupervisor>;
+  setFilteredParticipantsPool: (participantsPool: Array<EmployeeFlatWithSupervisor>) => void;
   hasFetchedParticipants: boolean;
   setHasFetchedParticipants: (hasFetchedParticipants: boolean) => void;
   location: string;
@@ -79,6 +83,8 @@ export const useEditBenchmarkingModalStore = create<
 export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   id: "",
   setId: (id) => set({ id }),
+  description: "",
+  setDescription: (description) => set({ description }),
   initialTitle: "",
   setInitialTitle: (initialTitle) => set({ initialTitle }),
   title: "",
@@ -103,6 +109,8 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   setFilesToDelete: (filesToDelete) => set({ filesToDelete }),
   participantsPool: [],
   setParticipantsPool: (participantsPool) => set({ participantsPool }),
+  filteredParticipantsPool: [],
+  setFilteredParticipantsPool: (filteredParticipantsPool) => set({ filteredParticipantsPool }),
   hasFetchedParticipants: false,
   setHasFetchedParticipants: (hasFetchedParticipants) => set({ hasFetchedParticipants }),
   status: undefined,
@@ -110,6 +118,7 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
   reset: () => {
     set({
       id: "",
+      description: "",
       location: "",
       title: "",
       participants: [],
@@ -120,6 +129,7 @@ export const useBenchmarkingStore = create<BenchmarkingState>((set) => ({
       action: undefined,
       initialTitle: "",
       participantsPool: [],
+      filteredParticipantsPool: [],
       hasFetchedParticipants: false,
     });
   },

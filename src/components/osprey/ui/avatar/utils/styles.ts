@@ -2,10 +2,11 @@ import cls from "classnames";
 
 export const styles = {
   avatar: (
-    size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl" | "10xl",
+    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl" | "10xl",
     roundedness?: "sm" | "md" | "lg" | "xl" | "full"
   ) =>
     cls("inline-block border-2 border-white static", {
+      "h-6 w-6": size === "xs",
       "h-8 w-8 ": size === "sm",
       "h-[2.375rem] w-[2.375rem]": size === "md",
       "h-[2.875rem] w-[2.875rem]": size === "lg",

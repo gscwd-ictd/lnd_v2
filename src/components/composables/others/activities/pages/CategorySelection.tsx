@@ -27,7 +27,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.CONFERENCE);
@@ -55,7 +55,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.CONVENTION);
@@ -83,7 +83,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.MEETING);
@@ -111,13 +111,13 @@ export const OtherCategorySelection: FunctionComponent = () => {
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.ORIENTATION);
               }}
             >
-              <p>Orientation</p>
+              <p>Orientation/Talakayan</p>
               {checked && (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                   <path
@@ -133,13 +133,13 @@ export const OtherCategorySelection: FunctionComponent = () => {
       </RadioGroup.Option>
 
       {/* Seminar */}
-      <RadioGroup.Option value={OthersCategory.SEMINAR} as={Fragment}>
+      {/* <RadioGroup.Option value={OthersCategory.SEMINAR} as={Fragment}>
         {({ checked }) => {
           checked = category === OthersCategory.SEMINAR;
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.SEMINAR);
@@ -158,7 +158,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
             </div>
           );
         }}
-      </RadioGroup.Option>
+      </RadioGroup.Option> */}
 
       {/* Symposium */}
       <RadioGroup.Option value={OthersCategory.SYMPOSIUM} as={Fragment}>
@@ -167,7 +167,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.SYMPOSIUM);
@@ -189,13 +189,13 @@ export const OtherCategorySelection: FunctionComponent = () => {
       </RadioGroup.Option>
 
       {/* Workshop */}
-      <RadioGroup.Option value={OthersCategory.WORKSHOP} as={Fragment}>
+      {/* <RadioGroup.Option value={OthersCategory.WORKSHOP} as={Fragment}>
         {({ checked }) => {
           checked = category === OthersCategory.WORKSHOP;
           return (
             <div
               className={`${
-                checked ? "bg-indigo-500 text-white font-medium" : "bg-white text-gray-600"
+                checked ? "bg-green-500 text-white font-medium" : "bg-white text-gray-600"
               } cursor-pointer px-4 py-2 mb-2 border rounded flex items-center justify-between hover:scale-105 transition-transform`}
               onClick={() => {
                 setCategory(OthersCategory.WORKSHOP);
@@ -214,7 +214,7 @@ export const OtherCategorySelection: FunctionComponent = () => {
             </div>
           );
         }}
-      </RadioGroup.Option>
+      </RadioGroup.Option> */}
     </RadioGroup>
   );
 };

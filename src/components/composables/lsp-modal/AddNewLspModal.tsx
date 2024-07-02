@@ -76,7 +76,7 @@ export const AddNewLspModal: FunctionComponent = () => {
   const onNext = () => {
     if (lspType === LspType.INDIVIDUAL) {
       page === 2 && isEmpty(employeeId) && lspSource === LspSource.INTERNAL
-        ? console.log("ERROR")
+        ? null
         : page === 5 && isEmpty(education)
         ? null
         : page === 12 && lspType === LspType.INDIVIDUAL && lspSource === LspSource.INTERNAL
@@ -179,7 +179,7 @@ export const AddNewLspModal: FunctionComponent = () => {
 
       queryClient.setQueryData(["lsp-individual"], getUpdatedIndividualLsp.data.items);
     },
-    onError: (error) => console.log(error),
+    onError: (error) => {},
     mutationFn: async () => {
       const response = await axios.post(`${url}/lsp/individual/internal`, {
         employeeId,

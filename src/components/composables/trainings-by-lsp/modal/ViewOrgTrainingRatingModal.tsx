@@ -38,6 +38,9 @@ export const ViewOrgTrainingRatingModal: FunctionComponent = () => {
     },
     onSuccess: async () => {
       const getUpdatedTrainingsWithRatings = await axios.get(`${url}/lsp/${lspId}/rating`);
+      const getUpdatedAverageRatingByLspId = await axios.get(`${url}/lsp/${lspId}/rating/average`);
+
+      queryClient.setQueryData(["average-rating-by-lsp-id", lspId], getUpdatedAverageRatingByLspId);
       queryClient.setQueryData(["lsp-trainings", lspId], getUpdatedTrainingsWithRatings.data.items);
       setToastOptions("success", "Success", "Successfully updated the rating!");
       setRatingIsClicked(false);
@@ -235,7 +238,15 @@ export const ViewOrgTrainingRatingModal: FunctionComponent = () => {
                           {submitMutation.isLoading && <Spinner color="indigo" size="xs" />}
                         </span>
                       </button>
-                      <button className="px-3 rounded py-2 bg-transparent text-gray-500 w-[50%]">No Thanks</button>
+                      <button
+                        className="px-3 rounded py-2 bg-transparent text-gray-500 w-[50%]"
+                        onClick={() => {
+                          setRatingIsClicked(false);
+                          setRating(initialRating);
+                        }}
+                      >
+                        No Thanks
+                      </button>
                     </div>
                   )}
                 </div>
